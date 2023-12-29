@@ -708,7 +708,7 @@ testDeviceToHostTransfer(unsigned int memSize, memoryMode memMode, bool wc)
 
     // make sure GPU has finished copying
     checkCudaErrors(cudaDeviceSynchronize());
-    //get the the total elapsed time in ms
+    //get the total elapsed time in ms
     sdkStopTimer(&timer);
     checkCudaErrors(cudaEventElapsedTime(&elapsedTimeInMs, start, stop));
 
@@ -922,7 +922,7 @@ testDeviceToDeviceTransfer(unsigned int memSize)
     //proper timing.
     checkCudaErrors(cudaDeviceSynchronize());
 
-    //get the the total elapsed time in ms
+    //get the total elapsed time in ms
     sdkStopTimer(&timer);
     checkCudaErrors(cudaEventElapsedTime(&elapsedTimeInMs, start, stop));
 

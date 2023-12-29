@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-7.0"
+CUDA_PATH ?= "/usr/local/cuda-7.5"
 
 ##############################
 # start deprecated interface #
@@ -190,6 +190,12 @@ UBUNTU = $(shell lsb_release -i -s 2>/dev/null | grep -i ubuntu)
 
 SAMPLE_ENABLED := 1
 
+# This sample is not supported on Mac OSX
+ifeq ($(TARGET_OS),darwin)
+  $(info >>> WARNING - cudaOpenMP is not supported on Mac OSX - waiving sample <<<)
+  SAMPLE_ENABLED := 0
+endif
+
 # Attempt to compile a minimal OpenMP application. If a.out exists, OpenMP is properly set up.
 $(shell echo "int main() { omp_get_num_threads(); return 0; }" > test.c ; $(NVCC) $(ALL_CCFLAGS) -Xcompiler -fopenmp test.c)
 OPENMP ?= $(shell find a.out 2>/dev/null)
@@ -209,11 +215,7 @@ endif
 $(shell rm a.out test.c 2>/dev/null)
 
 # Gencode arguments
-ifeq ($(TARGET_ARCH),armv7l)
-SMS ?= 20 30 32 35 37 50 52
-else
 SMS ?= 20 30 35 37 50 52
-endif
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)

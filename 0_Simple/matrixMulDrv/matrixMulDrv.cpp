@@ -37,6 +37,7 @@
 #include <cstring>
 
 #include <cuda.h>
+#include <cudaProfiler.h>
 #include <builtin_types.h>
 #include <drvapi_error_string.h>
 
@@ -297,6 +298,7 @@ runTest(int argc, char **argv)
     checkCudaErrors(cuMemFree(d_A));
     checkCudaErrors(cuMemFree(d_B));
     checkCudaErrors(cuMemFree(d_C));
+    checkCudaErrors(cuProfilerStop());
     checkCudaErrors(cuCtxDestroy(cuContext));
 }
 
@@ -465,6 +467,7 @@ initCUDA(int argc, char **argv, CUfunction *pMatrixMul, int *block_size_out)
     }
 
     *pMatrixMul = cuFunction;
+
     return CUDA_SUCCESS;
 Error:
     cuCtxDestroy(cuContext);

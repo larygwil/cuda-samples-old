@@ -10,7 +10,7 @@
  */
 
 /**
- * This sample implemenets bitonic sort and odd-even merge sort, algorithms
+ * This sample implements bitonic sort and odd-even merge sort, algorithms
  * belonging to the class of sorting networks.
  * While generally subefficient on large sequences
  * compared to algorithms with better asymptotic algorithmic complexity

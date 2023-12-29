@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-7.0"
+CUDA_PATH ?= "/usr/local/cuda-7.5"
 
 ##############################
 # start deprecated interface #
@@ -189,11 +189,7 @@ LIBRARIES :=
 SAMPLE_ENABLED := 1
 
 # Gencode arguments
-ifeq ($(TARGET_ARCH),armv7l)
-SMS ?= 30 32 35 37 50 52
-else
 SMS ?= 30 35 37 50 52
-endif
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)

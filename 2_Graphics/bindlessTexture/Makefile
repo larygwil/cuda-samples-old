@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-7.0"
+CUDA_PATH ?= "/usr/local/cuda-7.5"
 
 ##############################
 # start deprecated interface #
@@ -199,15 +199,11 @@ ifeq ($(TARGET_OS),darwin)
  ALL_LDFLAGS += -Xlinker -framework -Xlinker GLUT
 else
  LIBRARIES += -L../../common/lib/$(TARGET_OS)/$(TARGET_ARCH) $(GLLINK)
- LIBRARIES += -lGL -lGLU -lX11 -lXi -lXmu -lglut -lGLEW
+ LIBRARIES += -lGL -lGLU -lX11 -lglut -lGLEW
 endif
 
 # Gencode arguments
-ifeq ($(TARGET_ARCH),armv7l)
-SMS ?= 30 32 35 37 50 52
-else
 SMS ?= 30 35 37 50 52
-endif
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)

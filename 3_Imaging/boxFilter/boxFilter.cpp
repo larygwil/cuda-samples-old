@@ -580,7 +580,7 @@ int findCapableDevice(int argc, char **argv)
 
     if (deviceCount==0)
     {
-        fprintf(stderr,"There are no CUDA capabile devices.\n");
+        fprintf(stderr,"There are no CUDA capable devices.\n");
         exit(EXIT_SUCCESS);
     }
     else

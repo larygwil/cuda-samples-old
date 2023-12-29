@@ -460,7 +460,7 @@ int main(int argc, char **argv)
     nErrors += (k > max_iter) ? 1 : 0;
     qaerr2 = err;
 
-    /* Destroy paramters */
+    /* Destroy parameters */
     cusparseDestroySolveAnalysisInfo(infoA);
     cusparseDestroySolveAnalysisInfo(info_u);
 

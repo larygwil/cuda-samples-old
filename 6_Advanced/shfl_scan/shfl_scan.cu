@@ -377,7 +377,7 @@ bool shuffle_integral_image_test()
 
 int main(int argc, char *argv[])
 {
-    // Initialization.  The shuffle instrinsic is not available on SM < 3.0
+    // Initialization.  The shuffle intrinsic is not available on SM < 3.0
     // so waive the test if the hardware is not present.
     int cuda_device = 0;
 

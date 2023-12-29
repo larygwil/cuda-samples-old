@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-7.0"
+CUDA_PATH ?= "/usr/local/cuda-7.5"
 
 ##############################
 # start deprecated interface #
@@ -199,7 +199,7 @@ ifeq ($(TARGET_OS),darwin)
  ALL_LDFLAGS += -Xlinker -framework -Xlinker GLUT
 else
  LIBRARIES += -L../../common/lib/$(TARGET_OS)/$(TARGET_ARCH) $(GLLINK)
- LIBRARIES += -lGL -lGLU -lX11 -lXi -lXmu -lglut -lGLEW
+ LIBRARIES += -lGL -lGLU -lX11 -lglut -lGLEW
 endif
 
 # Gencode arguments

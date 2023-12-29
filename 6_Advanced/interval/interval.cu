@@ -105,7 +105,7 @@ int main(int argc,char *argv[])
         // We need L1 cache to store the stack (only applicable to sm_20 and higher)
         CHECKED_CALL(cudaFuncSetCacheConfig(test_interval_newton<T>, cudaFuncCachePreferL1));
 
-        // Increase the stack size large enought for the non-inlined and recursive function calls (only applicable to sm_20 and higher)
+        // Increase the stack size large enough for the non-inlined and recursive function calls (only applicable to sm_20 and higher)
 #if CUDART_VERSION >= 4000
         CHECKED_CALL(cudaDeviceSetLimit(cudaLimitStackSize, 8192));
 #else

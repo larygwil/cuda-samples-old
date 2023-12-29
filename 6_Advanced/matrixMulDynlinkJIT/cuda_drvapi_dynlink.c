@@ -165,6 +165,7 @@ tcuMipmappedArrayCreate               *cuMipmappedArrayCreate;
 tcuMipmappedArrayGetLevel             *cuMipmappedArrayGetLevel;
 tcuMipmappedArrayDestroy              *cuMipmappedArrayDestroy;
 
+tcuProfilerStop                       *cuProfilerStop;
 
 #ifdef CUDA_INIT_D3D9
 // D3D9/CUDA interop (CUDA 1.x compatible API). These functions
@@ -562,6 +563,7 @@ CUresult CUDAAPI cuInit(unsigned int Flags, int cudaVersion)
         GET_PROC(cuMemcpy);
         GET_PROC(cuMemcpyPeer);
         GET_PROC(cuLaunchKernel);
+        GET_PROC(cuProfilerStop);
     }
 
     if (driverVer >= 3010)

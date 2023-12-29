@@ -95,7 +95,7 @@ void runTest(int argc, char **argv)
     //allocate mem for the result on host side
     int *hOData = (int *) malloc(memSize);
 
-    //initalize the memory
+    //initialize the memory
     for (unsigned int i = 0; i < numData; i++)
         hOData[i] = 0;
 

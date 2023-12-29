@@ -1074,7 +1074,7 @@ main(int argc, char **argv)
         return 0;
     }
 
-    printf("Run \"nbody -benchmark [-numbodies=<numBodies>]\" to measure perfomance.\n");
+    printf("Run \"nbody -benchmark [-numbodies=<numBodies>]\" to measure performance.\n");
     showHelp();
 
     printf("NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
@@ -1128,7 +1128,7 @@ main(int argc, char **argv)
     if (numDevsAvailable < numDevsRequested)
     {
         printf("Error: only %d Devices available, %d requested.  Exiting.\n", numDevsAvailable, numDevsRequested);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_FAILURE);
     }
 
     printf("> %s mode\n", bFullscreen ? "Fullscreen" : "Windowed");

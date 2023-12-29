@@ -496,7 +496,7 @@ int main(int argc, char **argv)
 
     loadDefaultImage(argv[0]);
 
-    // If code is not printing the USage, then we execute this path.
+    // If code is not printing the usage, then we execute this path.
     printf("I: display Image (no filtering)\n");
     printf("T: display Sobel Edge Detection (Using Texture)\n");
     printf("S: display Sobel Edge Detection (Using SMEM+Texture)\n");

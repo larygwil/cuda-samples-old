@@ -229,3 +229,7 @@ common/lib/linux/armv7l/libGLEW.a filter=lfs diff=lfs merge=lfs -text
 7_CUDALibraries/common/FreeImage/lib/linux/ppc64le/libfreeimage.a filter=lfs diff=lfs merge=lfs -text
 7_CUDALibraries/common/FreeImage/lib/darwin/libfreeimage-3.16.0.dylib filter=lfs diff=lfs merge=lfs -text
 5_Simulations/nbody_screen/galaxy_20K.bin filter=lfs diff=lfs merge=lfs -text
+2_Graphics/simpleGLES_EGLOutput/data/ref_simpleGLES_EGLOutput.bin filter=lfs diff=lfs merge=lfs -text
+7_CUDALibraries/common/FreeImage/lib/linux/aarch64/libfreeimage.a filter=lfs diff=lfs merge=lfs -text
+7_CUDALibraries/common/FreeImage/lib/linux/armv7l/libfreeimage.a filter=lfs diff=lfs merge=lfs -text
+5_Simulations/nbody_opengles/galaxy_20K.bin filter=lfs diff=lfs merge=lfs -text

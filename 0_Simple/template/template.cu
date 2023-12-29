@@ -146,7 +146,7 @@ runTest(int argc, char **argv)
     else
     {
         // custom output handling when no regression test running
-        // in this case check if the result is equivalent to the expected soluion
+        // in this case check if the result is equivalent to the expected solution
         bTestResult = compareData(reference, h_odata, num_threads, 0.0f, 0.0f);
     }
 

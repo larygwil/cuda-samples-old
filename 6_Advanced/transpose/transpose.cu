@@ -25,7 +25,7 @@
 
 // Utilities and system includes
 #include <helper_string.h>    // helper for string parsing
-#include <helper_image.h>     // helper for image and data compariosn
+#include <helper_image.h>     // helper for image and data comparison
 #include <helper_cuda.h>      // helper for cuda error checking functions
 
 const char *sSDKsample = "Transpose";
@@ -495,7 +495,7 @@ main(int argc, char **argv)
     checkCudaErrors(cudaMalloc((void **) &d_idata, mem_size));
     checkCudaErrors(cudaMalloc((void **) &d_odata, mem_size));
 
-    // initalize host data
+    // initialize host data
     for (int i = 0; i < (size_x*size_y); ++i)
     {
         h_idata[i] = (float) i;

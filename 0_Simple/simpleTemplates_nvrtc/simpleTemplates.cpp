@@ -200,7 +200,7 @@ void runTest(int argc, char **argv, int len)
     // allocate host memory
     T *h_idata = (T *) malloc(mem_size);
 
-    // initalize the memory
+    // initialize the memory
     for (unsigned int i = 0; i < num_threads; ++i)
     {
         h_idata[i] = (T) i;
@@ -260,7 +260,7 @@ void runTest(int argc, char **argv, int len)
     else
     {
         // custom output handling when no regression test running
-        // in this case check if the result is equivalent to the expected soluion
+        // in this case check if the result is equivalent to the expected solution
         bool res = comparator.compare(reference, h_odata, num_threads);
 
         printf("Compare %s\n\n", (1 == res) ? "OK" : "MISMATCH");

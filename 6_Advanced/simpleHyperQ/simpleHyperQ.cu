@@ -27,13 +27,25 @@ const char *sSDKsample = "hyperQ";
 // of clock ticks.
 __device__ void clock_block(clock_t *d_o, clock_t clock_count)
 {
-    clock_t start_clock = clock();
+     unsigned int start_clock = (unsigned int) clock();
 
     clock_t clock_offset = 0;
 
     while (clock_offset < clock_count)
     {
-        clock_offset = clock() - start_clock;
+        unsigned int end_clock = (unsigned int) clock();
+
+        // The code below should work like 
+        // this (thanks to modular arithmetics): 
+        // 
+        // clock_offset = (clock_t) (end_clock > start_clock ? 
+        //                           end_clock - start_clock : 
+        //                           end_clock + (0xffffffffu - start_clock));
+        //
+        // Indeed, let m = 2^32 then
+        // end - start = end + m - start (mod m).
+
+        clock_offset = (clock_t) (end_clock - start_clock);
     }
 
     d_o[0] = clock_offset;

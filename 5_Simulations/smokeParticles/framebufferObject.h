@@ -31,7 +31,7 @@
  this list of conditions and the following disclaimer in the documentation
  and/or other materials provided with the distribution.
 
- Neither the name of the University of Californa, Davis nor the names of
+ Neither the name of the University of California, Davis nor the names of
  the contributors may be used to endorse or promote products derived
  from this software without specific prior written permission.
 
@@ -176,10 +176,10 @@ class FramebufferObject
         GLenum GetAttachedType(GLenum attachment);
 
         /// What is the Id of Renderbuffer/texture currently
-        /// attached to "attachement?"
+        /// attached to "attachment?"
         GLuint GetAttachedId(GLenum attachment);
 
-        /// Which mipmap level is currently attached to "attachement?"
+        /// Which mipmap level is currently attached to "attachment?"
         GLint  GetAttachedMipLevel(GLenum attachment);
 
         /// Which cube face is currently attached to "attachment?"
@@ -202,7 +202,7 @@ class FramebufferObject
         ///     and named "Disable" instead of "Unbind" for this reason. The
         ///     motivation for this strange semantic is performance. Providing
         ///     "Unbind" would likely lead to a large number of unnecessary
-        ///     FBO enablings/disabling.
+        ///     FBO enabling/disabling.
         static void Disable();
         /// END : Static methods global to all FBOs
 

@@ -59,16 +59,16 @@ bool printfNPPinfo(int argc, char *argv[])
 
     printf("NPP Library Version %d.%d.%d\n", libVer->major, libVer->minor, libVer->build);
 
-	int driverVersion, runtimeVersion;
+    int driverVersion, runtimeVersion;
     cudaDriverGetVersion(&driverVersion);
     cudaRuntimeGetVersion(&runtimeVersion);
 
-	printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
-	printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
+    printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
+    printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
 
-	// Min spec is SM 1.0 devices
-	bool bVal = checkCudaCapabilities(1, 0);
-	return bVal;
+    // Min spec is SM 1.0 devices
+    bool bVal = checkCudaCapabilities(1, 0);
+    return bVal;
 }
 
 int main(int argc, char *argv[])
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
         cudaDeviceInit(argc, (const char **)argv);
 
-        if (printfNPPinfo(argc, argv) == false) 
+        if (printfNPPinfo(argc, argv) == false)
         {
             cudaDeviceReset();
             exit(EXIT_SUCCESS);
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 
         // create struct with ROI size
         NppiSize oSizeROI = {(int)oDeviceSrc.width() , (int)oDeviceSrc.height() };
-        // allocate device image of appropriatedly reduced size
+        // allocate device image of appropriately reduced size
         npp::ImageNPP_8u_C1 oDeviceDst(oSizeROI.width, oSizeROI.height);
         // set anchor point inside the mask to (oMaskSize.width / 2, oMaskSize.height / 2)
         // It should round down when odd

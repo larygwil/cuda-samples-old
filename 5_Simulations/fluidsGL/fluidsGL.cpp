@@ -38,38 +38,6 @@
 #include <helper_cuda.h>
 #include <helper_cuda_gl.h>
 
-#ifdef WIN32
-bool IsOpenGLAvailable(const char *appName)
-{
-    return true;
-}
-#else
-#if (defined(__APPLE__) || defined(MACOSX))
-bool IsOpenGLAvailable(const char *appName)
-{
-    return true;
-}
-#else
-// check if this is a linux machine
-#include <X11/Xlib.h>
-
-bool IsOpenGLAvailable(const char *appName)
-{
-    Display *Xdisplay = XOpenDisplay(NULL);
-
-    if (Xdisplay == NULL)
-    {
-        return false;
-    }
-    else
-    {
-        XCloseDisplay(Xdisplay);
-        return true;
-    }
-}
-#endif
-#endif
-
 #if defined(__APPLE__) || defined(MACOSX)
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -216,7 +184,7 @@ void autoTest(char **argv)
     {
         simulateFluids();
 
-        // add in a little force so the automated testing is interesing.
+        // add in a little force so the automated testing is interesting.
         if (ref_file)
         {
             int x = wWidth/(count+1);
@@ -243,7 +211,7 @@ void autoTest(char **argv)
 
     fbo->unbindRenderPath();
 
-    // compare to offical reference image, printing PASS or FAIL.
+    // compare to official reference image, printing PASS or FAIL.
     printf("> (Frame %d) Readback BackBuffer\n", 100);
     g_CheckRender->readback(wWidth, wHeight);
     g_CheckRender->savePPM("fluidsGL.ppm", true, NULL);
@@ -410,16 +378,6 @@ void cleanup(void)
 
 int initGL(int *argc, char **argv)
 {
-    if (IsOpenGLAvailable(sSDKname))
-    {
-        fprintf(stderr, "   OpenGL device is Available\n");
-    }
-    else
-    {
-        fprintf(stderr, "   OpenGL device is NOT Available, [%s] exiting...\n", sSDKname);
-        exit(EXIT_SUCCESS);
-    }
-
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
     glutInitWindowSize(wWidth, wHeight);

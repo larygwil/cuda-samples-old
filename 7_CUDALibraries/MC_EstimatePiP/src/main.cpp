@@ -90,6 +90,7 @@ int main(int argc, char **argv)
     catch (invalid_argument &e)
     {
         printf("invalid command line argument (%s)\n", e.what());
+        exit(EXIT_FAILURE);
     }
 
     // Finish
@@ -219,10 +220,12 @@ void runTest(int argc, const char **argv)
     catch (invalid_argument &e)
     {
         printf("invalid command line argument (%s)\n", e.what());
+        exit(EXIT_FAILURE);
     }
     catch (runtime_error &e)
     {
         printf("runtime error (%s)\n", e.what());
+        exit(EXIT_FAILURE);
     }
 }
 

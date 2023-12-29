@@ -28,7 +28,7 @@
 #include <helper_functions.h> // helper functions for timing, string parsing
 
 #include <cuda_runtime.h>     // CUDA Runtime
-#include <cuda_gl_interop.h>  // CUDA OpenGL intero
+#include <cuda_gl_interop.h>  // CUDA OpenGL interop
 
 #include <helper_cuda.h>      // includes for CUDA initialization and error checking
 #include <helper_cuda_gl.h>

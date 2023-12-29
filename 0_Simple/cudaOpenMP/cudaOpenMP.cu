@@ -27,7 +27,7 @@ __global__ void kernelAddConstant(int *g_a, const int b)
     g_a[idx] += b;
 }
 
-// a predicate that checks whether each array elemen is set to its index plus b
+// a predicate that checks whether each array element is set to its index plus b
 int correctResult(int *data, const int n, const int b)
 {
     for (int i = 0; i < n; i++)

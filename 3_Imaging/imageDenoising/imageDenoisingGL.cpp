@@ -12,11 +12,11 @@
 
 
 /*
- * This sample demonstrates two adaptive image denoising technqiues:
+ * This sample demonstrates two adaptive image denoising techniques:
  * KNN and NLM, based on computation of both geometric and color distance
  * between texels. While both techniques are already implemented in the
  * DirectX SDK using shaders, massively speeded up variation
- * of the latter techique, taking advantage of shared memory, is implemented
+ * of the latter technique, taking advantage of shared memory, is implemented
  * in addition to DirectX counterparts.
  * See supplied whitepaper for more explanations.
  */
@@ -313,12 +313,12 @@ void keyboard(unsigned char k, int /*x*/, int /*y*/)
             break;
 
         case 'l':
-            printf("Decrease LERP quotent.\n");
+            printf("Decrease LERP quotient.\n");
             lerpC = MAX(lerpC - lerpStep, 0.0f);
             break;
 
         case 'L':
-            printf("Increase LERP quotent.\n");
+            printf("Increase LERP quotient.\n");
             lerpC = MIN(lerpC + lerpStep, 1.0f);
             break;
 

@@ -477,6 +477,13 @@ void keyboardFunc(unsigned char k, int, int)
         case 'q':
         case 'Q':
             printf("Shutting down...\n");
+
+            // cudaDeviceReset causes the driver to clean up all state. While
+            // not mandatory in normal operation, it is good practice.  It is also
+            // needed to ensure correct operation when the application is being
+            // profiled. Calling cudaDeviceReset causes all profile data to be
+            // flushed before the application exits
+            cudaDeviceReset();
             exit(EXIT_SUCCESS);
             break;
 
@@ -941,11 +948,6 @@ void initOpenGLBuffers(int w, int h)
     if ((w==0) && (h==0))
     {
         return;
-    }
-    else if(h==0)
-    {
-        // keeping height non null
-        h = 1;
     }
 
     // allocate new buffers

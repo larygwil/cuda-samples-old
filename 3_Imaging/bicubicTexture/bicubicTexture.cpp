@@ -245,7 +245,7 @@ void display()
 
     checkCudaErrors(cudaGraphicsUnmapResources(1, &cuda_pbo_resource, 0));
 
-    // Common diplay path
+    // Common display path
     {
         // display results
         glClear(GL_COLOR_BUFFER_BIT);

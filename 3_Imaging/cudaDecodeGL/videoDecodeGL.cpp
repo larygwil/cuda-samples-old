@@ -26,6 +26,7 @@
 // CUDA Header includes
 #include <cuda.h>
 #include <cudaGL.h>
+#include <cudaProfiler.h>
 
 // CUDA utilities and system includes
 #include <helper_functions.h>
@@ -438,7 +439,7 @@ bool initCudaResources(int argc, char **argv, int *bTCC)
         checkCudaErrors(cuCtxCreate(&g_oContext, CU_CTX_BLOCKING_SYNC, g_oDevice));
     }
 
-    // Initialize CUDA releated Driver API
+    // Initialize CUDA related Driver API
     // Determine if we are running on a 32-bit or 64-bit OS and choose the right PTX file
     try
     {
@@ -1113,6 +1114,7 @@ freeCudaResources(bool bDestroyContext)
         checkCudaErrors(cuvidCtxLockDestroy(g_CtxLock));
     }
 
+    cuProfilerStop();
     if (g_oContext && bDestroyContext)
     {
         checkCudaErrors(cuCtxDestroy(g_oContext));
@@ -1308,12 +1310,12 @@ bool drawScene(int field_num)
     return hr;
 }
 
-// Release all previously initd objects
+// Release all previously initialized objects
 bool cleanup(bool bDestroyContext)
 {
     if (bDestroyContext)
     {
-        // Attach the CUDA Context (so we may properly free memroy)
+        // Attach the CUDA Context (so we may properly free memory)
         checkCudaErrors(cuCtxPushCurrent(g_oContext));
 
         if (g_pInteropFrame[0])
@@ -1341,6 +1343,7 @@ bool cleanup(bool bDestroyContext)
                 g_bFrameData[1] = NULL;
             }
         }
+        cuProfilerStop();
 
         // Detach from the Current thread
         checkCudaErrors(cuCtxPopCurrent(NULL));
@@ -1348,6 +1351,7 @@ bool cleanup(bool bDestroyContext)
 
     if (g_pImageGL)
     {
+        cuProfilerStop();
         delete g_pImageGL;
         g_pImageGL = NULL;
     }

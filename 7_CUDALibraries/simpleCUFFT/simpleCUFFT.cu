@@ -76,7 +76,7 @@ void runTest(int argc, char **argv)
     // Allocate host memory for the signal
     Complex *h_signal = (Complex *)malloc(sizeof(Complex) * SIGNAL_SIZE);
 
-    // Initalize the memory for the signal
+    // Initialize the memory for the signal
     for (unsigned int i = 0; i < SIGNAL_SIZE; ++i)
     {
         h_signal[i].x = rand() / (float)RAND_MAX;
@@ -86,7 +86,7 @@ void runTest(int argc, char **argv)
     // Allocate host memory for the filter
     Complex *h_filter_kernel = (Complex *)malloc(sizeof(Complex) * FILTER_KERNEL_SIZE);
 
-    // Initalize the memory for the filter
+    // Initialize the memory for the filter
     for (unsigned int i = 0; i < FILTER_KERNEL_SIZE; ++i)
     {
         h_filter_kernel[i].x = rand() / (float)RAND_MAX;

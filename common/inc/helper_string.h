@@ -319,6 +319,16 @@ inline char *sdkFindFilePath(const char *filename, const char *executable_path)
         "./8_Android/",                             // "/8_Android/" subdir
         "./samples/",                               // "/samples/" subdir
 
+        "./0_Simple/<executable_name>/data/",        // "/0_Simple/<executable_name>/data/" subdir
+        "./1_Utilities/<executable_name>/data/",     // "/1_Utilities/<executable_name>/data/" subdir
+        "./2_Graphics/<executable_name>/data/",      // "/2_Graphics/<executable_name>/data/" subdir
+        "./3_Imaging/<executable_name>/data/",       // "/3_Imaging/<executable_name>/data/" subdir
+        "./4_Finance/<executable_name>/data/",       // "/4_Finance/<executable_name>/data/" subdir
+        "./5_Simulations/<executable_name>/data/",   // "/5_Simulations/<executable_name>/data/" subdir
+        "./6_Advanced/<executable_name>/data/",      // "/6_Advanced/<executable_name>/data/" subdir
+        "./7_CUDALibraries/<executable_name>/",      // "/7_CUDALibraries/<executable_name>/" subdir
+        "./7_CUDALibraries/<executable_name>/data/", // "/7_CUDALibraries/<executable_name>/data/" subdir
+
         "../",                                      // up 1 in tree
         "../common/",                               // up 1 in tree, "/common/" subdir
         "../common/data/",                          // up 1 in tree, "/common/data/" subdir

@@ -339,6 +339,7 @@ int main(int argc, char **argv)
     checkCudaErrors(cuMemFree(d_A));
     checkCudaErrors(cuMemFree(d_B));
     checkCudaErrors(cuMemFree(d_C));
+    checkCudaErrors(cuProfilerStop());
     checkCudaErrors(cuCtxDestroy(g_cuContext));
 
     printf("Test run %s\n", (1==res) ? "success!" : "failed!");

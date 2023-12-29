@@ -82,7 +82,7 @@ runTest(int argc, char **argv)
     StopWatchInterface *timer;
     sdkCreateTimer(&timer);
 
-    // Search paramters
+    // Search parameters
     int minDisp = -16;
     int maxDisp = 0;
 
@@ -118,7 +118,7 @@ runTest(int argc, char **argv)
     //allocate mem for the result on host side
     unsigned int *h_odata = (unsigned int *)malloc(memSize);
 
-    //initalize the memory
+    //initialize the memory
     for (unsigned int i = 0; i < numData; i++)
         h_odata[i] = 0;
 

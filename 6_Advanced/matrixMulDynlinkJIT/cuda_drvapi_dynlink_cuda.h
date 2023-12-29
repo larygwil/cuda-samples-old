@@ -1800,6 +1800,12 @@ typedef CUresult CUDAAPI tcuCtxGetSharedMemConfig(CUsharedconfig *pConfig);
 typedef CUresult CUDAAPI tcuCtxSetSharedMemConfig(CUsharedconfig config);
 typedef CUresult CUDAAPI tcuCtxGetApiVersion(CUcontext ctx, unsigned int *version);
 
+/************************************
+ **
+ **    Profiler
+ **
+ ***********************************/
+typedef CUresult CUDAAPI tcuProfilerStop(void);
 
 /************************************
  ************************************/
@@ -1939,6 +1945,7 @@ extern tcuMipmappedArrayCreate         *cuMipmappedArrayCreate;
 extern tcuMipmappedArrayGetLevel       *cuMipmappedArrayGetLevel;
 extern tcuMipmappedArrayDestroy        *cuMipmappedArrayDestroy;
 
+extern tcuProfilerStop                    *cuProfilerStop;
 
 #ifdef __cplusplus
 }

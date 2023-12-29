@@ -10,7 +10,7 @@
  */
 
 /* CUmoduleManager manages loading CUBIN, initializing CUBIN kernel function,
- * initializating CUDA kernel function pointers, and obtaining global memory
+ * initializing CUDA kernel function pointers, and obtaining global memory
  * addresses (i.e. constants).
  */
 

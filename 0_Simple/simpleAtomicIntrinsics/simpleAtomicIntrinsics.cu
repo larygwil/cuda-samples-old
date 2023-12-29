@@ -111,7 +111,7 @@ void runTest(int argc, char **argv)
     //allocate mem for the result on host side
     int *hOData = (int *) malloc(memSize);
 
-    //initalize the memory
+    //initialize the memory
     for (unsigned int i = 0; i < numData; i++)
         hOData[i] = 0;
 
@@ -121,7 +121,7 @@ void runTest(int argc, char **argv)
     // allocate device memory for result
     int *dOData;
     checkCudaErrors(cudaMalloc((void **) &dOData, memSize));
-    // copy host memory to device to initialize to zers
+    // copy host memory to device to initialize to zero
     checkCudaErrors(cudaMemcpy(dOData,
                                hOData,
                                memSize,

@@ -604,7 +604,7 @@ int findCapableDevice(int argc, char **argv)
 
     if (deviceCount==0)
     {
-        fprintf(stderr,"There are no CUDA capabile devices.\n");
+        fprintf(stderr,"There are no CUDA capable devices.\n");
     }
     else
     {
@@ -762,7 +762,7 @@ int main(int argc, char **argv)
         printf("Press '+' and '-' to change filter width\n"
                "Press ']' and '[' to change number of iterations\n"
                "Press 'e' and 'E' to change Euclidean delta\n"
-               "Press 'g' and 'G' to changle Gaussian delta\n"
+               "Press 'g' and 'G' to change Gaussian delta\n"
                "Press 'a' or  'A' to change Animation mode ON/OFF\n\n");
 
         // Main OpenGL loop that will run visualization for every vsync

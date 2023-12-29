@@ -19,7 +19,7 @@
 * wavelet transform for these is computed with one block over 10 decomposition
 * levels. The resulting signal consisting of the approximation coefficients at
 * level X is then processed in a subsequent step on the device. This requires
-* interblock syncronization which is only possible on host side.
+* interblock synchronization which is only possible on host side.
 * Detail coefficients which have been computed are not further referenced
 * during the decomposition so that they can be stored directly in their final
 * position in global memory. The transform and its storing scheme preserve
@@ -29,7 +29,7 @@
 * approximation coefficient for a sub-signal processed by one block is stored
 * in a special global memory location to simplify the processing after the
 * interblock synchronization.
-* Most books on wavelets explain the Haar wavelet decompositon. A good freely
+* Most books on wavelets explain the Haar wavelet decomposition. A good freely
 * available resource is the Wavelet primer by Stollnitz et al.
 * http://grail.cs.washington.edu/projects/wavelets/article/wavelet1.pdf
 * http://grail.cs.washington.edu/projects/wavelets/article/wavelet2.pdf
@@ -40,8 +40,8 @@
 * of length eight. The index always describes the decomposition level where
 * a coefficient arises. The input signal is interpreted as approximation signal
 * at level 0. The coefficients computed on the device are stored in the same
-* scheme as in the example. This data strucure is particularly well suited for
-* compression and also preserves the hierachical strucure of the decomposition.
+* scheme as in the example. This data structure is particularly well suited for
+* compression and also preserves the hierarchical structure of the decomposition.
 
 -------------------------------------------------
 | a_0 | a_0 | a_0 | a_0 | a_0 | a_0 | a_0 | a_0 |
@@ -240,7 +240,7 @@ runTest(int argc, char **argv)
 
     // if less or equal 1k elements, then the data can be processed in one block,
     // this avoids the Wait-For-Idle (WFI) on host side which is necessary if the
-    // computation is split accross multiple SM's if enough input data
+    // computation is split across multiple SM's if enough input data
     if (dlevels_complete <= 10)
     {
         // decomposition can be performed at once

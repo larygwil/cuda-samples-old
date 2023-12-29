@@ -19,7 +19,7 @@
     Reductions are a very common computation in parallel algorithms.  Any time
     an array of values needs to be reduced to a single value using a binary
     associative operator, a reduction can be used.  Example applications include
-    statistics computaions such as mean and standard deviation, and image
+    statistics computations such as mean and standard deviation, and image
     processing applications such as finding the total luminance of an
     image.
 
@@ -115,7 +115,7 @@ main(int argc, char **argv)
         }
         else if (strcasecmp(typeInput, "int"))
         {
-            printf("Type %s is not recoginized. Using default type int.\n\n", typeInput);
+            printf("Type %s is not recognized. Using default type int.\n\n", typeInput);
         }
     }
 
@@ -234,7 +234,7 @@ unsigned int nextPow2(unsigned int x)
 void getNumBlocksAndThreads(int whichKernel, int n, int maxBlocks, int maxThreads, int &blocks, int &threads)
 {
 
-    //get device capability, to avoid block/grid size excceed the upbound
+    //get device capability, to avoid block/grid size exceed the upper bound
     cudaDeviceProp prop;
     int device;
     checkCudaErrors(cudaGetDevice(&device));
@@ -258,7 +258,7 @@ void getNumBlocksAndThreads(int whichKernel, int n, int maxBlocks, int maxThread
 
     if (blocks > prop.maxGridSize[0])
     {
-        printf("Grid size <%d> excceeds the device capability <%d>, set block size as %d (original %d)\n",
+        printf("Grid size <%d> exceeds the device capability <%d>, set block size as %d (original %d)\n",
                blocks, prop.maxGridSize[0], threads*2, threads);
 
         blocks /= 2;
@@ -470,7 +470,7 @@ void shmoo(int minN, int maxN, int maxThreads, int maxBlocks, ReduceType datatyp
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// The main function whihc runs the reduction test.
+// The main function which runs the reduction test.
 ////////////////////////////////////////////////////////////////////////////////
 template <class T>
 bool

@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-7.0"
+CUDA_PATH ?= "/usr/local/cuda-7.5"
 
 ##############################
 # start deprecated interface #
@@ -220,17 +220,15 @@ ifeq ($(MPICXX),)
 else
       MPI_GCC := $(shell $(MPICXX) -v 2>&1 | grep gcc | wc -l | tr -d ' ')
 ifeq ($(MPI_GCC),0)
+ifneq ($(TARGET_OS),darwin)
       MPI_CCFLAGS += -stdlib=libstdc++
       MPI_LDFLAGS += -stdlib=libstdc++
 endif
 endif
+endif
 
 # Gencode arguments
-ifeq ($(TARGET_ARCH),armv7l)
-SMS ?= 20 30 32 35 37 50 52
-else
 SMS ?= 20 30 35 37 50 52
-endif
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)

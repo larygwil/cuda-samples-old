@@ -20,6 +20,7 @@
 
 // System includes
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 
 #include <cuda_runtime.h>
@@ -116,7 +117,7 @@ int main(int argc, char **argv)
         maxEnd = timer[NUM_BLOCKS+i] > maxEnd ? timer[NUM_BLOCKS+i] : maxEnd;
     }
 
-    printf("Total clocks = %d\n", (int)(maxEnd - minStart));
+    printf("Total clocks = %Lf\n", (long double)(maxEnd - minStart));
 
     cuProfilerStop();
 

@@ -12,8 +12,6 @@
 
 #include <screen/screen.h>
 
-#define belch printf ("\n\nmade it here: %s:%d\n\n", __FILE__, __LINE__);
-
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
@@ -607,7 +605,7 @@ void initGL(int *argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    // query the total no of display avaibale from QNX CAR2 screen
+    // query the total no of display available from QNX CAR2 screen
     int displayCount = 0;
     if (screen_get_context_property_iv(screen_context, SCREEN_PROPERTY_DISPLAY_COUNT, &displayCount))
     {
@@ -1037,7 +1035,7 @@ main(int argc, char **argv)
         return 0;
     }
 
-    printf("Run \"nbody_screen -benchmark [-numbodies=<numBodies>]\" to measure perfomance.\n");
+    printf("Run \"nbody_screen -benchmark [-numbodies=<numBodies>]\" to measure performance.\n");
     showHelp();
 
     bFullscreen  = (checkCmdLineFlag(argc, (const char **) argv, "fullscreen") != 0);

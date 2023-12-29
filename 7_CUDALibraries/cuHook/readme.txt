@@ -1,4 +1,4 @@
-Sample: CUDA Interception Library
+Sample: cuHook
 Minimum spec: SM 2.0
 
 This sample demonstrates how to build and use an intercept library with CUDA.

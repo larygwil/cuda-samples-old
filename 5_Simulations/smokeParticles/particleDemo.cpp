@@ -417,7 +417,7 @@ void mouse(int button, int state, int x, int y)
     glutPostRedisplay();
 }
 
-// transfrom vector by matrix
+// transform vector by matrix
 void xform(vec3f &v, vec3f &r, float *m)
 {
     r.x = v.x*m[0] + v.y*m[4] + v.z*m[8] + m[12];

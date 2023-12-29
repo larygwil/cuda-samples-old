@@ -29,9 +29,9 @@
 
 // This sample needs at least CUDA 5.5 and a GPU that has at least Compute Capability 2.0
 
-// This sample demonstrates a simple image processing pipline.
+// This sample demonstrates a simple image processing pipeline.
 // First, a JPEG file is huffman decoded and inverse DCT transformed and dequantized.
-// Then the different plances are resized. Finally, the resized image is quantized, forward
+// Then the different planes are resized. Finally, the resized image is quantized, forward
 // DCT transformed and huffman encoded.
 
 #include <npp.h>
@@ -346,26 +346,26 @@ bool printfNPPinfo(int argc, char *argv[], int cudaVerMajor, int cudaVerMinor)
 
     printf("NPP Library Version %d.%d.%d\n", libVer->major, libVer->minor, libVer->build);
 
-	int driverVersion, runtimeVersion;
+    int driverVersion, runtimeVersion;
     cudaDriverGetVersion(&driverVersion);
     cudaRuntimeGetVersion(&runtimeVersion);
 
-	printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
-	printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
+    printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
+    printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
 
-	bool bVal = checkCudaCapabilities(cudaVerMajor, cudaVerMinor);
-	return bVal;
+    bool bVal = checkCudaCapabilities(cudaVerMajor, cudaVerMinor);
+    return bVal;
 }
 
 int main(int argc, char **argv)
 {
-	// Min spec is SM 2.0 devices
-	if (printfNPPinfo(argc, argv, 2, 0) == false)
-	{
+    // Min spec is SM 2.0 devices
+    if (printfNPPinfo(argc, argv, 2, 0) == false)
+    {
         cerr << "jpegNPP requires a GPU with Compute Capability 2.0 or higher" << endl;
         cudaDeviceReset();
         return EXIT_SUCCESS;
-	}
+    }
 
     const char *szInputFile;
     const char *szOutputFile;
@@ -478,7 +478,7 @@ int main(int argc, char **argv)
     {
         if (nMarker == 0x0D8)
         {
-            // Embeded Thumbnail, skip it
+            // Embedded Thumbnail, skip it
             int nNextMarker = nextMarker(pJpegData, nPos, nInputLength);
 
             while (nNextMarker != -1 && nNextMarker != 0x0D9)
@@ -518,14 +518,14 @@ int main(int argc, char **argv)
             // Compute channel sizes as stored in the JPEG (8x8 blocks & MCU block layout)
             for (int i=0; i < oFrameHeader.nComponents; ++i)
             {
-                nMCUBlocksV = max(nMCUBlocksV, oFrameHeader.aSamplingFactors[i] >> 4);
-                nMCUBlocksH = max(nMCUBlocksH, oFrameHeader.aSamplingFactors[i] & 0x0f);
+                nMCUBlocksV = max(nMCUBlocksV, oFrameHeader.aSamplingFactors[i] & 0x0f );
+                nMCUBlocksH = max(nMCUBlocksH, oFrameHeader.aSamplingFactors[i] >> 4 );
             }
 
             for (int i=0; i < oFrameHeader.nComponents; ++i)
             {
                 NppiSize oBlocks;
-                NppiSize oBlocksPerMCU = { oFrameHeader.aSamplingFactors[i] & 0x0f, oFrameHeader.aSamplingFactors[i] >> 4};
+                NppiSize oBlocksPerMCU = { oFrameHeader.aSamplingFactors[i]  >> 4, oFrameHeader.aSamplingFactors[i] & 0x0f};
 
                 oBlocks.width = (int)ceil((oFrameHeader.nWidth + 7)/8  *
                                           static_cast<float>(oBlocksPerMCU.width)/nMCUBlocksH);

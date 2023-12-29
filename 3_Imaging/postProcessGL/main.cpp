@@ -144,38 +144,6 @@ StopWatchInterface *timer = NULL;
 #endif
 GLuint shDrawPot;  // colors the teapot
 
-#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
-bool IsOpenGLAvailable(const char *appName)
-{
-    return true;
-}
-#else
-#if (defined(__APPLE__) || defined(MACOSX))
-bool IsOpenGLAvailable(const char *appName)
-{
-    return true;
-}
-#else
-// check if this is a linux machine
-#include <X11/Xlib.h>
-
-bool IsOpenGLAvailable(const char *appName)
-{
-    Display *Xdisplay = XOpenDisplay(NULL);
-
-    if (Xdisplay == NULL)
-    {
-        return false;
-    }
-    else
-    {
-        XCloseDisplay(Xdisplay);
-        return true;
-    }
-}
-#endif
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" void
 launch_cudaProcess(dim3 grid, dim3 block, int sbytes,
@@ -1089,16 +1057,6 @@ initCUDA(int argc, char **argv, bool bUseGL)
 bool
 initGL(int *argc, char **argv)
 {
-    if (IsOpenGLAvailable(sSDKname))
-    {
-        fprintf(stderr, "   OpenGL device is Available\n");
-    }
-    else
-    {
-        fprintf(stderr, "   OpenGL device is NOT Available, [%s] exiting...\n", sSDKname);
-        exit(EXIT_WAIVED);
-    }
-
     // Create GL context
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH);

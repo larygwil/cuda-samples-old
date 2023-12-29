@@ -108,7 +108,7 @@ bool checkresult(Parameters &host_params)
 
     double *device_I;
     double *host_I = (double *)malloc(len);
-    // initialize iidentity matrix
+    // initialize identity matrix
     memset(host_I, 0, len);
 
     for (int i = 0; i < host_params.n; i++)

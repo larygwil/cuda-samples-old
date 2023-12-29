@@ -298,7 +298,7 @@ advectParticles_k(cData *part, cData *v, int dx, int dy,
 }
 
 
-// These are the external function calls necessary for launching fluid simuation
+// These are the external function calls necessary for launching fluid simulation
 extern "C"
 void addForces(cData *v, int dx, int dy, int spx, int spy, float fx, float fy, int r)
 {

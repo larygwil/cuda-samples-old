@@ -25,7 +25,7 @@
 
 // includes, project
 #include <helper_functions.h> // Helper functions (utilities, parsing, timing)
-#include <helper_cuda.h>      // helper functions (cuda error checking and intialization)
+#include <helper_cuda.h>      // helper functions (cuda error checking and initialization)
 #include <multithreading.h>
 
 #include "MonteCarlo_common.h"
@@ -114,7 +114,7 @@ static CUT_THREADPROC solverThread(TOptionPlan *plan)
     // RNG states
     initMonteCarloGPU(plan);
 
-    // Main commputation
+    // Main computation
     MonteCarloGPU(plan);
 
     checkCudaErrors(cudaDeviceSynchronize());

@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-7.0"
+CUDA_PATH ?= "/usr/local/cuda-7.5"
 
 ##############################
 # start deprecated interface #
@@ -188,12 +188,6 @@ LIBRARIES :=
 
 SAMPLE_ENABLED := 1
 
-# This sample is not supported on Mac OSX
-ifeq ($(TARGET_OS),darwin)
-  $(info >>> WARNING - StreamPriorities is not supported on Mac OSX - waiving sample <<<)
-  SAMPLE_ENABLED := 0
-endif
-
 # This sample is not supported on ARM
 ifeq ($(TARGET_ARCH),armv7l)
   $(info >>> WARNING - StreamPriorities is not supported on ARM - waiving sample <<<)
@@ -201,11 +195,7 @@ ifeq ($(TARGET_ARCH),armv7l)
 endif
 
 # Gencode arguments
-ifeq ($(TARGET_ARCH),armv7l)
-SMS ?= 32 35 37 50 52
-else
 SMS ?= 35 37 50 52
-endif
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
