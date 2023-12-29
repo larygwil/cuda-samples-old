@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -35,6 +35,13 @@ inline void getCudaAttribute(T *attribute, CUdevice_attribute device_attribute, 
     {
         fprintf(stderr, "cuSafeCallNoSync() Driver API error = %04d from file <%s>, line %i.\n",
                 error, __FILE__, __LINE__);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
+        cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
 }
@@ -42,7 +49,7 @@ inline void getCudaAttribute(T *attribute, CUdevice_attribute device_attribute, 
 
 inline bool IsGPUCapableP2P(cudaDeviceProp *pProp)
 {
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     return (bool)(pProp->tccDriver ? true : false);
 #else
     return (bool)(pProp->major >= 2);
@@ -76,7 +83,7 @@ main(int argc, char **argv)
     if (error_id != cudaSuccess)
     {
         printf("cudaGetDeviceCount returned %d\n-> %s\n", (int)error_id, cudaGetErrorString(error_id));
-		printf("Result = FAIL\n");
+        printf("Result = FAIL\n");
         exit(EXIT_FAILURE);
     }
 
@@ -127,6 +134,7 @@ main(int argc, char **argv)
         {
             printf("  L2 Cache Size:                                 %d bytes\n", deviceProp.l2CacheSize);
         }
+
 #else
         // This only available in CUDA 4.0-4.2 (but these were only exposed in the CUDA Driver API)
         int memoryClock;
@@ -142,6 +150,7 @@ main(int argc, char **argv)
         {
             printf("  L2 Cache Size:                                 %d bytes\n", L2CacheSize);
         }
+
 #endif
 
         printf("  Maximum Texture Dimension Size (x,y,z)         1D=(%d), 2D=(%d, %d), 3D=(%d, %d, %d)\n",
@@ -149,8 +158,8 @@ main(int argc, char **argv)
                deviceProp.maxTexture3D[0], deviceProp.maxTexture3D[1], deviceProp.maxTexture3D[2]);
         printf("  Maximum Layered 1D Texture Size, (num) layers  1D=(%d), %d layers\n",
                deviceProp.maxTexture1DLayered[0], deviceProp.maxTexture1DLayered[1]);
-		printf("  Maximum Layered 2D Texture Size, (num) layers  2D=(%d, %d), %d layers\n",
-			   deviceProp.maxTexture2DLayered[0], deviceProp.maxTexture2DLayered[1], deviceProp.maxTexture2DLayered[2]);
+        printf("  Maximum Layered 2D Texture Size, (num) layers  2D=(%d, %d), %d layers\n",
+               deviceProp.maxTexture2DLayered[0], deviceProp.maxTexture2DLayered[1], deviceProp.maxTexture2DLayered[2]);
 
 
         printf("  Total amount of constant memory:               %lu bytes\n", deviceProp.totalConstMem);
@@ -175,7 +184,7 @@ main(int argc, char **argv)
         printf("  Support host page-locked memory mapping:       %s\n", deviceProp.canMapHostMemory ? "Yes" : "No");
         printf("  Alignment requirement for Surfaces:            %s\n", deviceProp.surfaceAlignment ? "Yes" : "No");
         printf("  Device has ECC support:                        %s\n", deviceProp.ECCEnabled ? "Enabled" : "Disabled");
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
         printf("  CUDA Device Driver Mode (TCC or WDDM):         %s\n", deviceProp.tccDriver ? "TCC (Tesla Compute Cluster Driver)" : "WDDM (Windows Display Driver Model)");
 #endif
         printf("  Device supports Unified Addressing (UVA):      %s\n", deviceProp.unifiedAddressing ? "Yes" : "No");
@@ -207,7 +216,7 @@ main(int argc, char **argv)
 
             // Only boards based on Fermi or later can support P2P
             if ((prop[i].major >= 2)
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
                 // on Windows (64-bit), the Tesla Compute Cluster driver for windows must be enabled to supprot this
                 && prop[i].tccDriver
 #endif
@@ -256,7 +265,7 @@ main(int argc, char **argv)
 
     // driver version
     sProfileString += ", CUDA Driver Version = ";
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     sprintf_s(cTemp, 10, "%d.%d", driverVersion/1000, (driverVersion%100)/10);
 #else
     sprintf(cTemp, "%d.%d", driverVersion/1000, (driverVersion%100)/10);
@@ -265,7 +274,7 @@ main(int argc, char **argv)
 
     // Runtime version
     sProfileString += ", CUDA Runtime Version = ";
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     sprintf_s(cTemp, 10, "%d.%d", runtimeVersion/1000, (runtimeVersion%100)/10);
 #else
     sprintf(cTemp, "%d.%d", runtimeVersion/1000, (runtimeVersion%100)/10);
@@ -274,7 +283,7 @@ main(int argc, char **argv)
 
     // Device count
     sProfileString += ", NumDevs = ";
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     sprintf_s(cTemp, 10, "%d", deviceCount);
 #else
     sprintf(cTemp, "%d", deviceCount);
@@ -284,7 +293,7 @@ main(int argc, char **argv)
     // Print Out all device Names
     for (dev = 0; dev < deviceCount; ++dev)
     {
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
         sprintf_s(cTemp, 13, ", Device%d = ", dev);
 #else
         sprintf(cTemp, ", Device%d = ", dev);
@@ -298,8 +307,14 @@ main(int argc, char **argv)
     sProfileString += "\n";
     printf("%s", sProfileString.c_str());
 
-	printf("Result = PASS\n");
+    printf("Result = PASS\n");
 
     // finish
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
     exit(EXIT_SUCCESS);
 }

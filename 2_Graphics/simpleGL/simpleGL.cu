@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -40,7 +40,10 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined (__APPLE__) || defined(MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -254,6 +257,11 @@ int main(int argc, char **argv)
 
     runTest(argc, argv, ref_file);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     printf("%s completed, returned %s\n", sSDKsample, (g_TotalErrors == 0) ? "OK" : "ERROR!");
     exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -373,6 +381,11 @@ bool runTest(int argc, char **argv, char *ref_file)
         glutKeyboardFunc(keyboard);
         glutMouseFunc(mouse);
         glutMotionFunc(motion);
+#if defined (__APPLE__) || defined(MACOSX)
+        atexit(cleanup);
+#else
+        glutCloseFunc(cleanup);
+#endif
 
         // create VBO
         createVBO(&vbo, &cuda_vbo_resource, cudaGraphicsMapFlagsWriteDiscard);
@@ -382,7 +395,6 @@ bool runTest(int argc, char **argv, char *ref_file)
 
         // start rendering mainloop
         glutMainLoop();
-        atexit(cleanup);
     }
 
     return true;

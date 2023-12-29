@@ -50,4 +50,23 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>jpegNPP</name>
+        <libraries>
+            <library>nppi</library>
+            <library>nppc</library>
+            <library>freeimage</library>
+        </libraries>
+        <librarypaths>
+            <path>../common/FreeImage/lib/$(OSLOWER)</path>
+            <path>../common/FreeImage/lib/$(OSLOWER)/$(OS_ARCH)</path>
+        </librarypaths>
+        <includepaths>
+            <path>../common/UtilNPP</path>
+            <path>../common/FreeImage/include</path>
+        </includepaths>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -42,6 +42,8 @@ __global__ void Mandelbrot0(uchar4 *dst, const int imageW, const int imageH, con
     // loop until all blocks completed
     while (1)
     {
+      __syncthreads(); // (needed to avoid race condition between threadblocks after first iteration)
+
         if ((threadIdx.x==0) && (threadIdx.y==0))
         {
             // get block to process
@@ -124,6 +126,8 @@ __global__ void MandelbrotDS0(uchar4 *dst, const int imageW, const int imageH, c
     // loop until all blocks completed
     while (1)
     {
+      __syncthreads(); // (needed to avoid race condition between threadblocks after first iteration)
+
         if ((threadIdx.x==0) && (threadIdx.y==0))
         {
             // get block to process
@@ -207,6 +211,8 @@ __global__ void Mandelbrot1(uchar4 *dst, const int imageW, const int imageH, con
     // loop until all blocks completed
     while (1)
     {
+      __syncthreads(); // (needed to avoid race condition between threadblocks after first iteration)
+
         if ((threadIdx.x==0) && (threadIdx.y==0))
         {
             // get block to process
@@ -305,6 +311,8 @@ __global__ void MandelbrotDS1(uchar4 *dst, const int imageW, const int imageH, c
     // loop until all blocks completed
     while (1)
     {
+      __syncthreads(); // (needed to avoid race condition between threadblocks after first iteration)
+
         if ((threadIdx.x==0) && (threadIdx.y==0))
         {
             // get block to process

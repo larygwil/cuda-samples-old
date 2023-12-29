@@ -36,6 +36,10 @@
     <sm-arch>sm13</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
+    <sm-arch>sm50</sm-arch>
+    <sm-arch>sm32</sm-arch>
+    <sm-arch>sm35</sm-arch>
+    
 
     <!-- One of "exe|dll|lib" (exe is default) -->
     <type>exe</type>
@@ -45,4 +49,30 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>quasirandomGenerator</name>
+        <gencode>
+            <sm>10</sm>
+            <sm>13</sm>
+            <sm>20</sm>
+            <sm>30</sm>
+            <sm>32</sm>
+            <sm>35</sm>
+            
+            <sm>50</sm>
+        </gencode>
+        <compilations>
+            <object>
+                <src>quasirandomGenerator_SM10.cu</src>
+                <cmd>$(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_SM10) $(GENCODE_SM20) $(GENCODE_SM30) $(GENCODE_SM35) $(GENCODE_SM50) -o $@ -c $&lt;</cmd>
+            </object>
+            <object>
+                <src>quasirandomGenerator_SM13.cu</src>
+                <cmd>$(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_SM13) $(GENCODE_SM20) $(GENCODE_SM30) $(GENCODE_SM35) $(GENCODE_SM50) -o $@ -c $&lt;</cmd>
+            </object>
+        </compilations>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

@@ -1,4 +1,4 @@
-Sample: DirectX Texture Compressor (DXTC)
+Sample: dxtc
 Minimum spec: SM 1.0
 
 High Quality DXT Compre

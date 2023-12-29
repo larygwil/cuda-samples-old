@@ -1,34 +1,29 @@
-project(FreeImageInteropNPP)
+project(freeImageInteropNPP)
 
-include_directories(../../common/FreeImage/include ../../common/UtilNPP/)
+set(FreeImageInteropNPP_SOURCES freeImageInteropNPP.cpp)
 
+# debug options
+set(CUDA_NVCC_FLAGS_DEBUG "-G;-g")
+set(CUDA_NVCC_FLAGS_RELEASE "-O2")
 
-SET(FreeImageInteropNPP_SOURCES
-freeImageInteropNPP.cpp
-)
+if (MSVC)
+  set(CMAKE_CXX_FLAGS_DEBUG "/DEBUG")
+  set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+else()
+  set(CMAKE_CXX_FLAGS_DEBUG "-g")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+endif()
 
+# set runtime library for VC
+if (MSVC)
+  set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} ";-Xcompiler;/MTd")
+  set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} " /MTd")
+  
+  set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE} ";-Xcompiler;/MT")
+  set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} " /MT")
+endif()
 
-SET(LIBRARY_OUTPUT_PATH ../../bin/)
-SET(EXECUTABLE_OUTPUT_PATH ../../bin/)
-
-
-CUDA_ADD_EXECUTABLE(FreeImageInterop 
-${FreeImageInterop_SOURCES}
-)
-
-TARGET_LINK_LIBRARIES(FreeImageInteropNPP
-npp
-UtilNPP
-FreeImage
-)
-
-
-add_library(FreeImage UNKNOWN IMPORTED)
-set_property(TARGET FreeImage PROPERTY IMPORTED_LOCATION ../../common/FreeImage/lib/FreeImage.lib)
-
-IF(CMAKE_CXX_COMPILER MATCHES cl)
-
-SET(CMAKE_CXX_FLAGS_DEBUG "/MTd /Z7 /0d")
-SET(CMAKE_CXX_FLAGS_RELEASE "/MT /O2")
-
-ENDIF(CMAKE_CXX_COMPILER MATCHES cl)
+cuda_add_executable(freeImageInteropNPP ${FreeImageInteropNPP_SOURCES})
+target_link_libraries(freeImageInteropNPP nppi nppc freeimage)
+install(TARGETS freeImageInteropNPP
+        RUNTIME DESTINATION ${INSTALL_PATH})

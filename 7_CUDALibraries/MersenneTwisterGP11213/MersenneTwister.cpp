@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -23,7 +23,7 @@
 #include <curand.h>
 
 // Utilities and system includes
-#include <helper_functions.h>  // helper for shared functions common to CUDA SDK samples
+#include <helper_functions.h>  // helper for shared functions common to CUDA Samples
 #include <helper_cuda.h>       // helper for CUDA Error handling
 
 /* Using updated (v2) interfaces to cublas and cusparse */
@@ -131,6 +131,11 @@ int main(int argc, char **argv)
     free(h_RandGPU);
     free(h_RandCPU);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(L1norm < 1e-6 ? EXIT_SUCCESS : EXIT_FAILURE);
 }

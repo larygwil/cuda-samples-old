@@ -189,14 +189,14 @@ tcuGraphicsD3D11RegisterResource      *cuGraphicsD3D11RegisterResource;
 tcuGLCtxCreate                        *cuGLCtxCreate;
 tcuGraphicsGLRegisterBuffer           *cuGraphicsGLRegisterBuffer;
 tcuGraphicsGLRegisterImage            *cuGraphicsGLRegisterImage;
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 tcuWGLGetDevice                       *cuWGLGetDevice;
 #endif
 #endif
 
 #define STRINGIFY(X) #X
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #include <Windows.h>
 
 #ifdef UNICODE
@@ -475,7 +475,7 @@ CUresult CUDAAPI cuInit(unsigned int Flags, int cudaVersion)
         GET_PROC(cuGLCtxCreate);
         GET_PROC(cuGraphicsGLRegisterBuffer);
         GET_PROC(cuGraphicsGLRegisterImage);
-#  ifdef _WIN32
+#  ifdef WIN32
         GET_PROC(cuWGLGetDevice);
 #  endif
 #endif

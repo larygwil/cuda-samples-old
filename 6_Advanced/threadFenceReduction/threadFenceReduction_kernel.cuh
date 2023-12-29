@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -248,25 +248,44 @@ void reduce(int size, int threads, int blocks, float *d_idata, float *d_odata)
         switch (threads)
         {
             case 512:
-                reduceMultiPass<512, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<512, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 256:
-                reduceMultiPass<256, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<256, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 128:
-                reduceMultiPass<128, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<128, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 64:
-                reduceMultiPass< 64, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass< 64, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 32:
-                reduceMultiPass< 32, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass< 32, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 16:
-                reduceMultiPass< 16, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass< 16, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  8:
-                reduceMultiPass<  8, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  8, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  4:
-                reduceMultiPass<  4, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  4, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  2:
-                reduceMultiPass<  2, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  2, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  1:
-                reduceMultiPass<  1, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  1, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
         }
     }
     else
@@ -274,25 +293,44 @@ void reduce(int size, int threads, int blocks, float *d_idata, float *d_odata)
         switch (threads)
         {
             case 512:
-                reduceMultiPass<512, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<512, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 256:
-                reduceMultiPass<256, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<256, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 128:
-                reduceMultiPass<128, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<128, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 64:
-                reduceMultiPass< 64, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass< 64, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 32:
-                reduceMultiPass< 32, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass< 32, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 16:
-                reduceMultiPass< 16, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass< 16, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  8:
-                reduceMultiPass<  8, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  8, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  4:
-                reduceMultiPass<  4, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  4, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  2:
-                reduceMultiPass<  2, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  2, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  1:
-                reduceMultiPass<  1, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceMultiPass<  1, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
         }
     }
 }
@@ -310,25 +348,44 @@ void reduceSinglePass(int size, int threads, int blocks, float *d_idata, float *
         switch (threads)
         {
             case 512:
-                reduceSinglePass<512, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<512, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 256:
-                reduceSinglePass<256, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<256, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 128:
-                reduceSinglePass<128, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<128, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 64:
-                reduceSinglePass< 64, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass< 64, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 32:
-                reduceSinglePass< 32, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass< 32, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 16:
-                reduceSinglePass< 16, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass< 16, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  8:
-                reduceSinglePass<  8, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  8, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  4:
-                reduceSinglePass<  4, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  4, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  2:
-                reduceSinglePass<  2, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  2, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  1:
-                reduceSinglePass<  1, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  1, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
         }
     }
     else
@@ -336,25 +393,44 @@ void reduceSinglePass(int size, int threads, int blocks, float *d_idata, float *
         switch (threads)
         {
             case 512:
-                reduceSinglePass<512, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<512, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 256:
-                reduceSinglePass<256, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<256, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 128:
-                reduceSinglePass<128, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<128, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 64:
-                reduceSinglePass< 64, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass< 64, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 32:
-                reduceSinglePass< 32, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass< 32, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case 16:
-                reduceSinglePass< 16, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass< 16, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  8:
-                reduceSinglePass<  8, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  8, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  4:
-                reduceSinglePass<  4, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  4, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  2:
-                reduceSinglePass<  2, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  2, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
             case  1:
-                reduceSinglePass<  1, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                reduceSinglePass<  1, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
         }
     }
 }

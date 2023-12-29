@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #   pragma warning( disable : 4996 ) // disable deprecated warning 
 #endif
 
@@ -100,7 +100,7 @@ extern "C" void LoadBMPFile(uchar4 **dst, int *width, int *height, const char *n
 
     *width  = infoHdr.width;
     *height = infoHdr.height;
-    *dst    = (uchar4 *)malloc(*width * *height * 4);
+    *dst    = (uchar4 *)malloc(*width **height * 4);
 
     printf("BMP width: %u\n", infoHdr.width);
     printf("BMP height: %u\n", infoHdr.height);

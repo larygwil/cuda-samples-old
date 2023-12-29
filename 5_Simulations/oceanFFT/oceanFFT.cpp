@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -23,7 +23,7 @@
     buffer streams from CUDA and render them using GLSL shaders.
 */
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -194,6 +194,11 @@ int main(int argc, char **argv)
         runGraphicsTest(argc, argv);
     }
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(EXIT_SUCCESS);
 }
@@ -240,6 +245,11 @@ void runAutoTest(int argc, char **argv)
     checkCudaErrors(cufftDestroy(fftPlan));
     free(h_h0);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     exit(g_TotalErrors==0 ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -260,6 +270,13 @@ void runGraphicsTest(int argc, char **argv)
         printf("   To use -device=n, the sample must be running w/o OpenGL\n\n");
         printf(" > %s -device=n -qatest\n", argv[0]);
         printf("exiting...\n");
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
+        cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
 
@@ -267,6 +284,11 @@ void runGraphicsTest(int argc, char **argv)
     // This is necessary in order to achieve optimal performance with OpenGL/CUDA interop.
     if (false == initGL(&argc, argv))
     {
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         return;
     }
@@ -314,6 +336,12 @@ void runGraphicsTest(int argc, char **argv)
 
     // start rendering mainloop
     glutMainLoop();
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 }
 
@@ -643,6 +671,12 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/)
     {
         case (27) :
             cleanup();
+            // cudaDeviceReset causes the driver to clean up all state. While
+            // not mandatory in normal operation, it is good practice.  It is also
+            // needed to ensure correct operation when the application is being
+            // profiled. Calling cudaDeviceReset causes all profile data to be
+            // flushed before the application exits
+            cudaDeviceReset();
             exit(EXIT_SUCCESS);
 
         case 'w':

@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -31,7 +31,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // These are CUDA Helper functions
 
-// add a level of protection to the CUDA SDK samples, let's force samples to explicitly include CUDA.H
+// add a level of protection to the CUDA Samples, let's force samples to explicitly include CUDA.H
 #ifdef  __cuda_cuda_h__
 // This will output the proper CUDA error strings in the event that a CUDA host call returns an error
 #ifndef checkCudaErrors
@@ -101,6 +101,7 @@ inline int _ConvertSMVer2CoresDRV(int major, int minor)
         { 0x20, 32 }, // Fermi Generation (SM 2.0) GF100 class
         { 0x21, 48 }, // Fermi Generation (SM 2.1) GF10x class
         { 0x30, 192}, // Kepler Generation (SM 3.0) GK10x class
+        { 0x32, 192}, // Kepler Generation (SM 3.2) GK10x class
         { 0x35, 192}, // Kepler Generation (SM 3.5) GK11x class
         {   -1, -1 }
     };

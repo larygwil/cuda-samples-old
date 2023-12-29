@@ -79,7 +79,7 @@ tcudaDeviceSynchronize          *cudaDeviceSynchronize;
 
 
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #define _WIN    1
 #define _OS _WIN
 #elif defined(__unix__)

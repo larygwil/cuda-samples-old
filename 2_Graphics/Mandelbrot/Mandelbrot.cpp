@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -20,11 +20,14 @@
 
 // OpenGL Graphics includes
 #include <GL/glew.h>
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #include <GL/wglew.h>
 #endif
 #if defined(__APPLE__) || defined(__MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -167,7 +170,7 @@ const char *sSDKsample = "CUDA Mandelbrot/Julia Set";
 #endif
 #define BUFFER_DATA(i) ((char *)0 + i)
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 // This is specifically to enable the application to enable/disable vsync
 typedef BOOL (WINAPI *PFNWGLSWAPINTERVALFARPROC)(int);
 
@@ -317,7 +320,7 @@ void renderImage(bool bUseOpenGL, bool fp64, int mode)
             printf("CPU = %5.8f\n", 0.001f * sdkGetTimerValue(&hTimer));
 #endif
         }
-               else // this is the GPU Path
+        else // this is the GPU Path
         {
             float timeEstimate;
             int startPass = pass;
@@ -373,8 +376,8 @@ void renderImage(bool bUseOpenGL, bool fp64, int mode)
     }
 }
 
-       // OpenGL display function
-       void displayFunc(void)
+// OpenGL display function
+void displayFunc(void)
 {
     sdkStartTimer(&hTimer);
 
@@ -458,7 +461,6 @@ void cleanup()
     glDeleteBuffers(1, &gl_PBO);
     glDeleteTextures(1, &gl_Tex);
     glDeleteProgramsARB(1, &gl_Shader);
-    exit(EXIT_SUCCESS);
 }
 
 void initMenus() ;
@@ -700,7 +702,7 @@ void keyboardFunc(unsigned char k, int, int)
 
         case 'p':
         case 'P' :
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
             if (fopen_s(&stream, "params.txt", "w") != 0)
 #else
             if ((stream = fopen("params.txt", "w")) == NULL)
@@ -716,7 +718,7 @@ void keyboardFunc(unsigned char k, int, int)
 
         case 'o':
         case 'O' :
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
             if (fopen_s(&stream, "params.txt", "r") != 0)
 #else
             if ((stream = fopen("params.txt", "r")) == NULL)
@@ -1281,6 +1283,12 @@ int main(int argc, char **argv)
 
         // We run the Automated Testing code path
         runSingleTest(argc, argv);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     }
@@ -1298,6 +1306,12 @@ int main(int argc, char **argv)
 
         // We run the Automated Performance Test
         runBenchmark(argc, argv);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     }
@@ -1315,6 +1329,12 @@ int main(int argc, char **argv)
     // If the GPU does not meet SM1.1 capabilities, we quit
     if (!checkCudaCapabilities(1,1))
     {
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
@@ -1350,13 +1370,22 @@ int main(int argc, char **argv)
     sdkCreateTimer(&hTimer);
     sdkStartTimer(&hTimer);
 
-    atexit(cleanup);
+#if defined (__APPLE__) || defined(MACOSX)
+        atexit(cleanup);
+#else
+        glutCloseFunc(cleanup);
+#endif
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     setVSync(0) ;
 #endif
 
     glutMainLoop();
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 } // main

@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -27,7 +27,10 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined (__APPLE__) || defined(MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -727,7 +730,7 @@ int findCapableDevice(int argc, char **argv)
     if (bestDev == -1)
     {
         fprintf(stderr, "\nNo configuration with available capabilities was found.  Test has been waived.\n");
-        fprintf(stderr, "This SDK sample has minimum requirements:\n");
+        fprintf(stderr, "This CUDA Sample has minimum requirements:\n");
         fprintf(stderr, "\tCUDA Compute Capability >= %d.%d is required\n", MIN_COMPUTE_VERSION/16, MIN_COMPUTE_VERSION%16);
         fprintf(stderr, "\tCUDA Runtime Version    >= %d.%d is required\n", MIN_RUNTIME_VERSION/1000, (MIN_RUNTIME_VERSION%100)/10);
     }
@@ -751,6 +754,12 @@ void checkDeviceMeetComputeSpec(int argc, char **argv)
         fprintf(stderr, "This sample requires:\n");
         fprintf(stderr, "\tCUDA Compute Capability >= %d.%d is required\n", MIN_COMPUTE_VERSION/16, MIN_COMPUTE_VERSION%16);
         fprintf(stderr, "\tCUDA Runtime Version    >= %d.%d is required\n", MIN_RUNTIME_VERSION/1000, (MIN_RUNTIME_VERSION%100)/10);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
@@ -894,6 +903,11 @@ main(int argc, char **argv)
             }
             else
             {
+                // cudaDeviceReset causes the driver to clean up all state. While
+                // not mandatory in normal operation, it is good practice.  It is also
+                // needed to ensure correct operation when the application is being
+                // profiled. Calling cudaDeviceReset causes all profile data to be
+                // flushed before the application exits
                 cudaDeviceReset();
                 exit(EXIT_SUCCESS);
             }
@@ -955,10 +969,19 @@ main(int argc, char **argv)
 
         initPixelBuffer();
 
+#if defined (__APPLE__) || defined(MACOSX)
         atexit(cleanup);
+#else
+        glutCloseFunc(cleanup);
+#endif
 
         glutMainLoop();
     }
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 }

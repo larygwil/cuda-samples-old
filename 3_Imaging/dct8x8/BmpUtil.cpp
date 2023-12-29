@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -22,7 +22,7 @@
 #include "BmpUtil.h"
 
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #pragma warning( disable : 4996 ) // disable deprecated warning 
 #endif
 

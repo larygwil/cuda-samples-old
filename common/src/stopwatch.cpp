@@ -23,7 +23,7 @@
 // static variables
 
 //! global index for all stop watches
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 /*static*/ std::vector< StopWatchC * > StopWatchC::swatches;
 #else
 template<class OSPolicy>

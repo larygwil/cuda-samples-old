@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -144,13 +144,13 @@ main(int argc, char **argv)
         getCudaAttribute<int>(&maxTex1DLayered[0], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_WIDTH, dev);
         getCudaAttribute<int>(&maxTex1DLayered[1], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_LAYERS, dev);
         printf("  Maximum Layered 1D Texture Size, (num) layers  1D=(%d), %d layers\n",
-				maxTex1DLayered[0], maxTex1DLayered[1]);
+               maxTex1DLayered[0], maxTex1DLayered[1]);
 
         int  maxTex2DLayered[3];
         getCudaAttribute<int>(&maxTex2DLayered[0], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_WIDTH, dev);
         getCudaAttribute<int>(&maxTex2DLayered[1], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_HEIGHT, dev);
         getCudaAttribute<int>(&maxTex2DLayered[2], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_LAYERS, dev);
-		printf("  Maximum Layered 2D Texture Size, (num) layers  2D=(%d, %d), %d layers\n",
+        printf("  Maximum Layered 2D Texture Size, (num) layers  2D=(%d, %d), %d layers\n",
                maxTex2DLayered[0], maxTex2DLayered[1], maxTex2DLayered[2]);
 
         int totalConstantMemory;
@@ -220,7 +220,7 @@ main(int argc, char **argv)
         getCudaAttribute<int>(&eccEnabled,  CU_DEVICE_ATTRIBUTE_ECC_ENABLED, dev);
         printf("  Device has ECC support:                        %s\n", eccEnabled ? "Enabled" : "Disabled");
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
         int tccDriver ;
         getCudaAttribute<int>(&tccDriver ,  CU_DEVICE_ATTRIBUTE_TCC_DRIVER, dev);
         printf("  CUDA Device Driver Mode (TCC or WDDM):         %s\n", tccDriver ? "TCC (Tesla Compute Cluster Driver)" : "WDDM (Windows Display Driver Model)");
@@ -266,7 +266,7 @@ main(int argc, char **argv)
 
             // Only boards based on Fermi or later can support P2P
             if ((major >= 2)
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
                 // on Windows (64-bit), the Tesla Compute Cluster driver for windows must be enabled to supprot this
                 && tccDriver
 #endif

@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 *
 * NOTICE TO USER:
 *
@@ -46,6 +46,7 @@
 #include <iostream>
 
 #include <helper_string.h>
+#include <helper_cuda.h>
 
 using namespace std;
 
@@ -339,15 +340,32 @@ void printHelp()
     cout << "   -scale=1.0             (scale multiplier for width and height)" << endl << endl;
 }
 
+bool printfNPPinfo(int argc, char *argv[], int cudaVerMajor, int cudaVerMinor)
+{
+    const NppLibraryVersion *libVer   = nppGetLibVersion();
+
+    printf("NPP Library Version %d.%d.%d\n", libVer->major, libVer->minor, libVer->build);
+
+	int driverVersion, runtimeVersion;
+    cudaDriverGetVersion(&driverVersion);
+    cudaRuntimeGetVersion(&runtimeVersion);
+
+	printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
+	printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
+
+	bool bVal = checkCudaCapabilities(cudaVerMajor, cudaVerMinor);
+	return bVal;
+}
+
 int main(int argc, char **argv)
 {
-    NppGpuComputeCapability computeCap = nppGetGpuComputeCapability();
-
-    if (computeCap < NPP_CUDA_2_0)
-    {
-        cerr << "This sample needs a GPU with Compute Capability 2.0 or higher" << endl;
+	// Min spec is SM 2.0 devices
+	if (printfNPPinfo(argc, argv, 2, 0) == false)
+	{
+        cerr << "jpegNPP requires a GPU with Compute Capability 2.0 or higher" << endl;
+        cudaDeviceReset();
         return EXIT_SUCCESS;
-    }
+	}
 
     const char *szInputFile;
     const char *szOutputFile;
@@ -355,7 +373,7 @@ int main(int argc, char **argv)
 
     if ((argc == 1) || checkCmdLineFlag(argc, (const char **)argv, "help"))
     {
-        printHelp();      
+        printHelp();
     }
 
     if (checkCmdLineFlag(argc, (const char **)argv, "input"))
@@ -366,6 +384,7 @@ int main(int argc, char **argv)
     {
         szInputFile = sdkFindFilePath("Growth_of_cubic_bacteria_25x16.jpg", argv[0]);
     }
+
     cout << "Source File: " << szInputFile << endl;
 
     if (checkCmdLineFlag(argc, (const char **)argv, "output"))
@@ -376,6 +395,7 @@ int main(int argc, char **argv)
     {
         szOutputFile = "scaled.jpg";
     }
+
     cout << "Output File: " << szOutputFile << endl;
 
     if (checkCmdLineFlag(argc, (const char **)argv, "scale"))
@@ -386,6 +406,7 @@ int main(int argc, char **argv)
     {
         nScaleFactor = 0.5f;
     }
+
     cout << "Scale Factor: " << nScaleFactor << endl;
 
     NppiDCTState *pDCTState;
@@ -417,6 +438,7 @@ int main(int argc, char **argv)
     if (nMarker != 0x0D8)
     {
         cerr << "Invalid Jpeg Image" << endl;
+        cudaDeviceReset();
         return EXIT_FAILURE;
     }
 
@@ -477,6 +499,7 @@ int main(int argc, char **argv)
             if (nMarker != 0x0C0)
             {
                 cerr << "The sample does only support baseline JPEG images" << endl;
+                cudaDeviceReset();
                 return EXIT_SUCCESS;
             }
 
@@ -488,6 +511,7 @@ int main(int argc, char **argv)
             if (oFrameHeader.nComponents != 3)
             {
                 cerr << "The sample does only support color JPEG images" << endl;
+                cudaDeviceReset();
                 return EXIT_SUCCESS;
             }
 
@@ -555,7 +579,7 @@ int main(int argc, char **argv)
                     nAfterScanMarker = nextMarker(pJpegData, nAfterNextMarkerPos, nInputLength);
                 }
             }
-        
+
             NppiDecodeHuffmanSpec *apHuffmanDCTable[3];
             NppiDecodeHuffmanSpec *apHuffmanACTable[3];
 
@@ -571,6 +595,7 @@ int main(int argc, char **argv)
                                                                    apHuffmanDCTable,
                                                                    apHuffmanACTable,
                                                                    aSrcSize));
+
             for (int i = 0; i < 3; ++i)
             {
                 nppiDecodeHuffmanSpecFreeHost_JPEG(apHuffmanDCTable[i]);
@@ -650,16 +675,21 @@ int main(int argc, char **argv)
         NppiRect oSrcImageROI = {0,0,oSrcImageSize.width, oSrcImageSize.height};
         NppiRect oDstImageROI;
 
+        NppiInterpolationMode eInterploationMode = NPPI_INTER_SUPER;
+
+        if (nScaleFactor >= 1.f)
+            eInterploationMode = NPPI_INTER_LANCZOS;
+
         NPP_CHECK_NPP(nppiGetResizeRect(oSrcImageROI, &oDstImageROI,
                                         nScaleFactor,
                                         nScaleFactor,
-                                        0.5, 0.5, NPPI_INTER_SUPER));
+                                        0.5, 0.5, eInterploationMode));
 
         NPP_CHECK_NPP(nppiResizeSqrPixel_8u_C1R(apSrcImage[i], oSrcImageSize, aSrcImageStep[i], oSrcImageROI,
                                                 apDstImage[i], aDstImageStep[i], oDstImageROI ,
                                                 nScaleFactor,
                                                 nScaleFactor,
-                                                0.5, 0.5, NPPI_INTER_SUPER));
+                                                0.5, 0.5, eInterploationMode));
     }
 
 
@@ -759,5 +789,6 @@ int main(int argc, char **argv)
         cudaFree(apDstImage[i]);
     }
 
+    cudaDeviceReset();
     return EXIT_SUCCESS;
 }

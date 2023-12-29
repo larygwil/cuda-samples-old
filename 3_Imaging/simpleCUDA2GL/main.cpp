@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -15,7 +15,7 @@
 // map a texture in CUDA and blit the result into it
 //#define USE_TEXSUBIMAGE2D
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -108,7 +108,7 @@ StopWatchInterface *timer = NULL;
 #endif
 GLuint shDrawPot;  // colors the teapot
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 bool IsOpenGLAvailable(const char *appName)
 {
     return true;
@@ -549,7 +549,7 @@ void FreeResource()
     sdkDeleteTimer(&timer);
 
     // unregister this buffer object with CUDA
-//    checkCudaErrors(cudaGraphicsUnregisterResource(cuda_tex_screen_resource));
+    //    checkCudaErrors(cudaGraphicsUnregisterResource(cuda_tex_screen_resource));
 #ifdef USE_TEXSUBIMAGE2D
     checkCudaErrors(cudaGraphicsUnregisterResource(cuda_pbo_dest_resource));
     deletePBO(&pbo_dest);
@@ -559,6 +559,11 @@ void FreeResource()
     deleteTexture(&tex_screen);
     deleteTexture(&tex_cudaResult);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     if (iGLUTWindowHandle)

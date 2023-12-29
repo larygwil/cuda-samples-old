@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -9,7 +9,7 @@
  *
  */
 
-// Shuffle intrinsics SDK sample
+// Shuffle intrinsics CUDA Sample
 // This sample demonstrates the use of the shuffle intrinsic
 // First, a simple example of a prefix sum using the shuffle to
 // perform a scan operation is provided.
@@ -408,6 +408,12 @@ int main(int argc, char *argv[])
     bool intTest = shuffle_integral_image_test();
 
     bTestResult = simpleTest & intTest;
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit((bTestResult) ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -351,16 +351,19 @@ void PricingEngine<Real>::operator()(AsianOption<Real> &option)
         cudaFree(d_option);
         d_option = 0;
     }
+
     if (d_paths)
     {
         cudaFree(d_paths);
         d_paths = 0;
     }
+
     if (d_rngStates)
     {
         cudaFree(d_rngStates);
         d_rngStates = 0;
     }
+
     if (d_values)
     {
         cudaFree(d_values);

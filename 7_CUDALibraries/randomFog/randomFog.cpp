@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -393,6 +393,11 @@ void cleanup(int code, int argc = 0, const char **argv = NULL)
         g_pCheckRender = NULL;
     }
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(code);
 }
@@ -401,7 +406,7 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-            // Select shape
+        // Select shape
         case 's':
         case 'S':
             g_currentShape = Sphere;
@@ -430,7 +435,7 @@ void keyboard(unsigned char key, int x, int y)
             display();
             break;
 
-            // Rotation
+        // Rotation
         case 'a':
         case 'A':
             g_bAutoRotate = !g_bAutoRotate;
@@ -483,7 +488,7 @@ void keyboard(unsigned char key, int x, int y)
             display();
             break;
 
-            // Zoom
+        // Zoom
         case 't':
         case 'T':
             g_bTenXZoom = !g_bTenXZoom;
@@ -491,14 +496,14 @@ void keyboard(unsigned char key, int x, int y)
             reCreate();
             break;
 
-            // Axes
+        // Axes
         case 'z':
         case 'Z':
             g_bShowAxes = !g_bShowAxes;
             reCreate();
             break;
 
-            // RNG
+        // RNG
         case 'x':
         case 'X':
             g_pRng->selectRng(RNG::Pseudo);
@@ -555,7 +560,7 @@ void keyboard(unsigned char key, int x, int y)
             reCreate();
             break;
 
-            // Number of vertices
+        // Number of vertices
         case '+':
             g_nVerticesPopulated += 8000;
 
@@ -578,7 +583,7 @@ void keyboard(unsigned char key, int x, int y)
             reCreate();
             break;
 
-            // Quit
+        // Quit
         case 27:
         case 'q':
         case 'Q':

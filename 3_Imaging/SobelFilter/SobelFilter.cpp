@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -12,7 +12,10 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined(__APPLE__) || defined(MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -268,6 +271,11 @@ void initializeData(char *file)
     }
     else
     {
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
@@ -292,6 +300,12 @@ void initializeData(char *file)
         if ((GLuint)bsize != (g_Bpp * sizeof(Pixel) * imWidth * imHeight))
         {
             printf("Buffer object (%d) has incorrect size (%d).\n", (unsigned)pbo_buffer, (unsigned)bsize);
+
+            // cudaDeviceReset causes the driver to clean up all state. While
+            // not mandatory in normal operation, it is good practice.  It is also
+            // needed to ensure correct operation when the application is being
+            // profiled. Calling cudaDeviceReset causes all profile data to be
+            // flushed before the application exits
             cudaDeviceReset();
             exit(EXIT_FAILURE);
         }
@@ -468,10 +482,21 @@ int main(int argc, char **argv)
     printf("S: display Sobel Edge Detection (Using SMEM+Texture)\n");
     printf("Use the '-' and '=' keys to change the brightness.\n");
     fflush(stdout);
+
+#if defined (__APPLE__) || defined(MACOSX)
     atexit(cleanup);
+#else
+    glutCloseFunc(cleanup);
+#endif
+
     glutTimerFunc(REFRESH_DELAY, timerEvent,0);
     glutMainLoop();
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(EXIT_SUCCESS);
 }

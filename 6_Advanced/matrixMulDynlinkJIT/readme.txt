@@ -1,4 +1,4 @@
-Sample: Matrix Multiplication (CUDA Driver API version with Dynamic Linking Version)
+Sample: matrixMulDynlinkJIT
 Minimum spec: SM 1.0
 
 This sample revisits matrix multiplication using the 

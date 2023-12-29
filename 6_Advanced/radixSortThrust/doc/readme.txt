@@ -1,4 +1,4 @@
-NVIDIA CUDA SDK Sample "radixSortThrust"
+NVIDIA CUDA Sample "radixSortThrust"
 ----------------------------------
 
 --------

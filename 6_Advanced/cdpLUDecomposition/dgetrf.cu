@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 *
 * NOTICE TO USER:
 *
@@ -48,9 +48,9 @@ __device__ __noinline__ void dgetrf(cublasHandle_t cb_handle, cudaStream_t strea
     __shared__ int s_info;
 
     // Initialize to 0
-    if (threadIdx.x == 0) 
+    if (threadIdx.x == 0)
     {
-       s_info = 0;
+        s_info = 0;
     }
 
     *info = 0;

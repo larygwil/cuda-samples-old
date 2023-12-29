@@ -1,6 +1,6 @@
 <entry>
     <name>Histogram Equalization with NPP</name>
-    <description><![CDATA[This SDK sample demonstrates how to use NPP for histogram equalization for image data.]]></description>
+    <description><![CDATA[This CUDA Sample demonstrates how to use NPP for histogram equalization for image data.]]></description>
     <whitepaper></whitepaper>
     <minspec>SM 1.1</minspec>
     <keywords>CUDA,NPP,Image Processing</keywords>
@@ -50,4 +50,23 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>histEqualizationNPP</name>
+        <libraries>
+            <library>nppi</library>
+            <library>nppc</library>
+            <library>freeimage</library>
+        </libraries>
+        <librarypaths>
+            <path>../common/FreeImage/lib/$(OSLOWER)</path>
+            <path>../common/FreeImage/lib/$(OSLOWER)/$(OS_ARCH)</path>
+        </librarypaths>
+        <includepaths>
+            <path>../common/UtilNPP</path>
+            <path>../common/FreeImage/include</path>
+        </includepaths>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

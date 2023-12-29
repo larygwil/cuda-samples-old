@@ -78,7 +78,7 @@ namespace nv
         size_t fsize = 0;
 
         // read files as binary to prevent problems from newline translation
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 
         if (fopen_s(&shaderFile, filename, "rb") != 0)
 #else
@@ -219,7 +219,7 @@ namespace nv
         size_t fsize = 0;
 
         // read files as binary to prevent problems from newline translation
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 
         if (fopen_s(&shaderFile, filename, "rb") != 0)
 #else
@@ -254,6 +254,4 @@ namespace nv
     }
 
 } // nv namespace
-
 #endif
-

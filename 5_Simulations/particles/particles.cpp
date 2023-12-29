@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -22,11 +22,14 @@
 
 // OpenGL Graphics includes
 #include <GL/glew.h>
-#if defined (_WIN32)
+#if defined (WIN32)
 #include <GL/wglew.h>
 #endif
 #if defined(__APPLE__) || defined(__MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -157,7 +160,7 @@ void initGL(int *argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-#if defined (_WIN32)
+#if defined (WIN32)
 
     if (wglewIsSupported("WGL_EXT_swap_control"))
     {
@@ -510,6 +513,12 @@ void key(unsigned char key, int /*x*/, int /*y*/)
 
         case '\033':
         case 'q':
+            // cudaDeviceReset causes the driver to clean up all state. While
+            // not mandatory in normal operation, it is good practice.  It is also
+            // needed to ensure correct operation when the application is being
+            // profiled. Calling cudaDeviceReset causes all profile data to be
+            // flushed before the application exits
+            cudaDeviceReset();
             exit(EXIT_SUCCESS);
             break;
 
@@ -762,7 +771,7 @@ main(int argc, char **argv)
         glutSpecialFunc(special);
         glutIdleFunc(idle);
 
-        atexit(cleanup);
+        glutCloseFunc(cleanup);
 
         glutMainLoop();
     }
@@ -772,6 +781,11 @@ main(int argc, char **argv)
         delete psystem;
     }
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(g_TotalErrors > 0 ? EXIT_FAILURE : EXIT_SUCCESS);
 }

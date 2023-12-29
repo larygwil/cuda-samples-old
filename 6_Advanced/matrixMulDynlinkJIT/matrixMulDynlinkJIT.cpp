@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -162,7 +162,7 @@ CUresult initCUDA(int argc, char **argv, CUfunction *pMatrixMul, int *block_size
         // in this branch we use compilation with parameters
         const unsigned int jitNumOptions = 3;
         CUjit_option *jitOptions = new CUjit_option[jitNumOptions];
-        void **jitOptVals = new void*[jitNumOptions];
+        void **jitOptVals = new void *[jitNumOptions];
 
         // set up size of compilation log buffer
         jitOptions[0] = CU_JIT_INFO_LOG_BUFFER_SIZE_BYTES;

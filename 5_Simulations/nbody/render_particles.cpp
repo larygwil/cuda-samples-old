@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -334,7 +334,7 @@ inline float evalHermite(float pA, float pB, float vA, float vB, float u)
     float B1 = -2*u3 + 3*u2;
     float B2 = u3 - 2*u2 + u;
     float B3 = u3 - u;
-    return(B0*pA + B1*pB + B2*vA + B3*vB);
+    return (B0*pA + B1*pB + B2*vA + B3*vB);
 }
 
 
@@ -366,7 +366,7 @@ unsigned char *createGaussianMap(int N)
     }
 
     delete [] M;
-    return(B);
+    return (B);
 }
 
 void ParticleRenderer::_createTexture(int resolution)

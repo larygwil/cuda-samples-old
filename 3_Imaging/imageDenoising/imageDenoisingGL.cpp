@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -291,7 +291,7 @@ void shutDown(unsigned char k, int /*x*/, int /*y*/)
             g_Kernel = 3;
             break;
 
-        case ' ':
+        case '*':
             printf(g_Diag ? "LERP highlighting mode.\n" : "Normal mode.\n");
             g_Diag = !g_Diag;
             break;
@@ -415,7 +415,7 @@ void initOpenGLBuffers()
 
     if (gl_error != GL_NO_ERROR)
     {
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
         char tmpStr[512];
         // NOTE: "%s(%i) : " allows Visual Studio to directly jump to the file at the right line
         // when the user double clicks on the error line in the Output pane. Like any compile error.
@@ -487,6 +487,11 @@ void runAutoTest(int argc, char **argv, const char *filename, int kernel_param)
 
     printf("\n[%s] -> Kernel %d, Saved: %s\n", sSDKsample, kernel_param, filename);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
 }
@@ -558,7 +563,7 @@ int main(int argc, char **argv)
     printf("Press [2] to view image restored with knn filter\n");
     printf("Press [3] to view image restored with nlm filter\n");
     printf("Press [4] to view image restored with modified nlm filter\n");
-    printf("Press [ ] to view smooth/edgy areas [RED/BLUE] Ct's\n");
+    printf("Press [*] to view smooth/edgy areas [RED/BLUE] Ct's when a filter is active\n");
     printf("Press [f] to print frame rate\n");
     printf("Press [?] to print Noise and Lerp Ct's\n");
     printf("Press [q] to exit\n");
@@ -572,6 +577,11 @@ int main(int argc, char **argv)
     glutTimerFunc(REFRESH_DELAY, timerEvent,0);
     glutMainLoop();
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(EXIT_SUCCESS);
 }

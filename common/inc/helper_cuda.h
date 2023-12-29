@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -600,6 +600,7 @@ static const char *_cudaGetErrorEnum(NppStatus error)
             return "NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY";
 
 #if ((NPP_VERSION_MAJOR << 12) + (NPP_VERSION_MINOR << 4)) <= 0x5000
+
         case NPP_BAD_ARG_ERROR:
             return "NPP_BAD_ARGUMENT_ERROR";
 
@@ -680,6 +681,7 @@ static const char *_cudaGetErrorEnum(NppStatus error)
 
 
 #if ((NPP_VERSION_MAJOR << 12) + (NPP_VERSION_MINOR << 4)) <= 0x5000
+
         case NPP_MEMFREE_ERR:
             return "NPP_MEMFREE_ERR";
 
@@ -692,6 +694,7 @@ static const char *_cudaGetErrorEnum(NppStatus error)
         case NPP_MIRROR_FLIP_ERR:
             return "NPP_MIRROR_FLIP_ERR";
 #else
+
         case NPP_MEMFREE_ERROR:
             return "NPP_MEMFREE_ERROR";
 
@@ -755,7 +758,7 @@ static const char *_cudaGetErrorEnum(NppStatus error)
 #endif
 #else
 #ifndef DEVICE_RESET
-#define DEVICE_RESET 
+#define DEVICE_RESET
 #endif
 #endif
 
@@ -766,7 +769,7 @@ void check(T result, char const *const func, const char *const file, int const l
     {
         fprintf(stderr, "CUDA error at %s:%d code=%d(%s) \"%s\" \n",
                 file, line, static_cast<unsigned int>(result), _cudaGetErrorEnum(result), func);
-		DEVICE_RESET
+        DEVICE_RESET
         // Make sure we call CUDA Device Reset before exiting
         exit(EXIT_FAILURE);
     }
@@ -787,7 +790,7 @@ inline void __getLastCudaError(const char *errorMessage, const char *file, const
     {
         fprintf(stderr, "%s(%i) : getLastCudaError() CUDA error : %s : (%d) %s.\n",
                 file, line, errorMessage, (int)err, cudaGetErrorString(err));
-		DEVICE_RESET
+        DEVICE_RESET
         exit(EXIT_FAILURE);
     }
 }
@@ -816,7 +819,9 @@ inline int _ConvertSMVer2Cores(int major, int minor)
         { 0x20, 32 }, // Fermi Generation (SM 2.0) GF100 class
         { 0x21, 48 }, // Fermi Generation (SM 2.1) GF10x class
         { 0x30, 192}, // Kepler Generation (SM 3.0) GK10x class
+        { 0x32, 192}, // Kepler Generation (SM 3.2) GK10x class
         { 0x35, 192}, // Kepler Generation (SM 3.5) GK11x class
+        { 0x50, 128}, // Maxwell Generation (SM 5.0) GM10x class
         {   -1, -1 }
     };
 
@@ -890,11 +895,13 @@ inline int gpuDeviceInit(int devID)
 inline int gpuGetMaxGflopsDeviceId()
 {
     int current_device     = 0, sm_per_multiproc  = 0;
-    int max_compute_perf   = 0, max_perf_device   = 0;
+    int max_perf_device    = 0;
     int device_count       = 0, best_SM_arch      = 0;
+    
+    unsigned long long max_compute_perf = 0;
     cudaDeviceProp deviceProp;
     cudaGetDeviceCount(&device_count);
-
+    
     checkCudaErrors(cudaGetDeviceCount(&device_count));
 
     if (device_count == 0)
@@ -939,7 +946,7 @@ inline int gpuGetMaxGflopsDeviceId()
                 sm_per_multiproc = _ConvertSMVer2Cores(deviceProp.major, deviceProp.minor);
             }
 
-            int compute_perf  = deviceProp.multiProcessorCount * sm_per_multiproc * deviceProp.clockRate;
+            unsigned long long compute_perf  = (unsigned long long) deviceProp.multiProcessorCount * sm_per_multiproc * deviceProp.clockRate;
 
             if (compute_perf  > max_compute_perf)
             {
@@ -1021,12 +1028,12 @@ inline bool checkCudaCapabilities(int major_version, int minor_version)
     if ((deviceProp.major > major_version) ||
         (deviceProp.major == major_version && deviceProp.minor >= minor_version))
     {
-        printf("> Device %d: <%16s >, Compute SM %d.%d detected\n", dev, deviceProp.name, deviceProp.major, deviceProp.minor);
+        printf("  GPU Device %d: <%16s >, Compute SM %d.%d detected\n", dev, deviceProp.name, deviceProp.major, deviceProp.minor);
         return true;
     }
     else
     {
-        printf("No GPU device was found that can support CUDA compute capability %d.%d.\n", major_version, minor_version);
+        printf("  No GPU device was found that can support CUDA compute capability %d.%d.\n", major_version, minor_version);
         return false;
     }
 }

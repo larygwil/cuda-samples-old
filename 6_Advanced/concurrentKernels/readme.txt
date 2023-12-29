@@ -1,4 +1,4 @@
-Sample: Concurrent Kernels
+Sample: concurrentKernels
 Minimum spec: SM 1.0
 
 

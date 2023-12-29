@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -523,65 +523,109 @@ reduce(int size, int threads, int blocks,
         case 0:
             reduce0<T><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
             break;
+
         case 1:
             reduce1<T><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
             break;
+
         case 2:
             reduce2<T><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
             break;
+
         case 3:
             reduce3<T><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
             break;
+
         case 4:
             switch (threads)
             {
                 case 512:
-                    reduce4<T, 512><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T, 512><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 256:
-                    reduce4<T, 256><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T, 256><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 128:
-                    reduce4<T, 128><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T, 128><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 64:
-                    reduce4<T,  64><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T,  64><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 32:
-                    reduce4<T,  32><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T,  32><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 16:
-                    reduce4<T,  16><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T,  16><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  8:
-                    reduce4<T,   8><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T,   8><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  4:
-                    reduce4<T,   4><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T,   4><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  2:
-                    reduce4<T,   2><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T,   2><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  1:
-                    reduce4<T,   1><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce4<T,   1><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
             }
+
             break;
 
         case 5:
             switch (threads)
             {
                 case 512:
-                    reduce5<T, 512><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T, 512><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 256:
-                    reduce5<T, 256><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T, 256><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 128:
-                    reduce5<T, 128><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T, 128><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 64:
-                    reduce5<T,  64><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T,  64><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 32:
-                    reduce5<T,  32><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T,  32><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case 16:
-                    reduce5<T,  16><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T,  16><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  8:
-                    reduce5<T,   8><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T,   8><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  4:
-                    reduce5<T,   4><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T,   4><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  2:
-                    reduce5<T,   2><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T,   2><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
+
                 case  1:
-                    reduce5<T,   1><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                    reduce5<T,   1><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                    break;
             }
+
             break;
 
         case 6:
@@ -591,25 +635,44 @@ reduce(int size, int threads, int blocks,
                 switch (threads)
                 {
                     case 512:
-                        reduce6<T, 512, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T, 512, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 256:
-                        reduce6<T, 256, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T, 256, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 128:
-                        reduce6<T, 128, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T, 128, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 64:
-                        reduce6<T,  64, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,  64, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 32:
-                        reduce6<T,  32, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,  32, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 16:
-                        reduce6<T,  16, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,  16, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  8:
-                        reduce6<T,   8, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   8, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  4:
-                        reduce6<T,   4, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   4, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  2:
-                        reduce6<T,   2, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   2, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  1:
-                        reduce6<T,   1, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   1, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
                 }
             }
             else
@@ -617,27 +680,47 @@ reduce(int size, int threads, int blocks,
                 switch (threads)
                 {
                     case 512:
-                        reduce6<T, 512, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T, 512, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 256:
-                        reduce6<T, 256, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T, 256, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 128:
-                        reduce6<T, 128, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T, 128, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 64:
-                        reduce6<T,  64, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,  64, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 32:
-                        reduce6<T,  32, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,  32, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case 16:
-                        reduce6<T,  16, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,  16, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  8:
-                        reduce6<T,   8, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   8, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  4:
-                        reduce6<T,   4, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   4, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  2:
-                        reduce6<T,   2, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   2, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
+
                     case  1:
-                        reduce6<T,   1, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size); break;
+                        reduce6<T,   1, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                        break;
                 }
             }
+
             break;
     }
 }

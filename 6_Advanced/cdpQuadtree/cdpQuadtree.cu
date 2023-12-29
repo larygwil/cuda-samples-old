@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -590,32 +590,14 @@ struct Random_generator
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Main entry point.
+// Allocate GPU structs, launch kernel and clean up
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char **argv)
+bool cdpQuadtree(int warp_size)
 {
     // Constants to control the algorithm.
     const int num_points = 1024;
     const int max_depth  = 8;
     const int min_points_per_node = 16;
-
-    // Find/set the device.
-    // The test requires an architecture SM35 or greater (CDP capable).
-    int warp_size = 0;
-    int cuda_device = findCudaDevice(argc, (const char **)argv);
-    cudaDeviceProp deviceProps;
-    checkCudaErrors(cudaGetDeviceProperties(&deviceProps, cuda_device));
-    int cdpCapable = (deviceProps.major == 3 && deviceProps.minor >= 5) || deviceProps.major >=4;
-
-    printf("GPU device %s has compute capabilities (SM %d.%d)\n", deviceProps.name, deviceProps.major, deviceProps.minor);
-
-    if (!cdpCapable)
-    {
-        std::cerr << "cdpQuadTree requires SM 3.5 or higher to use CUDA Dynamic Parallelism.  Exiting...\n" << std::endl;
-        exit(EXIT_SUCCESS);
-    }
-
-    warp_size = deviceProps.warpSize;
 
     // Allocate memory for points.
     thrust::device_vector<float> x_d0(num_points);
@@ -686,9 +668,39 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaFree(nodes));
     checkCudaErrors(cudaFree(points));
 
+    return ok;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Main entry point.
+////////////////////////////////////////////////////////////////////////////////
+int main(int argc, char **argv)
+{
+    // Find/set the device.
+    // The test requires an architecture SM35 or greater (CDP capable).
+    int cuda_device = findCudaDevice(argc, (const char **)argv);
+    cudaDeviceProp deviceProps;
+    checkCudaErrors(cudaGetDeviceProperties(&deviceProps, cuda_device));
+    int cdpCapable = (deviceProps.major == 3 && deviceProps.minor >= 5) || deviceProps.major >=4;
+
+    printf("GPU device %s has compute capabilities (SM %d.%d)\n", deviceProps.name, deviceProps.major, deviceProps.minor);
+
+    if (!cdpCapable)
+    {
+        std::cerr << "cdpQuadTree requires SM 3.5 or higher to use CUDA Dynamic Parallelism.  Exiting...\n" << std::endl;
+        exit(EXIT_SUCCESS);
+    }
+
+    bool ok = cdpQuadtree(deviceProps.warpSize);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
-    exit(ok ? EXIT_SUCCESS : EXIT_FAILURE);
+    return (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 

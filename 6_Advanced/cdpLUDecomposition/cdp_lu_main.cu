@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -185,6 +185,10 @@ bool checkresult(Parameters &host_params)
                 break;
             }
 
+    status = cublasDestroy(cb_handle);
+    if (status != CUBLAS_STATUS_SUCCESS)
+       errorExit("checkresult: cublas failed");
+
     free(perm);
     free(host_I);
     free(host_result);
@@ -257,6 +261,12 @@ int main(int argc, char **argv)
     if (!cdpCapable)
     {
         printf("cdpLUDecomposition requires SM 3.5 or higher to use CUDA Dynamic Parallelism.  Exiting...\n");
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
@@ -269,6 +279,11 @@ int main(int argc, char **argv)
     printf("Launching single task from device...\n");
     bool result = launch_test(host_params);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     if (result)

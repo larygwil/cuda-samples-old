@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -348,9 +348,11 @@ extern "C" void sobelFilter(Pixel *odata, int iw, int ih, enum SobelDisplayMode 
         case SOBELDISPLAY_IMAGE:
             SobelCopyImage<<<ih, 384>>>(odata, iw, iw, ih, fScale);
             break;
+
         case SOBELDISPLAY_SOBELTEX:
             SobelTex<<<ih, 384>>>(odata, iw, iw, ih, fScale, blockOperation, pPointOp);
             break;
+
         case SOBELDISPLAY_SOBELSHARED:
             {
                 dim3 threads(16,4);

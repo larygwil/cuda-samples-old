@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -167,7 +167,7 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
 
     sdkStartTimer(&timer_total);
 
-    // do for multiple iterations to improve timing accuracy    
+    // do for multiple iterations to improve timing accuracy
     for (unsigned int iter = 0; iter < iterations; ++iter)
     {
 
@@ -184,7 +184,7 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
 
         getLastCudaError("Kernel launch failed.");
         checkCudaErrors(cudaDeviceSynchronize());
-        sdkStopTimer(&timer_step1);        
+        sdkStopTimer(&timer_step1);
 
         // get the number of intervals containing one eigenvalue after the first
         // processing step
@@ -192,7 +192,7 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
         checkCudaErrors(cudaMemcpy(&num_one_intervals, result.g_num_one,
                                    sizeof(unsigned int),
                                    cudaMemcpyDeviceToHost));
-        
+
         dim3 grid_onei;
         grid_onei.x = getNumBlocksLinear(num_one_intervals, MAX_THREADS_BLOCK);
         dim3 threads_onei;
@@ -239,12 +239,12 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
          result.g_lambda_mult, result.g_pos_mult,
          precision
         );
-        
+
 
         getLastCudaError("bisectKernelLarge_MultIntervals() FAILED.");
         checkCudaErrors(cudaDeviceSynchronize());
         sdkStopTimer(&timer_step2_mult);
-        
+
     }
 
     sdkStopTimer(&timer_total);

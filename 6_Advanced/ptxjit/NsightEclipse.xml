@@ -44,4 +44,13 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>ptxjit</name>
+        <libraries>
+            <library>cuda</library>
+        </libraries>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

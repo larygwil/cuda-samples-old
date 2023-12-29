@@ -15,8 +15,8 @@
 
 //Simple portable thread library.
 
-#if _WIN32
 //Windows threads.
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #include <windows.h>
 
 typedef HANDLE CUTThread;
@@ -41,17 +41,17 @@ typedef void *(*CUT_THREADROUTINE)(void *);
 extern "C" {
 #endif
 
-    //Create thread.
-    CUTThread cutStartThread(CUT_THREADROUTINE, void *data);
+//Create thread.
+CUTThread cutStartThread(CUT_THREADROUTINE, void *data);
 
-    //Wait for thread to finish.
-    void cutEndThread(CUTThread thread);
+//Wait for thread to finish.
+void cutEndThread(CUTThread thread);
 
-    //Destroy thread.
-    void cutDestroyThread(CUTThread thread);
+//Destroy thread.
+void cutDestroyThread(CUTThread thread);
 
-    //Wait for multiple threads.
-    void cutWaitForThreads(const CUTThread *threads, int num);
+//Wait for multiple threads.
+void cutWaitForThreads(const CUTThread *threads, int num);
 
 #ifdef __cplusplus
 } //extern "C"

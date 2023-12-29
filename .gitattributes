@@ -222,3 +222,5 @@ doc/CUDA_Profiler_Users_Guide.pdf filter=lfs diff=lfs merge=lfs -text
 3_Imaging/simpleCUDA2GL/data/ref_simpleCUDA2GL.ppm filter=lfs diff=lfs merge=lfs -text
 common/data/Growth_of_cubic_bacteria_25x16.jpg filter=lfs diff=lfs merge=lfs -text
 common/lib/linux/armv7l/libGLEW.a filter=lfs diff=lfs merge=lfs -text
+3_Imaging/cudaDecodeGL/doc/nvcuvid.pdf filter=lfs diff=lfs merge=lfs -text
+3_Imaging/cudaDecodeGL/data/plush1_720p_10s.m2v filter=lfs diff=lfs merge=lfs -text

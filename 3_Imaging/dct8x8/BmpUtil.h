@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -10,7 +10,7 @@
  */
 
 /*
-* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -31,7 +31,7 @@
 
 #pragma once
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #pragma pack(push)
 #endif
 
@@ -79,7 +79,7 @@ typedef struct
 } BMPInfoHeader;
 
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #pragma pack(pop)
 #else
 #pragma pack()

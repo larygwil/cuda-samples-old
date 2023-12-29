@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -64,7 +64,7 @@
     Using number of vertices from readback.
 */
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -393,6 +393,11 @@ main(int argc, char **argv)
         runGraphicsTest(argc, argv);
     }
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(EXIT_SUCCESS);
 }
@@ -455,6 +460,12 @@ initMC(int argc, char **argv)
     if (path == NULL)
     {
         fprintf(stderr, "Error finding file '%s'\n", volumeFilename);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
@@ -585,6 +596,12 @@ runGraphicsTest(int argc, char **argv)
 
     // start rendering mainloop
     glutMainLoop();
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 }
 
@@ -920,6 +937,11 @@ keyboard(unsigned char key, int /*x*/, int /*y*/)
     {
         case (27) :
             cleanup();
+            // cudaDeviceReset causes the driver to clean up all state. While
+            // not mandatory in normal operation, it is good practice.  It is also
+            // needed to ensure correct operation when the application is being
+            // profiled. Calling cudaDeviceReset causes all profile data to be
+            // flushed before the application exits
             cudaDeviceReset();
             exit(EXIT_SUCCESS);
 

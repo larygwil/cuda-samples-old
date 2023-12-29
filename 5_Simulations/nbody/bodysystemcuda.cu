@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -142,13 +142,13 @@ template <typename T>
 __device__ typename vec3<T>::Type
 computeBodyAccel(typename vec4<T>::Type bodyPos,
                  typename vec4<T>::Type *positions,
-                 int numBodies)
+                 int numTiles)
 {
     typename vec4<T>::Type *sharedPos = SharedMemory<typename vec4<T>::Type>();
 
     typename vec3<T>::Type acc = {0.0f, 0.0f, 0.0f};
 
-    for (int tile = 0; tile < gridDim.x; tile++)
+    for (int tile = 0; tile < numTiles; tile++)
     {
         sharedPos[threadIdx.x] = positions[tile * blockDim.x + threadIdx.x];
 
@@ -174,7 +174,7 @@ integrateBodies(typename vec4<T>::Type *__restrict__ newPos,
                 typename vec4<T>::Type *__restrict__ oldPos,
                 typename vec4<T>::Type *vel,
                 unsigned int deviceOffset, unsigned int deviceNumBodies,
-                float deltaTime, float damping, int totalNumBodies)
+                float deltaTime, float damping, int numTiles)
 {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -187,7 +187,7 @@ integrateBodies(typename vec4<T>::Type *__restrict__ newPos,
 
     typename vec3<T>::Type accel = computeBodyAccel<T>(position,
                                                        oldPos,
-                                                       totalNumBodies);
+                                                       numTiles);
 
     // acceleration = force / mass;
     // new velocity = old velocity + acceleration * deltaTime
@@ -234,8 +234,6 @@ void integrateNbodySystem(DeviceData<T> *deviceData,
         checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **)&(deviceData[0].dPos[1-currentRead]), &bytes, pgres[1-currentRead]));
     }
 
-    cudaDeviceProp props;
-
     for (unsigned int dev = 0; dev != numDevices; dev++)
     {
         if (numDevices > 1)
@@ -243,9 +241,8 @@ void integrateNbodySystem(DeviceData<T> *deviceData,
             cudaSetDevice(dev);
         }
 
-        checkCudaErrors(cudaGetDeviceProperties(&props, dev));
-
-        int numBlocks = (deviceData[dev].numBodies + (blockSize-1)) / blockSize;
+        int numBlocks = (deviceData[dev].numBodies + blockSize-1) / blockSize;
+        int numTiles = (numBodies + blockSize - 1) / blockSize;
         int sharedMemSize = blockSize * 4 * sizeof(T); // 4 floats for pos
 
         integrateBodies<T><<< numBlocks, blockSize, sharedMemSize >>>
@@ -253,7 +250,7 @@ void integrateNbodySystem(DeviceData<T> *deviceData,
          (typename vec4<T>::Type *)deviceData[dev].dPos[currentRead],
          (typename vec4<T>::Type *)deviceData[dev].dVel,
          deviceData[dev].offset, deviceData[dev].numBodies,
-         deltaTime, damping, numBodies);
+         deltaTime, damping, numTiles);
 
         if (numDevices > 1)
         {

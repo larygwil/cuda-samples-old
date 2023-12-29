@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -104,27 +104,50 @@ __global__ void freeVertexMem(BezierLine *bLines, int nLines)
         cudaFree(bLines[lidx].vertexPos);
 }
 
-bool checkCapableSM35Device()
+bool checkCapableSM35Device(int argc, char** argv)
 {
     // Get device properties
     cudaDeviceProp properties;
     int device_count = 0, device = -1;
-    checkCudaErrors(cudaGetDeviceCount(&device_count));
-
-    for (int i=0; i < device_count; ++i)
+    
+    if(checkCmdLineFlag(argc, (const char **)argv, "device"))
     {
-        checkCudaErrors(cudaGetDeviceProperties(&properties, i));
-
+        device = getCmdLineArgumentInt(argc, (const char **)argv, "device");
+        
+        cudaDeviceProp properties;
+        checkCudaErrors(cudaGetDeviceProperties(&properties, device));
+        
         if (properties.major > 3 || (properties.major == 3 && properties.minor >= 5))
         {
-            device = i;
-            printf("Running on GPU %d (%s)\n", i, properties.name);
-            break;
+            printf("Running on GPU  %d (%s)\n", device , properties.name);
+        }
+        else
+        {
+            printf("cdpBezierTessellation requires GPU devices with compute SM 3.5 or higher.");
+            printf("Current GPU device has compute SM %d.%d. Exiting...\n",properties.major, properties.minor);
+            return false;
         }
 
-        printf("GPU %d %s does not support CUDA Dynamic Parallelism\n", i, properties.name);
     }
+    else
+    {
+    
+        checkCudaErrors(cudaGetDeviceCount(&device_count));
 
+        for (int i=0; i < device_count; ++i)
+        {
+            checkCudaErrors(cudaGetDeviceProperties(&properties, i));
+
+            if (properties.major > 3 || (properties.major == 3 && properties.minor >= 5))
+            {
+                device = i;
+                printf("Running on GPU %d (%s)\n", i, properties.name);
+                break;
+            }
+
+            printf("GPU %d %s does not support CUDA Dynamic Parallelism\n", i, properties.name);
+        }
+    }
     if (device == -1)
     {
         fprintf(stderr, "cdpBezierTessellation requires GPU devices with compute SM 3.5 or higher.  Exiting...\n");
@@ -158,7 +181,7 @@ int main(int argc, char **argv)
         bLines_h[i].nVertices = 0;
     }
 
-    if (checkCapableSM35Device() == false)
+    if (checkCapableSM35Device(argc, argv) == false)
     {
         exit(EXIT_SUCCESS);
     }
@@ -176,6 +199,11 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaFree(bLines_d));
     delete[] bLines_h;
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exitsits
     cudaDeviceReset();
 
     exit(EXIT_SUCCESS);

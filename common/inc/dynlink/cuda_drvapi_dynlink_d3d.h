@@ -12,7 +12,7 @@
 #ifndef __cuda_drvapi_dynlink_d3d_h__
 #define __cuda_drvapi_dynlink_d3d_h__
 
-#if defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #pragma warning(disable: 4312)
 
 #if defined (CUDA_INIT_D3D9) || defined(CUDA_INIT_D3D10) || defined(CUDA_INIT_D3D11)

@@ -1,7 +1,7 @@
 <entry>
     <name>threadFenceReduction</name>
     <description><![CDATA[This sample shows how to perform a reduction operation on an array of values using the thread Fence intrinsic.
-to produce a single value in a single kernel (as opposed to two or more kernel calls as shown in the "reduction" SDK sample).  Single-pass reduction requires global atomic instructions (Compute Capability 1.1 or later) and the _threadfence() intrinsic (CUDA 2.2 or later).]]></description>
+to produce a single value in a single kernel (as opposed to two or more kernel calls as shown in the "reduction" CUDA Sample).  Single-pass reduction requires global atomic instructions (Compute Capability 1.1 or later) and the _threadfence() intrinsic (CUDA 2.2 or later).]]></description>
     <whitepaper></whitepaper>
     <minspec>SM 1.1</minspec>
     <keywords>reduction</keywords>
@@ -34,6 +34,10 @@ to produce a single value in a single kernel (as opposed to two or more kernel c
     <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
+    <sm-arch>sm50</sm-arch>
+    <sm-arch>sm32</sm-arch>
+    <sm-arch>sm35</sm-arch>
+    
 
     <!-- One of "exe|dll|lib" (exe is default) -->
     <type>exe</type>
@@ -43,4 +47,19 @@ to produce a single value in a single kernel (as opposed to two or more kernel c
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>threadFenceReduction</name>
+        <gencode>
+            <sm>11</sm>
+            <sm>20</sm>
+            <sm>30</sm>
+            <sm>32</sm>
+            <sm>35</sm>
+            
+            <sm>50</sm>
+        </gencode>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

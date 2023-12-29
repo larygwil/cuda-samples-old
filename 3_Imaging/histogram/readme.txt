@@ -1,4 +1,4 @@
-Sample: CUDA Histogram
+Sample: histogram
 Minimum spec: SM 1.1
 
 This sample demonstrates efficient implementation of 64-bin and 2

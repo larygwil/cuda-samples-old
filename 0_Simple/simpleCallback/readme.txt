@@ -1,4 +1,4 @@
-Sample: Simple CUDA Callbacks
+Sample: simpleCallback
 Minimum spec: SM 1.0
 
 

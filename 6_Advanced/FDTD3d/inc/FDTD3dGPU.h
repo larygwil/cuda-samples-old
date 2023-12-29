@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -13,7 +13,7 @@
 #define _FDTD3DGPU_H_
 
 #include <cstddef>
-#if defined(_WIN32) && defined(_MSC_VER)
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) && defined(_MSC_VER)
 typedef unsigned __int64 memsize_t;
 #else
 #include <stdint.h>

@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -10,7 +10,7 @@
  */
 
 #pragma warning(disable:4819)
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -23,7 +23,7 @@
 #include <fstream>
 #include <iostream>
 
-#include <cuda_runtime.h>      // CUDA Runtime
+#include <cuda_runtime.h>
 #include <npp.h>               // CUDA NPP Definitions
 
 #include <helper_cuda.h>       // helper for CUDA Error handling and initialization
@@ -54,37 +54,21 @@ inline int cudaDeviceInit(int argc, const char **argv)
     return dev;
 }
 
-void printfNPPinfo(int argc, char *argv[])
+bool printfNPPinfo(int argc, char *argv[], int cudaVerMajor, int cudaVerMinor)
 {
-    const char *sComputeCap[] =
-    {
-        "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
-    };
-
     const NppLibraryVersion *libVer   = nppGetLibVersion();
-    NppGpuComputeCapability computeCap = nppGetGpuComputeCapability();
 
     printf("NPP Library Version %d.%d.%d\n", libVer->major, libVer->minor, libVer->build);
 
-    if (computeCap != 0 && g_nDevice == -1)
-    {
-        printf("%s using GPU <%s> with %d SM(s) with", argv[0], nppGetGpuName(), nppGetGpuNumSMs(), sComputeCap[computeCap]);
+	int driverVersion, runtimeVersion;
+    cudaDriverGetVersion(&driverVersion);
+    cudaRuntimeGetVersion(&runtimeVersion);
 
-        if (computeCap > 0)
-        {
-            printf(" %s\n", sComputeCap[computeCap]);
-        }
-        else
-        {
-            printf(" Unknwon Compute Capabilities\n");
-        }
-    }
-    else
-    {
-        printf("%s\n", sComputeCap[computeCap]);
-    }
+	printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
+	printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
+
+	bool bVal = checkCudaCapabilities(cudaVerMajor, cudaVerMinor);
+	return bVal;
 }
 
 // Error handler for FreeImage library.
@@ -171,7 +155,12 @@ main(int argc, char *argv[])
 
         cudaDeviceInit(argc, (const char **)argv);
 
-        printfNPPinfo(argc, argv);
+		// Min spec is SM 1.0 devices
+		if (printfNPPinfo(argc, argv, 1, 0) == false) 
+		{
+	        cudaDeviceReset();
+			exit(EXIT_SUCCESS);
+		}
 
         if (argc > 1)
         {

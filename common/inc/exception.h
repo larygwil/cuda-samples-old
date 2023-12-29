@@ -127,7 +127,7 @@ throw_it(const char *file, const int line, const std::string &msg)
 ////////////////////////////////////////////////////////////////////////////////
 template<class Std_Exception>
 Exception<Std_Exception>::Exception() :
-    Exception("Unknown Exception.\n")
+    Std_Exception("Unknown Exception.\n")
 { }
 
 ////////////////////////////////////////////////////////////////////////////////

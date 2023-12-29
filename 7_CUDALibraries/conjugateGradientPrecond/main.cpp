@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -37,11 +37,11 @@
 #include <cuda_runtime.h>
 
 // Using updated (v2) interfaces for CUBLAS and CUSPARSE
-#include <cusparse_v2.h>
+#include <cusparse.h>
 #include <cublas_v2.h>
 
 // Utilities and system includes
-#include <helper_functions.h>  // helper for shared functions common to CUDA SDK samples
+#include <helper_functions.h>  // helper for shared functions common to CUDA Samples
 #include <helper_cuda.h>       // helper for CUDA error checking
 
 const char *sSDKname     = "conjugateGradientPrecond";
@@ -176,6 +176,12 @@ int main(int argc, char **argv)
     if (version < 0x11)
     {
         printf("%s: requires a minimum CUDA compute 1.1 capability\n", sSDKname);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
@@ -482,6 +488,11 @@ int main(int argc, char **argv)
     cudaFree(d_zm2);
     cudaFree(d_rm2);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     printf("  Test Summary:\n");

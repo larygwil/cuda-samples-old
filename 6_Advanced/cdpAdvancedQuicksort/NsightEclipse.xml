@@ -37,4 +37,22 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>cdpAdvancedQuicksort</name>
+        <gencode>
+            <sm>35</sm>
+            
+            <sm>50</sm>
+        </gencode>
+        <cflags>
+            <flag>-dc</flag>
+        </cflags>
+        <libraries>
+            <library>cudadevrt</library>
+        </libraries>
+        <supportedbuilds>
+            <build>makefile</build>
+            <build>solution</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

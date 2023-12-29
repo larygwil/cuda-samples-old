@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -25,7 +25,7 @@
 #define BLOCK_DIM 16
 #define CLAMP_TO_EDGE 1
 
-// Transpose kernel (see transpose SDK sample for details)
+// Transpose kernel (see transpose CUDA Sample for details)
 __global__ void d_transpose(uint *odata, uint *idata, int width, int height)
 {
     __shared__ uint block[BLOCK_DIM][BLOCK_DIM+1];

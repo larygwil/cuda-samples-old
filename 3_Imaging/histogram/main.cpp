@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -19,7 +19,7 @@
 
 // Utility and system includes
 #include <helper_cuda.h>
-#include <helper_functions.h>  // helper for shared that are common to CUDA SDK samples
+#include <helper_functions.h>  // helper for shared that are common to CUDA Samples
 
 // project include
 #include "histogram_common.h"
@@ -57,7 +57,13 @@ int main(int argc, char **argv)
 
     if (version < 0x11)
     {
-        printf("There is no device supporting a minimum of CUDA compute capability 1.1 for this SDK sample\n");
+        printf("There is no device supporting a minimum of CUDA compute capability 1.1 for this CUDA Sample\n");
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
@@ -201,6 +207,11 @@ int main(int argc, char **argv)
     free(h_HistogramCPU);
     free(h_Data);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     printf("%s - Test Summary\n", sSDKsample);
 

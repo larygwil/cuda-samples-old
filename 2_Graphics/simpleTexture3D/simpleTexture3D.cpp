@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -23,7 +23,10 @@
 #include <GL/glew.h>
 
 #if defined (__APPLE__) || defined(MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -74,6 +77,7 @@ int fpsLimit = 1;        // FPS limit for sampling
 int g_Index = 0;
 unsigned int frameCount = 0;
 unsigned int g_TotalErrors = 0;
+volatile int g_GraphicsMapFlag = 0;
 
 int *pArgc = NULL;
 char **pArgv = NULL;
@@ -82,6 +86,7 @@ char **pArgv = NULL;
 #define MAX(a,b) ((a > b) ? a : b)
 #endif
 
+extern "C" void cleanup();
 extern "C" void setTextureFilterMode(bool bLinearFilter);
 extern "C" void initCuda(const uchar *h_volume, cudaExtent volumeSize);
 extern "C" void render_kernel(dim3 gridSize, dim3 blockSize, uint *d_output, uint imageW, uint imageH, float w);
@@ -112,6 +117,7 @@ void computeFPS()
 void render()
 {
     // map PBO to get CUDA device pointer
+    g_GraphicsMapFlag++;
     checkCudaErrors(cudaGraphicsMapResources(1, &cuda_pbo_resource, 0));
     size_t num_bytes;
     checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **)&d_output, &num_bytes, cuda_pbo_resource));
@@ -122,7 +128,11 @@ void render()
 
     getLastCudaError("render_kernel failed");
 
-    checkCudaErrors(cudaGraphicsUnmapResources(1, &cuda_pbo_resource, 0));
+    if (g_GraphicsMapFlag)
+    {
+        checkCudaErrors(cudaGraphicsUnmapResources(1, &cuda_pbo_resource, 0));
+        g_GraphicsMapFlag--;
+    }
 }
 
 // display results using OpenGL (called by GLUT)
@@ -208,11 +218,22 @@ void cleanup()
     sdkDeleteTimer(&timer);
 
     // add extra check to unmap the resource before unregistering it
-    cudaGraphicsUnmapResources(1, &cuda_pbo_resource, 0);
+    if (g_GraphicsMapFlag)
+    {
+        cudaGraphicsUnmapResources(1, &cuda_pbo_resource, 0);
+        g_GraphicsMapFlag--;
+    }
 
     // unregister this buffer object from CUDA C
     cudaGraphicsUnregisterResource(cuda_pbo_resource);
     glDeleteBuffersARB(1, &pbo);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 void initGLBuffers()
@@ -305,6 +326,11 @@ void runAutoTest(const char *ref_file, char *exec_path)
     checkCudaErrors(cudaFree(d_output));
     free(h_output);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     sdkStopTimer(&timer);
     sdkDeleteTimer(&timer);
@@ -379,10 +405,13 @@ main(int argc, char **argv)
     printf("Press space to toggle animation\n"
            "Press '+' and '-' to change displayed slice\n");
 
+#if defined (__APPLE__) || defined(MACOSX)
     atexit(cleanup);
+#else
+    glutCloseFunc(cleanup);
+#endif
 
     glutMainLoop();
 
-    cudaDeviceReset();
     exit(EXIT_SUCCESS);
 }

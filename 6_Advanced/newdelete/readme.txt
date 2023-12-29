@@ -1,4 +1,4 @@
-Sample: NewDelete
+Sample: newdelete
 Minimum spec: SM 2.0
 
 

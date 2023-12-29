@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -14,7 +14,7 @@
 
     This sample shows how to perform a reduction operation on an array of values
     to produce a single value in a single kernel (as opposed to two or more
-    kernel calls as shown in the "reduction" SDK sample).  Single-pass
+    kernel calls as shown in the "reduction" CUDA Sample).  Single-pass
     reduction requires global atomic instructions (Compute Capability 1.1 or
     later) and the __threadfence() intrinsic (CUDA 2.2 or later).
 
@@ -113,6 +113,11 @@ main(int argc, char **argv)
         printf("GPU Device %d: %s\nDoes not support minimum compute capability SM %d.%d, exiting...\n\n",
                dev, deviceProp.name, minimumComputeVersion / 10, minimumComputeVersion % 10);
 
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
@@ -126,6 +131,11 @@ main(int argc, char **argv)
     exit(EXIT_SUCCESS);
 #endif
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
     exit(bTestResult ? EXIT_SUCCESS : EXIT_FAILURE);
 }

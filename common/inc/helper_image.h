@@ -105,7 +105,7 @@ namespace
     };
 }
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #ifndef FOPEN
 #define FOPEN(fHandle,filename,mode) fopen_s(&fHandle, filename, mode)
 #endif
@@ -206,13 +206,13 @@ __loadPPM(const char *file, unsigned char **data,
     }
     else
     {
-        *data = (unsigned char *) malloc(sizeof(unsigned char) * width * height * *channels);
+        *data = (unsigned char *) malloc(sizeof(unsigned char) * width * height **channels);
         *w = width;
         *h = height;
     }
 
     // read and close file
-    if (fread(*data, sizeof(unsigned char), width * height * *channels, fp) == 0)
+    if (fread(*data, sizeof(unsigned char), width * height **channels, fp) == 0)
     {
         std::cerr << "__LoadPPM() read data returned error." << std::endl;
     }
@@ -234,7 +234,7 @@ sdkLoadPGM(const char *file, T **data, unsigned int *w, unsigned int *h)
         return false;
     }
 
-    unsigned int size = *w * *h * channels;
+    unsigned int size = *w **h * channels;
 
     // initialize mem if necessary
     // the correct size is checked / set in loadPGMc()
@@ -262,7 +262,7 @@ sdkLoadPPM4(const char *file, T **data,
     if (__loadPPM(file, &idata, w, h, &channels))
     {
         // pad 4th component
-        int size = *w * *h;
+        int size = *w **h;
         // keep the original pointer
         unsigned char *idata_orig = idata;
         *data = (T *) malloc(sizeof(T) * size * 4);
@@ -934,7 +934,7 @@ sdkLoadPPM4ub(const char *file, unsigned char **data,
     if (__loadPPM(file, &idata, w, h, &channels))
     {
         // pad 4th component
-        int size = *w * *h;
+        int size = *w **h;
         // keep the original pointer
         unsigned char *idata_orig = idata;
         *data = (unsigned char *) malloc(sizeof(unsigned char) * size * 4);

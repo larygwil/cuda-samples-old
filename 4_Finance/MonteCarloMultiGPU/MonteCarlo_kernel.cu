@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -22,7 +22,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper reduction template
-// Please see the "reduction" CUDA SDK sample for more information
+// Please see the "reduction" CUDA Sample for more information
 ////////////////////////////////////////////////////////////////////////////////
 #include "MonteCarlo_reduction.cuh"
 

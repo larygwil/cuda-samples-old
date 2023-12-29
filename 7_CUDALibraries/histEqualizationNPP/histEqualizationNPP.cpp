@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -11,7 +11,7 @@
 
 #pragma warning (disable:4819)
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -31,7 +31,7 @@
 
 #include <helper_cuda.h>
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #define STRCASECMP  _stricmp
 #define STRNCASECMP _strnicmp
 #else
@@ -64,37 +64,22 @@ inline int cudaDeviceInit(int argc, const char **argv)
     return dev;
 }
 
-void printfNPPinfo(int argc, char *argv[])
+bool printfNPPinfo(int argc, char *argv[])
 {
-    const char *sComputeCap[] =
-    {
-        "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
-    };
-
     const NppLibraryVersion *libVer   = nppGetLibVersion();
-    NppGpuComputeCapability computeCap = nppGetGpuComputeCapability();
 
     printf("NPP Library Version %d.%d.%d\n", libVer->major, libVer->minor, libVer->build);
 
-    if (computeCap != 0 && g_nDevice == -1)
-    {
-        printf("%s using GPU <%s> with %d SM(s) with", argv[0], nppGetGpuName(), nppGetGpuNumSMs());
+	int driverVersion, runtimeVersion;
+    cudaDriverGetVersion(&driverVersion);
+    cudaRuntimeGetVersion(&runtimeVersion);
 
-        if (computeCap > 0)
-        {
-            printf(" %s\n", sComputeCap[computeCap]);
-        }
-        else
-        {
-            printf(" Unknown Compute Capabilities\n");
-        }
-    }
-    else
-    {
-        printf("%s\n", sComputeCap[computeCap]);
-    }
+	printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
+	printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
+
+	// Min spec is SM 1.1 devices
+	bool bVal = checkCudaCapabilities(1, 1);
+	return bVal;
 }
 
 int main(int argc, char *argv[])
@@ -118,7 +103,12 @@ int main(int argc, char *argv[])
 
         cudaDeviceInit(argc, (const char **)argv);
 
-        printfNPPinfo(argc, argv);
+        if (printfNPPinfo(argc, argv) == false)
+		{
+			cudaDeviceReset();
+			exit(EXIT_SUCCESS);
+		}
+
 
         if (g_bQATest == false && (g_nDevice == -1) && argc > 1)
         {
@@ -144,6 +134,7 @@ int main(int argc, char *argv[])
 
         if (file_errors > 0)
         {
+            cudaDeviceReset();
             exit(EXIT_FAILURE);
         }
 
@@ -193,7 +184,7 @@ int main(int argc, char *argv[])
 
         // compute levels values on host
         Npp32s levelsHost[levelCount];
-        NPP_CHECK_NPP(nppiEvenLevelsHost_32s(levelsHost, levelCount, 0, levelCount));
+        NPP_CHECK_NPP(nppiEvenLevelsHost_32s(levelsHost, levelCount, 0, binCount));
         // compute the histogram
         NPP_CHECK_NPP(nppiHistogramEven_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(), oSizeROI,
                                                histDevice, levelCount, 0, binCount,
@@ -202,7 +193,7 @@ int main(int argc, char *argv[])
         Npp32s histHost[binCount];
         NPP_CHECK_CUDA(cudaMemcpy(histHost, histDevice, binCount * sizeof(Npp32s), cudaMemcpyDeviceToHost));
 
-        Npp32s  lutHost[binCount + 1];
+        Npp32s  lutHost[levelCount];
 
         // fill LUT
         {
@@ -247,18 +238,18 @@ int main(int argc, char *argv[])
         Npp32s  *lutDevice  = 0;
         Npp32s  *lvlsDevice = 0;
 
-        NPP_CHECK_CUDA(cudaMalloc((void **)&lutDevice,    sizeof(Npp32s) * (binCount + 1)));
-        NPP_CHECK_CUDA(cudaMalloc((void **)&lvlsDevice,   sizeof(Npp32s) * (binCount + 1)));
+        NPP_CHECK_CUDA(cudaMalloc((void **)&lutDevice,    sizeof(Npp32s) * (levelCount)));
+        NPP_CHECK_CUDA(cudaMalloc((void **)&lvlsDevice,   sizeof(Npp32s) * (levelCount)));
 
-        NPP_CHECK_CUDA(cudaMemcpy(lutDevice , lutHost,    sizeof(Npp32s) * (binCount+1), cudaMemcpyHostToDevice));
-        NPP_CHECK_CUDA(cudaMemcpy(lvlsDevice, levelsHost, sizeof(Npp32s) * (binCount+1), cudaMemcpyHostToDevice));
+        NPP_CHECK_CUDA(cudaMemcpy(lutDevice , lutHost,    sizeof(Npp32s) * (levelCount), cudaMemcpyHostToDevice));
+        NPP_CHECK_CUDA(cudaMemcpy(lvlsDevice, levelsHost, sizeof(Npp32s) * (levelCount), cudaMemcpyHostToDevice));
 
         NPP_CHECK_NPP(nppiLUT_Linear_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(),
                                             oDeviceDst.data(), oDeviceDst.pitch(),
                                             oSizeROI,
                                             lutDevice, // value and level arrays are in GPU device memory
                                             lvlsDevice,
-                                            binCount+1));
+                                            levelCount));
 
         NPP_CHECK_CUDA(cudaFree(lutDevice));
         NPP_CHECK_CUDA(cudaFree(lvlsDevice));
@@ -268,7 +259,7 @@ int main(int argc, char *argv[])
                                             oSizeROI,
                                             lutHost, // value and level arrays are in host memory
                                             levelsHost,
-                                            binCount+1));
+                                            levelCount));
 #endif
 
         // copy the result image back into the storage that contained the
@@ -276,10 +267,14 @@ int main(int argc, char *argv[])
         npp::ImageCPU_8u_C1 oHostDst(oDeviceDst.size());
         oDeviceDst.copyTo(oHostDst.data(), oHostDst.pitch());
 
+        cudaFree(histDevice);
+        cudaFree(levelsDevice);
+        cudaFree(pDeviceBuffer);
+
         // save the result
         npp::saveImage(dstFileName.c_str(), oHostDst);
-
         std::cout << "Saved image file " << dstFileName << std::endl;
+        cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
     catch (npp::Exception &rException)
@@ -287,12 +282,14 @@ int main(int argc, char *argv[])
         std::cerr << "Program error! The following exception occurred: \n";
         std::cerr << rException << std::endl;
         std::cerr << "Aborting." << std::endl;
+        cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
     catch (...)
     {
         std::cerr << "Program error! An unknow type of exception occurred. \n";
         std::cerr << "Aborting." << std::endl;
+        cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
 

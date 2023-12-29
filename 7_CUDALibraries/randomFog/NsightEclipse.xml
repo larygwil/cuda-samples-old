@@ -53,4 +53,19 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>randomFog</name>
+        <keywords>
+            <keyword>openGL</keyword>
+        </keywords>
+        <cflags>
+            <flag>-Xcompiler -fpermissive</flag>
+        </cflags>
+        <libraries>
+            <library>curand</library>
+        </libraries>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -312,15 +312,17 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
     printf("Checking computed result for correctness: ");
     bool correct = true;
 
-    // test relative error by the formula 
-    //     |<x, y>_cpu - <x,y>_gpu|/<|x|, |y|>  < eps 
+    // test relative error by the formula
+    //     |<x, y>_cpu - <x,y>_gpu|/<|x|, |y|>  < eps
     double eps = 1.e-6 ; // machine zero
+
     for (int i = 0; i < (int)(dimsC.x * dimsC.y); i++)
     {
         double abs_err = fabs(h_C[i] - (dimsA.x * valB));
         double dot_length = dimsA.x;
         double abs_val = fabs(h_C[i]);
         double rel_err = abs_err/abs_val/dot_length ;
+
         if (rel_err > eps)
         {
             printf("Error! Matrix[%05d]=%.8f, ref=%.8f error term is > %E\n", i, h_C[i], dimsA.x*valB, eps);
@@ -340,6 +342,11 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
 
     printf("\nNote: For peak performance, please refer to the matrixMulCUBLAS example.\n");
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     if (correct)

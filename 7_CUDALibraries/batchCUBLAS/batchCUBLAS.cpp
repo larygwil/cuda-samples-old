@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -19,7 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#if defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #include <float.h>
 #endif
 
@@ -41,43 +41,43 @@ const char *sSDKname = "batchCUBLAS";
 extern "C" {
 #endif /* __cplusplus */
 
-    int getDeviceVersion(void)
+int getDeviceVersion(void)
+{
+    int device;
+    struct cudaDeviceProp properties;
+
+    if (cudaGetDevice(&device) != cudaSuccess)
     {
-        int device;
-        struct cudaDeviceProp properties;
-
-        if (cudaGetDevice(&device) != cudaSuccess)
-        {
-            printf("failed to get device\n");
-            return 0;
-        }
-
-        if (cudaGetDeviceProperties(&properties, device) != cudaSuccess)
-        {
-            printf("failed to get properties\n");
-            return 0;
-        }
-
-        return properties.major * 100 + properties.minor * 10;
+        printf("failed to get device\n");
+        return 0;
     }
 
-    size_t getDeviceMemory(void)
+    if (cudaGetDeviceProperties(&properties, device) != cudaSuccess)
     {
-        struct cudaDeviceProp properties;
-        int device;
-
-        if (cudaGetDevice(&device) != cudaSuccess)
-        {
-            return 0;
-        }
-
-        if (cudaGetDeviceProperties(&properties, device) != cudaSuccess)
-        {
-            return 0;
-        }
-
-        return properties.totalGlobalMem;
+        printf("failed to get properties\n");
+        return 0;
     }
+
+    return properties.major * 100 + properties.minor * 10;
+}
+
+size_t getDeviceMemory(void)
+{
+    struct cudaDeviceProp properties;
+    int device;
+
+    if (cudaGetDevice(&device) != cudaSuccess)
+    {
+        return 0;
+    }
+
+    if (cudaGetDeviceProperties(&properties, device) != cudaSuccess)
+    {
+        return 0;
+    }
+
+    return properties.totalGlobalMem;
+}
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
@@ -586,6 +586,12 @@ int main(int argc, char *argv[])
     if (cublasCreate(&handle) != CUBLAS_STATUS_SUCCESS)
     {
         fprintf(stdout, "CUBLAS initialization failed!\n");
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
@@ -603,6 +609,12 @@ int main(int argc, char *argv[])
     if (getDeviceVersion() < DEV_VER_DBL_SUPPORT)
     {
         fprintf(stdout, "@@@@ dgemm test WAIVED due to lack of DP support\n");
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_WAIVED);
     }
@@ -652,6 +664,12 @@ int main(int argc, char *argv[])
         if (getDeviceVersion() < DEV_VER_DBL_SUPPORT)
         {
             fprintf(stdout, "@@@@ dgemm test WAIVED due to lack of DP support\n");
+
+            // cudaDeviceReset causes the driver to clean up all state. While
+            // not mandatory in normal operation, it is good practice.  It is also
+            // needed to ensure correct operation when the application is being
+            // profiled. Calling cudaDeviceReset causes all profile data to be
+            // flushed before the application exits
             cudaDeviceReset();
             exit(EXIT_WAIVED);
         }
@@ -663,6 +681,12 @@ int main(int argc, char *argv[])
     }
 
     cublasDestroy(handle);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     printf("\nTest Summary\n");

@@ -54,10 +54,30 @@
     <!-- These options will be passed to NVCC compiler as is and for all files -->
     <nvcc-compiler file="bindlessTexture_kernel.cu"></nvcc-compiler>
     <sm-arch>sm30</sm-arch>
+    <sm-arch>sm50</sm-arch>
+    <sm-arch>sm32</sm-arch>
+    <sm-arch>sm35</sm-arch>
+    
 
     <!-- One of "exe|dll|lib" (exe is default) -->
     <type>exe</type>
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <recipe>
+        <name>bindlessTexture</name>
+        <gencode>
+            <sm>30</sm>
+            <sm>32</sm>
+            <sm>35</sm>
+            
+            <sm>50</sm>
+        </gencode>
+        <keywords>
+            <keyword>openGL</keyword>
+        </keywords>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

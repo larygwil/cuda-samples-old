@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -20,7 +20,7 @@
 // RAD is the radius of the region of support for the search
 #define RAD 8
 // STEPS is the number of loads we must perform to initialize the shared memory area
-// (see convolution SDK sample for example)
+// (see convolution CUDA Sample for example)
 #define STEPS 3
 
 texture<unsigned int, cudaTextureType2D, cudaReadModeElementType> tex2Dleft;

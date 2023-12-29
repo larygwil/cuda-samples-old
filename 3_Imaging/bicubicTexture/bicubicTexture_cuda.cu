@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -83,14 +83,17 @@ void render(int width, int height, float tx, float ty, float scale, float cx, fl
             tex.filterMode = cudaFilterModeLinear;
             d_render<<<gridSize, blockSize>>>(output, width, height, tx, ty, scale, cx, cy);
             break;
+
         case MODE_BICUBIC:
             tex.filterMode = cudaFilterModePoint;
             d_renderBicubic<<<gridSize, blockSize>>>(output, width, height, tx, ty, scale, cx, cy);
             break;
+
         case MODE_FAST_BICUBIC:
             tex.filterMode = cudaFilterModeLinear;
             d_renderFastBicubic<<<gridSize, blockSize>>>(output, width, height, tx, ty, scale, cx, cy);
             break;
+
         case MODE_CATROM:
             tex.filterMode = cudaFilterModePoint;
             d_renderCatRom<<<gridSize, blockSize>>>(output, width, height, tx, ty, scale, cx, cy);

@@ -1,7 +1,7 @@
 #pragma warning(disable:4819)
 
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -38,7 +38,10 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined (__APPLE__) || defined(MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -408,7 +411,7 @@ runSingleTest(const char *ref_file, const char *exec_path)
     printf("Summary: %d errors!\n", nTotalErrors);
 
     printf(nTotalErrors == 0 ? "Test passed\n": "Test failed!\n");
-    return(nTotalErrors == 0);
+    return (nTotalErrors == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -505,6 +508,12 @@ main(int argc, char **argv)
         bool testPassed = runSingleTest(ref_file, argv[0]);
 
         cleanup();
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
 
         exit(testPassed ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -516,16 +525,28 @@ main(int argc, char **argv)
         benchmark(100);
 
         cleanup();
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
 
         exit(EXIT_SUCCESS);
     }
 
     initGLBuffers();
-    //atexit(cleanup);
+    glutCloseFunc(cleanup);
     glutMainLoop();
 
     cleanup();
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     exit(EXIT_SUCCESS);

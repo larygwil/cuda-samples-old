@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -27,7 +27,7 @@
 #define MAXTHREADS  256
 #define NUM_INTS    32
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 // Windows threads use different data structures
 #include <windows.h>
 DWORD rgdwThreadIds[MAXTHREADS];
@@ -189,7 +189,7 @@ InitCUDAContext(CUDAContext *pContext, CUdevice hcuDevice, int deviceID, char **
         // in this branch we use compilation with parameters
         const unsigned int jitNumOptions = 3;
         CUjit_option *jitOptions = new CUjit_option[jitNumOptions];
-        void **jitOptVals = new void*[jitNumOptions];
+        void **jitOptVals = new void *[jitNumOptions];
 
         // set up size of compilation log buffer
         jitOptions[0] = CU_JIT_INFO_LOG_BUFFER_SIZE_BYTES;
@@ -259,7 +259,7 @@ InitCUDAContext(CUDAContext *pContext, CUdevice hcuDevice, int deviceID, char **
 
 // ThreadProc launches the CUDA kernel on a CUDA context.
 // We have more than one thread that talks to a CUDA context
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 DWORD WINAPI ThreadProc(CUDAContext *pParams)
 #else
 void *ThreadProc(CUDAContext *pParams)
@@ -280,7 +280,7 @@ void *ThreadProc(CUDAContext *pParams)
     }
 
     // There are two ways to launch CUDA kernels via the Driver API.
-    // In this SDK sample, we illustrate both ways to pass parameters
+    // In this CUDA Sample, we illustrate both ways to pass parameters
     // and specify parameters.  By default we use the simpler method.
 
     if (1)
@@ -410,7 +410,7 @@ bool
 runTest(int argc, char **argv)
 {
     printf("[ threadMigration ] API test...\n");
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     InitializeCriticalSection(&g_cs);
 #else
     pthread_mutex_init(&g_mutex, NULL);
@@ -501,30 +501,44 @@ runTest(int argc, char **argv)
             else
             {
                 // Launch (NumThreads) for each CUDA context
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
                 rghThreads[ThreadIndex] = CreateThread(NULL, 0,
                                                        (LPTHREAD_START_ROUTINE) ThreadProc,
                                                        &g_ThreadParams[ThreadIndex],
                                                        0, &rgdwThreadIds[ThreadIndex]);
 #else   // Assume we are running linux
                 pthread_create(&rghThreads[ThreadIndex], NULL,
-                               (void *( *)(void *)) ThreadProc, &g_ThreadParams[ThreadIndex]);
+                               (void *(*)(void *)) ThreadProc, &g_ThreadParams[ThreadIndex]);
 #endif
                 ThreadIndex += 1;
             }
         }
-        cudaDeviceReset();
     }
 
     // Wait until all workers are done
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     WaitForMultipleObjects(ThreadIndex, rghThreads, TRUE, INFINITE);
 #else
 
     for (int i = 0; i < ThreadIndex; i++)
+    {
         pthread_join(rghThreads[i], NULL);
+    }
 
 #endif
+
+    // Reset the CUDA Device
+    for (int iDevice = 0; iDevice < deviceCount; iDevice++)
+    {
+        cudaSetDevice(iDevice);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
+        cudaDeviceReset();
+    }
 
     return FinalErrorCheck(ThreadIndex, NumThreads, deviceCount);
 }

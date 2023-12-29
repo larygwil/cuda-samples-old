@@ -1,4 +1,4 @@
-Sample: PTX Just-in-Time compilation
+Sample: ptxjit
 Minimum spec: SM 2.0
 
 

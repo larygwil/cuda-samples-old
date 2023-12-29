@@ -108,7 +108,7 @@ inline int findCudaGLDevice(int argc, const char **argv)
         if (devID < 0)
         {
             printf("no CUDA capable devices found, exiting...\n");
-			DEVICE_RESET
+            DEVICE_RESET
             exit(EXIT_SUCCESS);
         }
     }
@@ -140,7 +140,7 @@ sdkCheckErrorGL(const char *file, const int line)
 
     if (gl_error != GL_NO_ERROR)
     {
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
         char tmpStr[512];
         // NOTE: "%s(%i) : " allows Visual Studio to directly jump to the file at the right line
         // when the user double clicks on the error line in the Output pane. Like any compile error.
@@ -157,7 +157,7 @@ sdkCheckErrorGL(const char *file, const int line)
 
 #define SDK_CHECK_ERROR_GL()                                              \
     if( false == sdkCheckErrorGL( __FILE__, __LINE__)) {                  \
-	    DEVICE_RESET                                                      \
+        DEVICE_RESET                                                      \
         exit(EXIT_FAILURE);                                               \
     }
 #endif

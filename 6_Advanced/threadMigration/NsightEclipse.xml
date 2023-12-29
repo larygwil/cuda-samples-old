@@ -43,6 +43,10 @@
     <sm-arch>sm10</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
+    <sm-arch>sm50</sm-arch>
+    <sm-arch>sm32</sm-arch>
+    <sm-arch>sm35</sm-arch>
+    
 
     <!-- One of "exe|dll|lib" (exe is default) -->
     <type>exe</type>
@@ -55,4 +59,14 @@
 
     <!-- Driver API projects are not supported by the Nsight EE -->
     <no-nsight-eclipse/>
+    <recipe>
+        <name>threadMigration</name>
+        <ptx>threadMigration_kernel</ptx>
+        <libraries>
+            <library>cuda</library>
+        </libraries>
+        <supportedbuilds>
+            <build>makefile</build>
+        </supportedbuilds>
+    </recipe>
 </entry>

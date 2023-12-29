@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 *
 * NOTICE TO USER:
 *
@@ -30,7 +30,7 @@
 // This sample needs at least CUDA 5.0
 
 #pragma warning (disable: 4819)
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -53,7 +53,7 @@
 #include <helper_string.h>
 #include <helper_cuda.h>
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #define STRCASECMP  _stricmp
 #define STRNCASECMP _strnicmp
 #else
@@ -82,7 +82,7 @@ void loadMiddleburyMRFData(const std::string &filename, int *&dataCostArray, int
 
     if (fp == 0)
     {
-        throw(new npp::Exception("File not found!"));
+        throw (new npp::Exception("File not found!"));
     }
 
     fscanf_s(fp,"%d %d %d",&width,&height,&nLabels);
@@ -206,37 +206,22 @@ inline int cudaDeviceInit(int argc, const char **argv)
     return dev;
 }
 
-void printfNPPinfo(int argc, char *argv[])
+bool printfNPPinfo(int argc, char *argv[])
 {
-    const char *sComputeCap[] =
-    {
-        "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
-    };
-
     const NppLibraryVersion *libVer   = nppGetLibVersion();
-    NppGpuComputeCapability computeCap = nppGetGpuComputeCapability();
 
     printf("NPP Library Version %d.%d.%d\n", libVer->major, libVer->minor, libVer->build);
 
-    if (computeCap != 0 && g_nDevice == -1)
-    {
-        printf("%s using GPU <%s> with %d SM(s) with", argv[0], nppGetGpuName(), nppGetGpuNumSMs());
+	int driverVersion, runtimeVersion;
+    cudaDriverGetVersion(&driverVersion);
+    cudaRuntimeGetVersion(&runtimeVersion);
 
-        if (computeCap > 0)
-        {
-            printf(" %s\n", sComputeCap[computeCap]);
-        }
-        else
-        {
-            printf(" Unknown Compute Capabilities\n");
-        }
-    }
-    else
-    {
-        printf("%s\n", sComputeCap[computeCap]);
-    }
+	printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
+	printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
+
+	// Min spec is SM 1.1 devices
+	bool bVal = checkCudaCapabilities(1, 1);
+	return bVal;
 }
 
 int main(int argc, char *argv[])
@@ -260,7 +245,11 @@ int main(int argc, char *argv[])
 
         cudaDeviceInit(argc, (const char **)argv);
 
-        printfNPPinfo(argc, argv);
+        if (printfNPPinfo(argc, argv) == false)
+		{
+			cudaDeviceReset();
+			exit(EXIT_SUCCESS);
+		}
 
         if (g_bQATest == false && (g_nDevice == -1) && argc > 1)
         {
@@ -287,6 +276,7 @@ int main(int argc, char *argv[])
 
         if (file_errors > 0)
         {
+            cudaDeviceReset();
             exit(EXIT_FAILURE);
         }
 
@@ -428,7 +418,7 @@ int main(int argc, char *argv[])
         cudaFree(d_source);
         cudaFree(d_sink);
         cudaFree(d_terminals);
-
+        cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
     catch (npp::Exception &rException)
@@ -436,12 +426,14 @@ int main(int argc, char *argv[])
         std::cerr << "Program error! The following exception occurred: \n";
         std::cerr << rException << std::endl;
         std::cerr << "Aborting." << std::endl;
+        cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
     catch (...)
     {
         std::cerr << "Program error! An unknow type of exception occurred. \n";
         std::cerr << "Aborting." << std::endl;
+        cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
 

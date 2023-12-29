@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -12,7 +12,7 @@
 
 /*
  * This sample implements the same algorithm as the convolutionSeparable
- * CUDA SDK sample, but without using the shared memory at all.
+ * CUDA Sample, but without using the shared memory at all.
  * Instead, it uses textures in exactly the same way an OpenGL-based
  * implementation would do.
  * Refer to the "Performance" section of convolutionSeparable whitepaper.
@@ -191,6 +191,12 @@ int main(int argc, char **argv)
     free(h_Kernel);
 
     sdkDeleteTimer(&hTimer);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     if (L2norm > 1e-6)

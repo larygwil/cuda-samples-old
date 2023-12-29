@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -64,24 +64,28 @@ typedef struct
 typedef struct __align__(4)
 {
     unsigned char r, g, b, a;
-} RGBA8;
+}
+RGBA8;
 
 typedef unsigned int I32;
 
 typedef struct __align__(8)
 {
     unsigned int l, a;
-} LA32;
+}
+LA32;
 
 typedef struct __align__(16)
 {
     unsigned int r, g, b;
-} RGB32;
+}
+RGB32;
 
 typedef struct __align__(16)
 {
     unsigned int r, g, b, a;
-} RGBA32;
+}
+RGBA32;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +100,8 @@ typedef struct __align__(16)
 typedef struct __align__(16)
 {
     RGBA32 c1, c2;
-} RGBA32_2;
+}
+RGBA32_2;
 
 
 
@@ -333,6 +338,12 @@ int main(int argc, char **argv)
     free(h_idataCPU);
 
     sdkDeleteTimer(&hTimer);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     if (nTotalFailures != 0)

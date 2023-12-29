@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -41,8 +41,8 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
-    int getDeviceVersion(void);
-    size_t getDeviceMemory(void);
+int getDeviceVersion(void);
+size_t getDeviceMemory(void);
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
@@ -119,18 +119,18 @@ template <> __inline__ __device__ __host__  double cuGet<double>(double x, doubl
 }
 static __inline__ __device__ __host__  bool cuEqual(float x, float y)
 {
-    return(x == y);
+    return (x == y);
 }
 static __inline__ __device__ __host__  bool cuEqual(double x, double y)
 {
-    return(x == y);
+    return (x == y);
 }
 
 //============================================================================================
 // Platform dependent timing/systemMemory utilities
 //============================================================================================
 
-#if defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #if !defined(WIN32_LEAN_AND_MEAN)
 #define WIN32_LEAN_AND_MEAN
 #endif

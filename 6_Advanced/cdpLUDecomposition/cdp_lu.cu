@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -16,7 +16,6 @@
 //
 
 #include <stdio.h>
-//#include <omp.h>
 #include "cdp_lu.h"
 #include "cdp_lu_utils.h"
 extern __global__ void dgetrf_cdpentry(Parameters *device_params);

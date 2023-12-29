@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -37,7 +37,10 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined(__APPLE__) || defined(__MACOSX)
-#include <GLUT/glut.h>
+  #include <GLUT/glut.h>
+  #ifndef glutCloseFunc
+  #define glutCloseFunc glutWMCloseFunc
+  #endif
 #else
 #include <GL/freeglut.h>
 #endif
@@ -612,7 +615,7 @@ int findCapableDevice(int argc, char **argv)
     if (bestDev == -1)
     {
         fprintf(stderr, "\nNo configuration with available capabilities was found.  Test has been waived.\n");
-        fprintf(stderr, "The SDK sample minimum requirements:\n");
+        fprintf(stderr, "The CUDA Sample minimum requirements:\n");
         fprintf(stderr, "\tCUDA Compute Capability >= %d.%d is required\n", MIN_COMPUTE_VERSION/16, MIN_COMPUTE_VERSION%16);
         fprintf(stderr, "\tCUDA Runtime Version    >= %d.%d is required\n", MIN_RUNTIME_VERSION/1000, (MIN_RUNTIME_VERSION%100)/10);
         exit(EXIT_WAIVED);
@@ -669,6 +672,13 @@ int main(int argc, char **argv)
 
         // Running CUDA kernels (bilateralfilter) in Benchmarking mode
         g_TotalErrors += runBenchmark(argc, argv);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
+        cudaDeviceReset();
         exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     }
     else if (checkCmdLineFlag(argc, (const char **)argv, "radius") ||
@@ -677,6 +687,13 @@ int main(int argc, char **argv)
         // This overrides the default mode.  Users can specify the radius used by the filter kernel
         devID = findCudaDevice(argc, (const char **)argv);
         g_TotalErrors += runSingleTest(ref_file, argv[0]);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
+        cudaDeviceReset();
         exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     }
     else
@@ -701,6 +718,11 @@ int main(int argc, char **argv)
         }
         else
         {
+            // cudaDeviceReset causes the driver to clean up all state. While
+            // not mandatory in normal operation, it is good practice.  It is also
+            // needed to ensure correct operation when the application is being
+            // profiled. Calling cudaDeviceReset causes all profile data to be
+            // flushed before the application exits
             cudaDeviceReset();
             exit(EXIT_SUCCESS);
         }
@@ -710,7 +732,11 @@ int main(int argc, char **argv)
         initGLResources();
 
         // sets the callback function so it will call cleanup upon exit
+#if defined (__APPLE__) || defined(MACOSX)
         atexit(cleanup);
+#else
+        glutCloseFunc(cleanup);
+#endif
 
         printf("Running Standard Demonstration with GLUT loop...\n\n");
         printf("Press '+' and '-' to change filter width\n"
@@ -722,6 +748,11 @@ int main(int argc, char **argv)
         // Main OpenGL loop that will run visualization for every vsync
         glutMainLoop();
 
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     }

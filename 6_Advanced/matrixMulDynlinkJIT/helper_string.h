@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -9,7 +9,7 @@
  *
  */
 
-// These are helper functions for the SDK samples (string parsing, timers, etc)
+// These are helper functions for the CUDA Samples (string parsing, timers, etc)
 #ifndef STRING_HELPER_H
 #define STRING_HELPER_H
 
@@ -18,7 +18,7 @@
 #include <fstream>
 #include <string>
 
-#if defined(WIN32) || defined(_WIN32) || defined(WIN64)
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
@@ -334,7 +334,7 @@ inline char *sdkFindFilePath(const char *filename, const char *executable_path)
     {
         executable_name = std::string(executable_path);
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
         // Windows path delimiter
         size_t delimiter_pos = executable_name.find_last_of('\\');
         executable_name.erase(0, delimiter_pos + 1);

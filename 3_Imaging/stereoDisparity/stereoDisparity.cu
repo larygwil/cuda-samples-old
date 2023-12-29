@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -25,7 +25,7 @@
 
 
 // includes, project
-#include <helper_functions.h>  // helper for shared that are common to CUDA SDK samples
+#include <helper_functions.h>  // helper for shared that are common to CUDA Samples
 #include <helper_cuda.h>       // helper for checking cuda initialization and error checking
 #include <helper_string.h>     // helper functions for string parsing
 
@@ -198,6 +198,7 @@ runTest(int argc, char **argv)
     {
         checkSum += h_odata[i];
     }
+
     printf("GPU Checksum = %u, ", checkSum);
 
     // write out the resulting disparity image.
@@ -209,6 +210,7 @@ runTest(int argc, char **argv)
     {
         dispOut[i] = (int)h_odata[i]*mult;
     }
+
     printf("GPU image: <%s>\n", fnameOut);
     sdkSavePGM(fnameOut, dispOut, w, h);
 
@@ -221,6 +223,7 @@ runTest(int argc, char **argv)
     {
         cpuCheckSum += h_odata[i];
     }
+
     printf("CPU Checksum = %u, ", cpuCheckSum);
     char *cpuFnameOut = "output_CPU.pgm";
 
@@ -228,6 +231,7 @@ runTest(int argc, char **argv)
     {
         dispOut[i] = (int)h_odata[i]*mult;
     }
+
     printf("CPU image: <%s>\n", cpuFnameOut);
     sdkSavePGM(cpuFnameOut, dispOut, w, h);
 
@@ -237,11 +241,20 @@ runTest(int argc, char **argv)
     checkCudaErrors(cudaFree(d_img1));
 
     if (h_odata != NULL) free(h_odata);
+
     if (h_img0 != NULL) free(h_img0);
+
     if (h_img1 != NULL) free(h_img1);
+
     if (dispOut != NULL) free(dispOut);
+
     sdkDeleteTimer(&timer);
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     exit((checkSum == cpuCheckSum) ? EXIT_SUCCESS : EXIT_FAILURE);

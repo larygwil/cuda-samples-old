@@ -11,7 +11,7 @@
 
 #include <multithreading.h>
 
-#if _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 //Create thread
 CUTThread cutStartThread(CUT_THREADROUTINE func, void *data)
 {

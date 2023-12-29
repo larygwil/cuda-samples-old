@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -29,7 +29,7 @@
 
 // helper functions and utilities to work with CUDA
 #include <helper_cuda.h>
-#include <helper_functions.h>  // helper for shared that are common to CUDA SDK samples
+#include <helper_functions.h>  // helper for shared that are common to CUDA Samples
 
 // sample include
 #include "ptxjit.h"
@@ -40,7 +40,7 @@ const char *sSDKname = "PTX Just In Time (JIT) Compilation (no-qatest)";
 void ptxJIT(int argc, char **argv, CUmodule *phModule, CUfunction *phKernel, CUlinkState *lState)
 {
     CUjit_option options[6];
-    void* optionVals[6];
+    void *optionVals[6];
     float walltime;
     char error_log[8192],
          info_log[8192];
@@ -52,22 +52,22 @@ void ptxJIT(int argc, char **argv, CUmodule *phModule, CUfunction *phKernel, CUl
     // Setup linker options
     // Return walltime from JIT compilation
     options[0] = CU_JIT_WALL_TIME;
-    optionVals[0] = (void*) &walltime;
+    optionVals[0] = (void *) &walltime;
     // Pass a buffer for info messages
     options[1] = CU_JIT_INFO_LOG_BUFFER;
-    optionVals[1] = (void*) info_log;
+    optionVals[1] = (void *) info_log;
     // Pass the size of the info buffer
     options[2] = CU_JIT_INFO_LOG_BUFFER_SIZE_BYTES;
-    optionVals[2] = (void*) logSize;
+    optionVals[2] = (void *) logSize;
     // Pass a buffer for error message
     options[3] = CU_JIT_ERROR_LOG_BUFFER;
-    optionVals[3] = (void*) error_log;
+    optionVals[3] = (void *) error_log;
     // Pass the size of the error buffer
     options[4] = CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES;
-    optionVals[4] = (void*) logSize;
+    optionVals[4] = (void *) logSize;
     // Make the linker verbose
     options[5] = CU_JIT_LOG_VERBOSE;
-    optionVals[5] = (void*) 1;
+    optionVals[5] = (void *) 1;
 
     // Create a pending linker invocation
     checkCudaErrors(cuLinkCreate(6,options, optionVals, lState));
@@ -77,22 +77,22 @@ void ptxJIT(int argc, char **argv, CUmodule *phModule, CUfunction *phKernel, CUl
         // Load the PTX from the string myPtx32
         printf("Loading myPtx32[] program\n");
         // PTX May also be loaded from file, as per below.
-        myErr = cuLinkAddData(*lState, CU_JIT_INPUT_PTX, (void*)myPtx32, strlen(myPtx32)+1, 0, 0, 0, 0);
+        myErr = cuLinkAddData(*lState, CU_JIT_INPUT_PTX, (void *)myPtx32, strlen(myPtx32)+1, 0, 0, 0, 0);
     }
     else
     {
         // Load the PTX from the string myPtx (64-bit)
         printf("Loading myPtx[] program\n");
-        myErr = cuLinkAddData(*lState, CU_JIT_INPUT_PTX, (void*)myPtx64, strlen(myPtx64)+1, 0, 0, 0, 0);
+        myErr = cuLinkAddData(*lState, CU_JIT_INPUT_PTX, (void *)myPtx64, strlen(myPtx64)+1, 0, 0, 0, 0);
         // PTX May also be loaded from file, as per below.
         // myErr = cuLinkAddFile(*lState, CU_JIT_INPUT_PTX, "myPtx64.ptx",0,0,0);
     }
 
-    if ( myErr != CUDA_SUCCESS )
+    if (myErr != CUDA_SUCCESS)
     {
-      // Errors will be put in error_log, per CU_JIT_ERROR_LOG_BUFFER option above. 
-      fprintf(stderr,"PTX Linker Error:\n%s\n",error_log);
-    }    
+        // Errors will be put in error_log, per CU_JIT_ERROR_LOG_BUFFER option above.
+        fprintf(stderr,"PTX Linker Error:\n%s\n",error_log);
+    }
 
     // Complete the linker step
     checkCudaErrors(cuLinkComplete(*lState, &cuOut, &outSize));
@@ -152,15 +152,17 @@ int main(int argc, char **argv)
     {
         // Otherwise pick the device with the highest Gflops/s
         cuda_device = gpuGetMaxGflopsDeviceId();
-        checkCudaErrors(cudaSetDevice(cuda_device));
-        checkCudaErrors(cudaGetDeviceProperties(&deviceProp, cuda_device));
-        printf("> Using CUDA device [%d]: %s\n", cuda_device, deviceProp.name);
-        if ( deviceProp.major < 2 )
-        {
-          fprintf(stderr, "Compute Capability 2.0 or greater required for this sample.\n");
-          fprintf(stderr, "Maximum Compute Capability of device[%d] is %d.%d.\n", cuda_device,deviceProp.major,deviceProp.minor);
-          exit(EXIT_WAIVED);
-        }
+    }
+
+    checkCudaErrors(cudaSetDevice(cuda_device));
+    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, cuda_device));
+    printf("> Using CUDA device [%d]: %s\n", cuda_device, deviceProp.name);
+
+    if (deviceProp.major < 2)
+    {
+        fprintf(stderr, "Compute Capability 2.0 or greater required for this sample.\n");
+        fprintf(stderr, "Maximum Compute Capability of device[%d] is %d.%d.\n", cuda_device,deviceProp.major,deviceProp.minor);
+        exit(EXIT_WAIVED);
     }
 
     // Allocate memory on host and device (Runtime API)
@@ -221,6 +223,11 @@ int main(int argc, char **argv)
         hModule = 0;
     }
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     return dataGood ? EXIT_SUCCESS : EXIT_FAILURE;

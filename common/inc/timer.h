@@ -14,14 +14,14 @@
 
 #include <stdlib.h>
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
 #include <sys/time.h>
 #endif
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 double PCFreq = 0.0;
 __int64 timerStart = 0;
 #else
@@ -30,7 +30,7 @@ struct timeval timerStart;
 
 void StartTimer()
 {
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     LARGE_INTEGER li;
 
     if (!QueryPerformanceFrequency(&li))
@@ -49,7 +49,7 @@ void StartTimer()
 // time elapsed in ms
 double GetTimer()
 {
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     LARGE_INTEGER li;
     QueryPerformanceCounter(&li);
     return (double)(li.QuadPart-timerStart)/PCFreq;

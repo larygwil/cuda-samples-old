@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -11,14 +11,14 @@
 
 #pragma warning(disable:4819)
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
 #endif
 
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #define STRCASECMP  _stricmp
 #define STRNCASECMP _strnicmp
 #else
@@ -157,60 +157,45 @@ void parseCommandLineArguments(int argc, char *argv[])
 
         if (checkCmdLineFlag(argc, (const char **)argv, "input"))
         {
-            char* pFilename = 0;
+            char *pFilename = 0;
             getCmdLineArgumentString(argc, (const char **)argv, "input", &pFilename);
-            if( pFilename ) sFilename = pFilename;
+
+            if (pFilename) sFilename = pFilename;
         }
+
         if (checkCmdLineFlag(argc, (const char **)argv, "verify"))
         {
-            char* pReferenceFile = 0;
+            char *pReferenceFile = 0;
             getCmdLineArgumentString(argc, (const char **)argv, "verify", &pReferenceFile);
-            if( pReferenceFile) sReferenceFile = pReferenceFile;
+
+            if (pReferenceFile) sReferenceFile = pReferenceFile;
+
             g_bQATest = true;
             g_bDisplay = false;
         }
     }
 }
 
-NppGpuComputeCapability printfNPPinfo(char *argv[])
+bool printfNPPinfo(int argc, char *argv[], int cudaVerMajor, int cudaVerMinor)
 {
-    const char *sComputeCap[] =
-    {
-        "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
-    };
-
     const NppLibraryVersion *libVer   = nppGetLibVersion();
-    NppGpuComputeCapability computeCap = nppGetGpuComputeCapability();
 
     printf("NPP Library Version %d.%d.%d\n", libVer->major, libVer->minor, libVer->build);
 
-    if (computeCap != 0 && g_nDevice == -1)
-    {
-        printf("%s using GPU <%s> with %d SM(s) with", argv[0], nppGetGpuName(), nppGetGpuNumSMs());
+	int driverVersion, runtimeVersion;
+    cudaDriverGetVersion(&driverVersion);
+    cudaRuntimeGetVersion(&runtimeVersion);
 
-        if (computeCap > 0)
-        {
-            printf(" %s\n", sComputeCap[computeCap]);
-        }
-        else
-        {
-            printf(" Unknown Compute Capabilities\n");
-        }
-    }
-    else
-    {
-        printf("%s\n", sComputeCap[computeCap]);
-    }
+	printf("  CUDA Driver  Version: %d.%d\n", driverVersion/1000, (driverVersion%100)/10);
+	printf("  CUDA Runtime Version: %d.%d\n", runtimeVersion/1000, (runtimeVersion%100)/10);
 
-    return computeCap;
+	bool bVal = checkCudaCapabilities(cudaVerMajor, cudaVerMinor);
+	return bVal;
 }
 
 
 int main(int argc, char **argv)
 {
-
     printf("%s Starting...\n\n", argv[0]);
 
     // Parse the command line arguments for proper configuration
@@ -233,9 +218,11 @@ int main(int argc, char **argv)
 
     cudaDeviceInit();
 
-    if (printfNPPinfo(argv) < NPP_CUDA_1_1)
+	// Min spec is SM 1.1 devices
+    if (printfNPPinfo(argc, argv, 1, 1) == false)
     {
         printf("Insufficient Compute Capability (must be >= 1.1)\n");
+        cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
 
@@ -259,6 +246,7 @@ int main(int argc, char **argv)
 
     if (file_errors > 0)
     {
+        cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
 
@@ -345,6 +333,7 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaFree(d_image));
     checkCudaErrors(cudaFree(d_trimap));
 
+    cudaDeviceReset();
     exit(qaStatus);
 }
 
@@ -445,7 +434,7 @@ void reshape(int w, int h)
 
 bool inside_rect(int x, int y, int x1, int y1, int x2, int y2)
 {
-    return(x >= x1 && x <= x2 && y >= y1 && y <= y2);
+    return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 }
 
 void mouseClick(int button, int state, int x, int y)
@@ -584,6 +573,7 @@ void keyboard(unsigned char key, int x, int y)
 {
     if (key == 27)
     {
+        cudaDeviceReset();
         exit(EXIT_SUCCESS);
     }
 
@@ -728,6 +718,7 @@ bool verifyResult(const char *filename)
             }
         }
     }
+
     printf("Checking grabcut results with reference file <%s>\n", filename);
     printf("Images %s\n", result ? "Match!" : "Mismatched!");
 

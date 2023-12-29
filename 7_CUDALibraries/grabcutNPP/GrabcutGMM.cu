@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -437,7 +437,8 @@ cudaError_t GMMUpdate(int gmm_N, float *gmm, float *scratch_mem, int gmm_pitch, 
 
     GMMFinalizeKernel<4, true><<<gmm_N, 32 *4>>>(gmm, &scratch_mem[grid.x *grid.y], gmm_pitch/4, grid.x *grid.y);
 
-    block.x = 32; block.y = 2;
+    block.x = 32;
+    block.y = 2;
     GMMcommonTerm<<<1, block>>>(gmm_N / 2, gmm, gmm_pitch/4);
 
     return cudaGetLastError();
@@ -785,6 +786,7 @@ cudaError_t GMMInitialize(int gmm_N, float *gmm, float *scratch_mem, int gmm_pit
         {
             GMMReductionKernel<4, false><<<grid, block>>>(i, &scratch_mem[grid.x *grid.y], gmm_pitch/4, image, image_pitch/4, alpha, alpha_pitch, width, height, (unsigned int *) scratch_mem);
         }
+
         GMMFinalizeKernel<4, false><<<k, 32 *4>>>(gmm, &scratch_mem[grid.x *grid.y], gmm_pitch/4, grid.x *grid.y);
 
         GMMFindSplit<<<1, smallblock>>>((GMMSplit_t *) scratch_mem, k / 2, gmm, gmm_pitch/4);

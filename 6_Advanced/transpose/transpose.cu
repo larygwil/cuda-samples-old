@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -68,7 +68,7 @@ __global__ void copy(float *odata, float *idata, int width, int height)
 
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      odata[index+i*width] = idata[index+i*width];
+        odata[index+i*width] = idata[index+i*width];
     }
 
 }
@@ -84,20 +84,20 @@ __global__ void copySharedMem(float *odata, float *idata, int width, int height)
 
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      if (xIndex < width && yIndex < height)
-      {
-        tile[threadIdx.y][threadIdx.x] = idata[index];
-      }
+        if (xIndex < width && yIndex < height)
+        {
+            tile[threadIdx.y][threadIdx.x] = idata[index];
+        }
     }
 
     __syncthreads();
-    
+
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      if (xIndex < height && yIndex < width)
-      {
-        odata[index] = tile[threadIdx.y][threadIdx.x];
-      }
+        if (xIndex < height && yIndex < width)
+        {
+            odata[index] = tile[threadIdx.y][threadIdx.x];
+        }
     }
 }
 
@@ -116,7 +116,7 @@ __global__ void transposeNaive(float *odata, float *idata, int width, int height
 
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      odata[index_out+i] = idata[index_in+i*width];
+        odata[index_out+i] = idata[index_in+i*width];
     }
 }
 
@@ -136,14 +136,14 @@ __global__ void transposeCoalesced(float *odata, float *idata, int width, int he
 
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+        tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
     }
-    
+
     __syncthreads();
 
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
+        odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
     }
 }
 
@@ -163,14 +163,14 @@ __global__ void transposeNoBankConflicts(float *odata, float *idata, int width, 
 
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+        tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
     }
-    
+
     __syncthreads();
-    
+
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
+        odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
     }
 }
 
@@ -217,14 +217,14 @@ __global__ void transposeDiagonal(float *odata, float *idata, int width, int hei
 
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+        tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
     }
 
     __syncthreads();
-    
+
     for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-      odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
+        odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
     }
 }
 
@@ -247,14 +247,14 @@ __global__ void transposeFineGrained(float *odata, float *idata, int width, int 
 
     for (int i=0; i < TILE_DIM; i += BLOCK_ROWS)
     {
-      block[threadIdx.y+i][threadIdx.x] = idata[index+i*width];
+        block[threadIdx.y+i][threadIdx.x] = idata[index+i*width];
     }
-    
+
     __syncthreads();
-    
+
     for (int i=0; i < TILE_DIM; i += BLOCK_ROWS)
     {
-      odata[index+i*height] = block[threadIdx.x][threadIdx.y+i];
+        odata[index+i*height] = block[threadIdx.x][threadIdx.y+i];
     }
 }
 
@@ -273,14 +273,14 @@ __global__ void transposeCoarseGrained(float *odata, float *idata, int width, in
 
     for (int i=0; i<TILE_DIM; i += BLOCK_ROWS)
     {
-      block[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+        block[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
     }
-    
+
     __syncthreads();
-    
+
     for (int i=0; i<TILE_DIM; i += BLOCK_ROWS)
     {
-            odata[index_out+i*height] = block[threadIdx.y+i][threadIdx.x];
+        odata[index_out+i*height] = block[threadIdx.y+i][threadIdx.x];
     }
 }
 
@@ -440,6 +440,12 @@ main(int argc, char **argv)
     if (size_x != size_y)
     {
         printf("\n[%s] does not support non-square matrices (row_dim_size(%d) != col_dim_size(%d))\nExiting...\n\n", sSDKsample, size_x, size_y);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
@@ -447,6 +453,12 @@ main(int argc, char **argv)
     if (size_x%TILE_DIM != 0 || size_y%TILE_DIM != 0)
     {
         printf("[%s] Matrix size must be integral multiple of tile size\nExiting...\n\n", sSDKsample);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
@@ -461,6 +473,12 @@ main(int argc, char **argv)
     if (grid.x < 1 || grid.y < 1)
     {
         printf("[%s] grid size computation incorrect in test \nExiting...\n\n", sSDKsample);
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
@@ -475,6 +493,12 @@ main(int argc, char **argv)
     {
         printf("Input matrix size is larger than the available device memory!\n");
         printf("Please choose a smaller size matrix\n");
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_FAILURE);
     }
@@ -591,6 +615,7 @@ main(int argc, char **argv)
             // Ensure no launch failure
             checkCudaErrors(cudaGetLastError());
         }
+
         checkCudaErrors(cudaEventRecord(stop, 0));
         checkCudaErrors(cudaEventSynchronize(stop));
         float kernelTime;
@@ -635,6 +660,11 @@ main(int argc, char **argv)
     checkCudaErrors(cudaEventDestroy(start));
     checkCudaErrors(cudaEventDestroy(stop));
 
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
     cudaDeviceReset();
 
     if (!success)

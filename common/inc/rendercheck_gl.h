@@ -89,7 +89,7 @@ class CheckRender
 
         virtual void setExecPath(char *path)
         {
-                STRCPY(m_ExecPath, strlen(path), path);
+            m_ExecPath = path;
         }
         virtual void EnableQAReadback(bool bStatus)
         {
@@ -258,11 +258,11 @@ class CheckRender
             unsigned long error_count = 0;
             unsigned int width, height;
 
-            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath);
+            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath.c_str());
 
             if (ref_file_path == NULL)
             {
-                printf("CheckRender::PGMvsPGM unable to find <%s> in <%s> Aborting comparison!\n", ref_file, m_ExecPath);
+                printf("CheckRender::PGMvsPGM unable to find <%s> in <%s> Aborting comparison!\n", ref_file, m_ExecPath.c_str());
                 printf(">>> Check info.xml and [project//data] folder <%s> <<<\n", ref_file);
                 printf("Aborting comparison!\n");
                 printf("  FAILED\n");
@@ -316,11 +316,11 @@ class CheckRender
         {
             unsigned long error_count = 0;
 
-            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath);
+            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath.c_str());
 
             if (ref_file_path == NULL)
             {
-                printf("CheckRender::PPMvsPPM unable to find <%s> in <%s> Aborting comparison!\n", ref_file, m_ExecPath);
+                printf("CheckRender::PPMvsPPM unable to find <%s> in <%s> Aborting comparison!\n", ref_file, m_ExecPath.c_str());
                 printf(">>> Check info.xml and [project//data] folder <%s> <<<\n", ref_file);
                 printf("Aborting comparison!\n");
                 printf("  FAILED\n");
@@ -363,17 +363,18 @@ class CheckRender
             size_t fsize = 0;
 
             FOPEN(src_fp, src_file, "rb");
+
             if (src_fp == NULL)
             {
                 printf("compareBin2Bin <unsigned int> unable to open src_file: %s\n", src_file);
                 error_count++;
             }
 
-            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath);
+            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath.c_str());
 
             if (ref_file_path == NULL)
             {
-                printf("compareBin2Bin <unsigned int>  unable to find <%s> in <%s>\n", ref_file, m_ExecPath);
+                printf("compareBin2Bin <unsigned int>  unable to find <%s> in <%s>\n", ref_file, m_ExecPath.c_str());
                 printf(">>> Check info.xml and [project//data] folder <%s> <<<\n", ref_file);
                 printf("Aborting comparison!\n");
                 printf("  FAILED\n");
@@ -392,6 +393,7 @@ class CheckRender
             else
             {
                 FOPEN(ref_fp, ref_file_path, "rb");
+
                 if (ref_fp == NULL)
                 {
                     printf("compareBin2Bin <unsigned int>  unable to open ref_file: %s\n", ref_file_path);
@@ -456,18 +458,19 @@ class CheckRender
             unsigned long error_count = 0;
 
             FOPEN(src_fp, src_file, "rb");
+
             if (src_fp == NULL)
             {
                 printf("compareBin2Bin <float> unable to open src_file: %s\n", src_file);
                 error_count = 1;
             }
 
-            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath);
+            char *ref_file_path = sdkFindFilePath(ref_file, m_ExecPath.c_str());
 
             if (ref_file_path == NULL)
             {
-                printf("compareBin2Bin <float> unable to find <%s> in <%s>\n", ref_file, m_ExecPath);
-                printf(">>> Check info.xml and [project//data] folder <%s> <<<\n", m_ExecPath);
+                printf("compareBin2Bin <float> unable to find <%s> in <%s>\n", ref_file, m_ExecPath.c_str());
+                printf(">>> Check info.xml and [project//data] folder <%s> <<<\n", m_ExecPath.c_str());
                 printf("Aborting comparison!\n");
                 printf("  FAILED\n");
                 error_count++;
@@ -485,6 +488,7 @@ class CheckRender
             else
             {
                 FOPEN(ref_fp, ref_file_path, "rb");
+
                 if (ref_fp == NULL)
                 {
                     printf("compareBin2Bin <float> unable to open ref_file: %s\n", ref_file_path);
@@ -548,7 +552,7 @@ class CheckRender
         GLuint        m_pboReadback;
         GLenum        m_PixelFormat;
         float         m_fThresholdCompare;
-        char          m_ExecPath[256];
+        string        m_ExecPath;
 };
 
 
