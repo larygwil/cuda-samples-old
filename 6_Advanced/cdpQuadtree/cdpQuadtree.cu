@@ -87,7 +87,7 @@ class Bounding_box
         // Does a box contain a point.
         __host__ __device__ bool contains(const float2 &p) const
         {
-            return p.x >= m_p_min.x && p.y < m_p_max.x && p.y >= m_p_min.y && p.y < m_p_max.y;
+            return p.x >= m_p_min.x && p.x < m_p_max.x && p.y >= m_p_min.y && p.y < m_p_max.y;
         }
 
         // Define the bounding box.
@@ -688,7 +688,7 @@ int main(int argc, char **argv)
     if (!cdpCapable)
     {
         std::cerr << "cdpQuadTree requires SM 3.5 or higher to use CUDA Dynamic Parallelism.  Exiting...\n" << std::endl;
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     bool ok = cdpQuadtree(deviceProps.warpSize);

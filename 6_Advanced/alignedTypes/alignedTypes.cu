@@ -160,7 +160,7 @@ template<class TData> __global__ void testKernel(
 // Validation routine for simple copy kernel.
 // We must know "packed" size of TData (number_of_fields * sizeof(simple_type))
 // and compare only these "packed" parts of the structure,
-// containig actual user data. The compiler behavior with padding bytes
+// containing actual user data. The compiler behavior with padding bytes
 // is undefined, since padding is merely a placeholder
 // and doesn't contain any user data.
 ////////////////////////////////////////////////////////////////////////////////

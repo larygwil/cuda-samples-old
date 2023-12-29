@@ -403,23 +403,13 @@ __global__ void MandelbrotDS1(uchar4 *dst, const int imageW, const int imageH, c
 
 } // MandelbrotDS1
 
-// The host CPU Mandebrot thread spawner
+// The host CPU Mandelbrot thread spawner
 void RunMandelbrot0(uchar4 *dst, const int imageW, const int imageH, const int crunch, const double xOff, const double yOff,
                     const double xjp, const double yjp, const double scale, const uchar4 colors, const int frame,
                     const int animationFrame, const int mode, const int numSMs, const bool isJ, int version)
 {
-    int blockdim_x_dynamic = BLOCKDIM_X;
-    int blockdim_y_dynamic = BLOCKDIM_Y;
-
-    //override original 1.x block dimensions on newer architectures, supporting 1024 threads/block with warpSize=32
-    if (version >= 20)
-    {
-        blockdim_x_dynamic = BLOCKDIM_X_SM20;
-        blockdim_y_dynamic = BLOCKDIM_Y_SM20;
-    }
-
-    dim3 threads(blockdim_x_dynamic, blockdim_y_dynamic);
-    dim3 grid(iDivUp(imageW, blockdim_x_dynamic), iDivUp(imageH, blockdim_y_dynamic));
+    dim3 threads(BLOCKDIM_X, BLOCKDIM_Y);
+    dim3 grid(iDivUp(imageW, BLOCKDIM_X), iDivUp(imageH, BLOCKDIM_Y));
 
     // zero block counter
     unsigned int hBlockCounter = 0;
@@ -450,23 +440,13 @@ void RunMandelbrot0(uchar4 *dst, const int imageW, const int imageH, const int c
     getLastCudaError("Mandelbrot0 kernel execution failed.\n");
 } // RunMandelbrot0
 
-// The host CPU Mandebrot thread spawner
+// The host CPU Mandelbrot thread spawner
 void RunMandelbrot1(uchar4 *dst, const int imageW, const int imageH, const int crunch, const double xOff, const double yOff,
                     const double xjp, const double yjp, const double scale, const uchar4 colors, const int frame,
                     const int animationFrame, const int mode, const int numSMs, const bool isJ, int version)
 {
-    int blockdim_x_dynamic = BLOCKDIM_X;
-    int blockdim_y_dynamic = BLOCKDIM_Y;
-
-    //override original 1.x block dimensions on newer architectures, supporting 1024 threads/block with warpSize=32
-    if (version >= 20)
-    {
-        blockdim_x_dynamic = BLOCKDIM_X_SM20;
-        blockdim_y_dynamic = BLOCKDIM_Y_SM20;
-    }
-
-    dim3 threads(blockdim_x_dynamic, blockdim_y_dynamic);
-    dim3 grid(iDivUp(imageW, blockdim_x_dynamic), iDivUp(imageH, blockdim_y_dynamic));
+    dim3 threads(BLOCKDIM_X, BLOCKDIM_Y);
+    dim3 grid(iDivUp(imageW, BLOCKDIM_X), iDivUp(imageH, BLOCKDIM_Y));
 
     // zero block counter
     unsigned int hBlockCounter = 0;

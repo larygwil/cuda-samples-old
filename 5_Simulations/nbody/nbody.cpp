@@ -83,7 +83,7 @@ void computePerfStats(double &interactionsPerSecond, double &gflops,
     // double precision uses intrinsic operation followed by refinement,
     // resulting in higher operation count per interaction.
     // (Note Astrophysicists use 38 flops per interaction no matter what,
-    // based on "historical precident", but they are using FLOP/s as a
+    // based on "historical precedent", but they are using FLOP/s as a
     // measure of "science throughput". We are using it as a measure of
     // hardware throughput.  They should really use interactions/s...
     // const int flopsPerInteraction = fp64 ? 30 : 20;
@@ -271,6 +271,7 @@ class NBodyDemo
             : m_nbody(0),
               m_nbodyCuda(0),
               m_nbodyCpu(0),
+              m_renderer(0),
               m_hPos(0),
               m_hVel(0),
               m_hColor(0)
@@ -1061,6 +1062,10 @@ main(int argc, char **argv)
 {
     bool bTestResults = true;
 
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     if (checkCmdLineFlag(argc, (const char **)argv, "help"))
     {
         printf("\n> Command line options\n");
@@ -1333,6 +1338,13 @@ main(int argc, char **argv)
             printf("Error: \"number of bodies\" specified %d is invalid.  Value should be >= 1\n", numBodies);
             exit(bTestResults ? EXIT_SUCCESS : EXIT_FAILURE);
         }
+        else if (numBodies % blockSize)
+        {
+            int newNumBodies = ((numBodies / blockSize) + 1) * blockSize;
+            printf("Warning: \"number of bodies\" specified %d is not a multiple of %d.\n", numBodies, blockSize);
+            printf("Rounding up to the nearest multiple: %d.\n", newNumBodies);
+            numBodies = newNumBodies;
+        }
         else
         {
             printf("number of bodies = %d\n", numBodies);
@@ -1348,12 +1360,6 @@ main(int argc, char **argv)
         bShowSliders = false;
 
     }
-
-    if (numBodies < blockSize)
-    {
-        blockSize = numBodies;
-    }
-
 
     if (numBodies <= 1024)
     {

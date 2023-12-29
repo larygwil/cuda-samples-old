@@ -34,13 +34,14 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-6.0"
+CUDA_PATH ?= "/usr/local/cuda-6.5"
 
 OSUPPER = $(shell uname -s 2>/dev/null | tr "[:lower:]" "[:upper:]")
 OSLOWER = $(shell uname -s 2>/dev/null | tr "[:upper:]" "[:lower:]")
 
-OS_SIZE = $(shell uname -m | sed -e "s/i.86/32/" -e "s/x86_64/64/" -e "s/armv7l/32/")
-OS_ARCH = $(shell uname -m | sed -e "s/i386/i686/")
+OS_SIZE    = $(shell uname -m | sed -e "s/x86_64/64/" -e "s/armv7l/32/" -e "s/aarch64/64/")
+OS_ARCH    = $(shell uname -m)
+ARCH_FLAGS =
 
 DARWIN = $(strip $(findstring DARWIN, $(OSUPPER)))
 ifneq ($(DARWIN),)
@@ -48,17 +49,19 @@ ifneq ($(DARWIN),)
 endif
 
 # Take command line flags that override any of these settings
-ifeq ($(i386),1)
-	OS_SIZE = 32
-	OS_ARCH = i686
-endif
 ifeq ($(x86_64),1)
 	OS_SIZE = 64
 	OS_ARCH = x86_64
 endif
 ifeq ($(ARMv7),1)
-	OS_SIZE = 32
-	OS_ARCH = armv7l
+	OS_SIZE    = 32
+	OS_ARCH    = armv7l
+	ARCH_FLAGS = -target-cpu-arch ARM
+endif
+ifeq ($(aarch64),1)
+	OS_SIZE    = 64
+	OS_ARCH    = aarch64
+	ARCH_FLAGS = -target-cpu-arch ARM
 endif
 
 # Common binaries
@@ -69,12 +72,16 @@ else
   GCC ?= g++
 endif
 else
+ifeq ($(ARMv7),1)
+  GCC ?= arm-linux-gnueabihf-g++
+else
   GCC ?= g++
+endif
 endif
 NVCC := $(CUDA_PATH)/bin/nvcc -ccbin $(GCC)
 
 # internal flags
-NVCCFLAGS   := -m${OS_SIZE}
+NVCCFLAGS   := -m${OS_SIZE} ${ARCH_FLAGS}
 CCFLAGS     :=
 LDFLAGS     :=
 
@@ -89,21 +96,27 @@ ifneq ($(DARWIN),)
   CCFLAGS += -arch $(OS_ARCH)
 else
   ifeq ($(OS_ARCH),armv7l)
-    ifeq ($(abi),gnueabi)
-      CCFLAGS += -mfloat-abi=softfp
+    ifeq ($(abi),androideabi)
+      NVCCFLAGS += -target-os-variant Android
     else
-      # default to gnueabihf
-      override abi := gnueabihf
-      LDFLAGS += --dynamic-linker=/lib/ld-linux-armhf.so.3
-      CCFLAGS += -mfloat-abi=hard
+      ifeq ($(abi),gnueabi)
+        CCFLAGS += -mfloat-abi=softfp
+      else
+        # default to gnueabihf
+        override abi := gnueabihf
+        LDFLAGS += --dynamic-linker=/lib/ld-linux-armhf.so.3
+        CCFLAGS += -mfloat-abi=hard
+      endif
     endif
   endif
 endif
 
 ifeq ($(ARMv7),1)
-NVCCFLAGS += -target-cpu-arch ARM
 ifneq ($(TARGET_FS),)
+GCCVERSIONLTEQ46 := $(shell expr `$(GCC) -dumpversion` \<= 4.6)
+ifeq ($(GCCVERSIONLTEQ46),1)
 CCFLAGS += --sysroot=$(TARGET_FS)
+endif
 LDFLAGS += --sysroot=$(TARGET_FS)
 LDFLAGS += -rpath-link=$(TARGET_FS)/lib
 LDFLAGS += -rpath-link=$(TARGET_FS)/usr/lib
@@ -136,7 +149,31 @@ LIBRARIES :=
 
 ################################################################################
 
-LIBRARIES += -lcublas -lcusparse
+# Gencode arguments
+SMS ?=
+
+ifeq ($(GENCODE_FLAGS),)
+# Generate SASS code for each SM architecture listed in $(SMS)
+$(foreach sm,$(SMS),$(eval GENCODE_FLAGS += -gencode arch=compute_$(sm),code=sm_$(sm)))
+
+ifeq ($(SMS),)
+ifeq ($(OS_ARCH),armv7l)
+# Generate PTX code from SM 20
+GENCODE_FLAGS += -gencode arch=compute_20,code=compute_20
+else
+# Generate PTX code from SM 11
+GENCODE_FLAGS += -gencode arch=compute_11,code=compute_11
+endif
+endif
+
+# Generate PTX code from the highest SM architecture in $(SMS) to guarantee forward-compatibility
+HIGHEST_SM := $(lastword $(sort $(SMS)))
+ifneq ($(HIGHEST_SM),)
+GENCODE_FLAGS += -gencode arch=compute_$(HIGHEST_SM),code=compute_$(HIGHEST_SM)
+endif
+endif
+
+LIBRARIES += -lcublas_static -lcusparse_static -lculibos
 
 ################################################################################
 

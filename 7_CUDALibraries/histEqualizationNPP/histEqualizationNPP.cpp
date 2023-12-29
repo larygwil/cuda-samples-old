@@ -9,9 +9,9 @@
  *
  */
 
-#pragma warning (disable:4819)
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#pragma warning (disable:4819)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -38,9 +38,6 @@
 #define STRCASECMP  strcasecmp
 #define STRNCASECMP strncasecmp
 #endif
-
-bool g_bQATest = false;
-int  g_nDevice = -1;
 
 inline int cudaDeviceInit(int argc, const char **argv)
 {
@@ -89,7 +86,24 @@ int main(int argc, char *argv[])
     try
     {
         std::string sFilename;
-        char *filePath = sdkFindFilePath("Lena.pgm", argv[0]);
+        char *filePath;
+
+        cudaDeviceInit(argc, (const char **)argv);
+
+        if (printfNPPinfo(argc, argv) == false)
+        {
+            cudaDeviceReset();
+            exit(EXIT_SUCCESS);
+        }
+
+        if (checkCmdLineFlag(argc, (const char **)argv, "input"))
+        {
+            getCmdLineArgumentString(argc, (const char **)argv, "input", &filePath);
+        }
+        else
+        {
+            filePath = sdkFindFilePath("Lena.pgm", argv[0]);
+        }
 
         if (filePath)
         {
@@ -97,22 +111,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("Error unable to find Lena.pgm\n");
-            exit(EXIT_FAILURE);
-        }
-
-        cudaDeviceInit(argc, (const char **)argv);
-
-        if (printfNPPinfo(argc, argv) == false)
-		{
-			cudaDeviceReset();
-			exit(EXIT_SUCCESS);
-		}
-
-
-        if (g_bQATest == false && (g_nDevice == -1) && argc > 1)
-        {
-            sFilename = argv[1];
+            sFilename = "Lena.pgm";
         }
 
         // if we specify the filename at the command line, then we only test sFilename.
@@ -149,9 +148,11 @@ int main(int argc, char *argv[])
 
         dstFileName += "_histEqualization.pgm";
 
-        if (argc >= 3 && !g_bQATest)
+        if (checkCmdLineFlag(argc, (const char **)argv, "output"))
         {
-            dstFileName = argv[2];
+            char *outputFilePath;
+            getCmdLineArgumentString(argc, (const char **)argv, "output", &outputFilePath);
+            dstFileName = outputFilePath;
         }
 
         npp::ImageCPU_8u_C1 oHostSrc;
@@ -175,7 +176,7 @@ int main(int argc, char *argv[])
         // compute histogram
         //
 
-        NppiSize oSizeROI = {oDeviceSrc.width(), oDeviceSrc.height()}; // full image
+        NppiSize oSizeROI = {(int)oDeviceSrc.width(), (int)oDeviceSrc.height()}; // full image
         // create device scratch buffer for nppiHistogram
         int nDeviceBufferSize;
         nppiHistogramEvenGetBufferSize_8u_C1R(oSizeROI, levelCount ,&nDeviceBufferSize);
@@ -267,9 +268,9 @@ int main(int argc, char *argv[])
         npp::ImageCPU_8u_C1 oHostDst(oDeviceDst.size());
         oDeviceDst.copyTo(oHostDst.data(), oHostDst.pitch());
 
-        cudaFree(histDevice);
-        cudaFree(levelsDevice);
-        cudaFree(pDeviceBuffer);
+        cudaFree((void **)&histDevice);
+        cudaFree((void **)&levelsDevice);
+        cudaFree((void **)&pDeviceBuffer);
 
         // save the result
         npp::saveImage(dstFileName.c_str(), oHostDst);

@@ -57,15 +57,6 @@ FILTER-OUT += 7_CUDALibraries/histEqualizationNPP/Makefile
 FILTER-OUT += 7_CUDALibraries/jpegNPP/Makefile
 endif
 
-ifeq ($(OSLOWER),DARWIN)
-XCODE_VERSION = $(shell xcodebuild -version | grep Xcode | grep -o "[\.0-9]\+")
-XCODE_VERSION_MAJOR = $(word 1, $(subst., ,$(XCODE_VERSION)))
-ifeq ($(XCODE_VERSION_MAJOR),5)
-FILTER-OUT += 0_Simple/cudaOpenMP/Makefile
-FILTER-OUT += 0_Simple/UnifiedMemoryStreams/Makefile
-endif
-endif
-
 PROJECTS := $(filter-out $(FILTER-OUT),$(PROJECTS))
 
 %.ph_build :

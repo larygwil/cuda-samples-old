@@ -405,8 +405,22 @@ class CheckRender
                     src_buffer = (unsigned int *)malloc(nelements*sizeof(unsigned int));
                     ref_buffer = (unsigned int *)malloc(nelements*sizeof(unsigned int));
 
-                    fsize = fread(src_buffer, nelements, sizeof(unsigned int), src_fp);
-                    fsize = fread(ref_buffer, nelements, sizeof(unsigned int), ref_fp);
+                    fsize = fread(src_buffer, sizeof(unsigned int), nelements, src_fp);
+
+                    if (fsize != nelements)
+                    {
+                        printf("compareBin2Bin <unsigned int>  failed to read %u elements from %s\n", nelements, src_file);
+                        error_count++;
+                    }
+
+                    fsize = fread(ref_buffer, sizeof(unsigned int), nelements, ref_fp);
+
+                    if (fsize == 0)
+                    {
+                        printf("compareBin2Bin <unsigned int>  failed to read %u elements from %s\n", nelements, ref_file_path);
+                        error_count++;
+                    }
+
 
                     printf("> compareBin2Bin <unsigned int> nelements=%d, epsilon=%4.2f, threshold=%4.2f\n", nelements, epsilon, threshold);
                     printf("   src_file <%s>\n", src_file);
@@ -500,8 +514,21 @@ class CheckRender
                     src_buffer = (float *)malloc(nelements*sizeof(float));
                     ref_buffer = (float *)malloc(nelements*sizeof(float));
 
-                    fsize = fread(src_buffer, nelements, sizeof(float), src_fp);
-                    fsize = fread(ref_buffer, nelements, sizeof(float), ref_fp);
+                    fsize = fread(src_buffer, sizeof(float), nelements, src_fp);
+
+                    if (fsize != nelements)
+                    {
+                        printf("compareBin2Bin <float>  failed to read %u elements from %s\n", nelements, src_file);
+                        error_count++;
+                    }
+
+                    fsize = fread(ref_buffer, sizeof(float), nelements, ref_fp);
+
+                    if (fsize == 0)
+                    {
+                        printf("compareBin2Bin <float>  failed to read %u elements from %s\n", nelements, ref_file_path);
+                        error_count++;
+                    }
 
                     printf("> compareBin2Bin <float> nelements=%d, epsilon=%4.2f, threshold=%4.2f\n", nelements, epsilon, threshold);
                     printf("   src_file <%s>\n", src_file);

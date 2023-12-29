@@ -409,7 +409,7 @@ void displayFunc(void)
         pass = 0;
     }
 
-    // render the Mandebrot image
+    // render the Mandelbrot image
     renderImage(true, g_isJuliaSet, precisionMode);
 
     // load texture from PBO
@@ -1221,6 +1221,10 @@ int main(int argc, char **argv)
 {
     pArgc = &argc;
     pArgv = argv;
+
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
 
     printf("[%s] - Starting...\n", sSDKsample);
 

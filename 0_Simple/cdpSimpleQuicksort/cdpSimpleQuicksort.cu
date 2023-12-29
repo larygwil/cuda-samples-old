@@ -240,7 +240,7 @@ int main(int argc, char **argv)
     if (device == -1)
     {
         std::cerr << "cdpSimpleQuicksort requires GPU devices with compute SM 3.5 or higher.  Exiting..." << std::endl;
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     cudaSetDevice(device);

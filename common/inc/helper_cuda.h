@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -22,36 +22,6 @@
 #include <string.h>
 
 #include <helper_string.h>
-
-/*
-inline void __ExitInTime(int seconds)
-{
-    fprintf(stdout, "> exiting in %d seconds: ", seconds);
-    fflush(stdout);
-    time_t t;
-    int count;
-
-    for (t=time(0)+seconds, count=seconds; time(0) < t; count--) {
-        fprintf(stdout, "%d...", count);
-#if defined(WIN32)
-        Sleep(1000);
-#else
-        sleep(1);
-#endif
-    }
-
-    fprintf(stdout,"done!\n\n");
-    fflush(stdout);
-}
-
-#define EXIT_TIME_DELAY 2
-
-inline void EXIT_DELAY(int return_code)
-{
-    __ExitInTime(EXIT_TIME_DELAY);
-    exit(return_code);
-}
-*/
 
 #ifndef EXIT_WAIVED
 #define EXIT_WAIVED 2
@@ -238,8 +208,7 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
         case cudaErrorProfilerAlreadyStopped:
             return "cudaErrorProfilerAlreadyStopped";
 
-#if __CUDA_API_VERSION >= 0x4000
-
+        /* Since CUDA 4.0*/
         case cudaErrorAssert:
             return "cudaErrorAssert";
 
@@ -251,7 +220,60 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorHostMemoryNotRegistered:
             return "cudaErrorHostMemoryNotRegistered";
-#endif
+
+        /* Since CUDA 5.0 */
+        case cudaErrorOperatingSystem:
+            return "cudaErrorOperatingSystem";
+
+        case cudaErrorPeerAccessUnsupported:
+            return "cudaErrorPeerAccessUnsupported";
+
+        case cudaErrorLaunchMaxDepthExceeded:
+            return "cudaErrorLaunchMaxDepthExceeded";
+
+        case cudaErrorLaunchFileScopedTex:
+            return "cudaErrorLaunchFileScopedTex";
+
+        case cudaErrorLaunchFileScopedSurf:
+            return "cudaErrorLaunchFileScopedSurf";
+
+        case cudaErrorSyncDepthExceeded:
+            return "cudaErrorSyncDepthExceeded";
+
+        case cudaErrorLaunchPendingCountExceeded:
+            return "cudaErrorLaunchPendingCountExceeded";
+
+        case cudaErrorNotPermitted:
+            return "cudaErrorNotPermitted";
+
+        case cudaErrorNotSupported:
+            return "cudaErrorNotSupported";
+
+        /* Since CUDA 6.0 */
+        case cudaErrorHardwareStackError:
+            return "cudaErrorHardwareStackError";
+
+        case cudaErrorIllegalInstruction:
+            return "cudaErrorIllegalInstruction";
+
+        case cudaErrorMisalignedAddress:
+            return "cudaErrorMisalignedAddress";
+
+        case cudaErrorInvalidAddressSpace:
+            return "cudaErrorInvalidAddressSpace";
+
+        case cudaErrorInvalidPc:
+            return "cudaErrorInvalidPc";
+
+        case cudaErrorIllegalAddress:
+            return "cudaErrorIllegalAddress";
+
+        /* Since CUDA 6.5*/
+        case cudaErrorInvalidPtx:
+            return "cudaErrorInvalidPtx";
+
+        case cudaErrorInvalidGraphicsContext:
+            return "cudaErrorInvalidGraphicsContext";
 
         case cudaErrorStartupFailure:
             return "cudaErrorStartupFailure";
@@ -486,6 +508,24 @@ static const char *_cudaGetErrorEnum(cufftResult error)
 
         case CUFFT_UNALIGNED_DATA:
             return "CUFFT_UNALIGNED_DATA";
+
+        case CUFFT_INCOMPLETE_PARAMETER_LIST:
+            return "CUFFT_INCOMPLETE_PARAMETER_LIST";
+
+        case CUFFT_INVALID_DEVICE:
+            return "CUFFT_INVALID_DEVICE";
+
+        case CUFFT_PARSE_ERROR:
+            return "CUFFT_PARSE_ERROR";
+
+        case CUFFT_NO_WORKSPACE:
+            return "CUFFT_NO_WORKSPACE";
+
+        case CUFFT_NOT_IMPLEMENTED:
+            return "CUFFT_NOT_IMPLEMENTED";
+
+        case CUFFT_LICENSE_ERROR:
+            return "CUFFT_LICENSE_ERROR";
     }
 
     return "<unknown>";
@@ -746,6 +786,91 @@ static const char *_cudaGetErrorEnum(NppStatus error)
 
         case NPP_WRONG_INTERSECTION_ROI_WARNING:
             return "NPP_WRONG_INTERSECTION_ROI_WARNING";
+
+#if ((NPP_VERSION_MAJOR << 12) + (NPP_VERSION_MINOR << 4)) >= 0x6000
+        /* These are 6.0 or higher */
+        case NPP_LUT_PALETTE_BITSIZE_ERROR:
+            return "NPP_LUT_PALETTE_BITSIZE_ERROR";
+
+        case NPP_ZC_MODE_NOT_SUPPORTED_ERROR:
+            return "NPP_ZC_MODE_NOT_SUPPORTED_ERROR";
+
+        case NPP_QUALITY_INDEX_ERROR:
+            return "NPP_QUALITY_INDEX_ERROR";
+
+        case NPP_CHANNEL_ORDER_ERROR:
+            return "NPP_CHANNEL_ORDER_ERROR";
+
+        case NPP_ZERO_MASK_VALUE_ERROR:
+            return "NPP_ZERO_MASK_VALUE_ERROR";
+
+        case NPP_NUMBER_OF_CHANNELS_ERROR:
+            return "NPP_NUMBER_OF_CHANNELS_ERROR";
+
+        case NPP_COI_ERROR:
+            return "NPP_COI_ERROR";
+
+        case NPP_DIVISOR_ERROR:
+            return "NPP_DIVISOR_ERROR";
+
+        case NPP_CHANNEL_ERROR:
+            return "NPP_CHANNEL_ERROR";
+
+        case NPP_STRIDE_ERROR:
+            return "NPP_STRIDE_ERROR";
+
+        case NPP_ANCHOR_ERROR:
+            return "NPP_ANCHOR_ERROR";
+
+        case NPP_MASK_SIZE_ERROR:
+            return "NPP_MASK_SIZE_ERROR";
+
+        case NPP_MOMENT_00_ZERO_ERROR:
+            return "NPP_MOMENT_00_ZERO_ERROR";
+
+        case NPP_THRESHOLD_NEGATIVE_LEVEL_ERROR:
+            return "NPP_THRESHOLD_NEGATIVE_LEVEL_ERROR";
+
+        case NPP_THRESHOLD_ERROR:
+            return "NPP_THRESHOLD_ERROR";
+
+        case NPP_CONTEXT_MATCH_ERROR:
+            return "NPP_CONTEXT_MATCH_ERROR";
+
+        case NPP_FFT_FLAG_ERROR:
+            return "NPP_FFT_FLAG_ERROR";
+
+        case NPP_FFT_ORDER_ERROR:
+            return "NPP_FFT_ORDER_ERROR";
+
+        case NPP_SCALE_RANGE_ERROR:
+            return "NPP_SCALE_RANGE_ERROR";
+
+        case NPP_DATA_TYPE_ERROR:
+            return "NPP_DATA_TYPE_ERROR";
+
+        case NPP_OUT_OFF_RANGE_ERROR:
+            return "NPP_OUT_OFF_RANGE_ERROR";
+
+        case NPP_DIVIDE_BY_ZERO_ERROR:
+            return "NPP_DIVIDE_BY_ZERO_ERROR";
+
+        case NPP_RANGE_ERROR:
+            return "NPP_RANGE_ERROR";
+
+        case NPP_NO_MEMORY_ERROR:
+            return "NPP_NO_MEMORY_ERROR";
+
+        case NPP_ERROR_RESERVED:
+            return "NPP_ERROR_RESERVED";
+
+        case NPP_NO_OPERATION_WARNING:
+            return "NPP_NO_OPERATION_WARNING";
+
+        case NPP_DIVIDE_BY_ZERO_WARNING:
+            return "NPP_DIVIDE_BY_ZERO_WARNING";
+#endif
+
     }
 
     return "<unknown>";
@@ -821,6 +946,7 @@ inline int _ConvertSMVer2Cores(int major, int minor)
         { 0x30, 192}, // Kepler Generation (SM 3.0) GK10x class
         { 0x32, 192}, // Kepler Generation (SM 3.2) GK10x class
         { 0x35, 192}, // Kepler Generation (SM 3.5) GK11x class
+        { 0x37, 192}, // Kepler Generation (SM 3.7) GK21x class
         { 0x50, 128}, // Maxwell Generation (SM 5.0) GM10x class
         {   -1, -1 }
     };
@@ -838,8 +964,8 @@ inline int _ConvertSMVer2Cores(int major, int minor)
     }
 
     // If we don't find the values, we default use the previous one to run properly
-    printf("MapSMtoCores for SM %d.%d is undefined.  Default to use %d Cores/SM\n", major, minor, nGpuArchCoresPerSM[7].Cores);
-    return nGpuArchCoresPerSM[7].Cores;
+    printf("MapSMtoCores for SM %d.%d is undefined.  Default to use %d Cores/SM\n", major, minor, nGpuArchCoresPerSM[index-1].Cores);
+    return nGpuArchCoresPerSM[index-1].Cores;
 }
 // end of GPU Architecture definitions
 
@@ -897,6 +1023,7 @@ inline int gpuGetMaxGflopsDeviceId()
     int current_device     = 0, sm_per_multiproc  = 0;
     int max_perf_device    = 0;
     int device_count       = 0, best_SM_arch      = 0;
+    int devices_prohibited = 0;
     
     unsigned long long max_compute_perf = 0;
     cudaDeviceProp deviceProp;
@@ -923,8 +1050,18 @@ inline int gpuGetMaxGflopsDeviceId()
                 best_SM_arch = MAX(best_SM_arch, deviceProp.major);
             }
         }
+        else
+        {
+            devices_prohibited++;
+        }
 
         current_device++;
+    }
+
+    if (devices_prohibited == device_count)
+    {
+    	fprintf(stderr, "gpuGetMaxGflopsDeviceId() CUDA error: all devices have compute mode prohibited.\n");
+    	exit(EXIT_FAILURE);
     }
 
     // Find the best CUDA capable GPU device
@@ -1028,7 +1165,7 @@ inline bool checkCudaCapabilities(int major_version, int minor_version)
     if ((deviceProp.major > major_version) ||
         (deviceProp.major == major_version && deviceProp.minor >= minor_version))
     {
-        printf("  GPU Device %d: <%16s >, Compute SM %d.%d detected\n", dev, deviceProp.name, deviceProp.major, deviceProp.minor);
+        printf("  Device %d: <%16s >, Compute SM %d.%d detected\n", dev, deviceProp.name, deviceProp.major, deviceProp.minor);
         return true;
     }
     else

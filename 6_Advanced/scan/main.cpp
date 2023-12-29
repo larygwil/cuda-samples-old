@@ -99,7 +99,7 @@ int main(int argc, char **argv)
         if (arrayLength == MAX_SHORT_ARRAY_SIZE)
         {
             printf("\n");
-            printf("scan-Short, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u Elements, NumDevsUsed = %u, Workgroup = %u\n",
+            printf("scan, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u Elements, NumDevsUsed = %u, Workgroup = %u\n",
                    (1.0e-6 * (double)arrayLength/timerValue), timerValue, (unsigned int)arrayLength, 1, (unsigned int)szWorkgroup);
             printf("\n");
         }
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
         if (arrayLength == MAX_LARGE_ARRAY_SIZE)
         {
             printf("\n");
-            printf("scan-Large, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u Elements, NumDevsUsed = %u, Workgroup = %u\n",
+            printf("scan, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u Elements, NumDevsUsed = %u, Workgroup = %u\n",
                    (1.0e-6 * (double)arrayLength/timerValue), timerValue, (unsigned int)arrayLength, 1, (unsigned int)szWorkgroup);
             printf("\n");
         }

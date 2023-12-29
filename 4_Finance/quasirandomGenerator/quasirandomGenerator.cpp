@@ -37,12 +37,9 @@ extern "C" double MoroInvCNDcpu(unsigned int p);
 ////////////////////////////////////////////////////////////////////////////////
 // GPU code
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" void initTable_SM10(unsigned int tableCPU[QRNG_DIMENSIONS][QRNG_RESOLUTION]);
-extern "C" void quasirandomGenerator_SM10(float *d_Output, unsigned int seed, unsigned int N);
-extern "C" void inverseCND_SM10(float *d_Output, unsigned int *d_Input, unsigned int N);
-extern "C" void initTable_SM13(unsigned int tableCPU[QRNG_DIMENSIONS][QRNG_RESOLUTION]);
-extern "C" void quasirandomGenerator_SM13(float *d_Output, unsigned int seed, unsigned int N);
-extern "C" void inverseCND_SM13(float *d_Output, unsigned int *d_Input, unsigned int N);
+extern "C" void initTableGPU(unsigned int tableCPU[QRNG_DIMENSIONS][QRNG_RESOLUTION]);
+extern "C" void quasirandomGeneratorGPU(float *d_Output, unsigned int seed, unsigned int N);
+extern "C" void inverseCNDgpu(float *d_Output, unsigned int *d_Input, unsigned int N);
 
 const int N = 1048576;
 
@@ -50,27 +47,6 @@ int main(int argc, char **argv)
 {
     // Start logs
     printf("%s Starting...\n\n", argv[0]);
-
-    unsigned int useDoublePrecision;
-
-    char *precisionChoice;
-    getCmdLineArgumentString(argc, (const char **)argv, "type", &precisionChoice);
-
-    if (precisionChoice == NULL)
-    {
-        useDoublePrecision = 0;
-    }
-    else
-    {
-        if (!STRCASECMP(precisionChoice, "double"))
-        {
-            useDoublePrecision = 1;
-        }
-        else
-        {
-            useDoublePrecision = 0;
-        }
-    }
 
     unsigned int tableCPU[QRNG_DIMENSIONS][QRNG_RESOLUTION];
 
@@ -87,29 +63,18 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    // use command-line specified CUDA device, otherwise use device with highest Gflops/s
+    cudaDeviceProp deviceProp;
     int dev = findCudaDevice(argc, (const char **)argv);
+    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, dev));
+
+    if (((deviceProp.major << 4) + deviceProp.minor) < 0x20)
+    {
+        fprintf(stderr, "quasirandomGenerator requires Compute Capability of SM 2.0 or higher to run.\n");
+        cudaDeviceReset();
+        exit(EXIT_WAIVED);
+    }
 
     sdkCreateTimer(&hTimer);
-
-    int deviceIndex;
-    checkCudaErrors(cudaGetDevice(&deviceIndex));
-    cudaDeviceProp deviceProp;
-    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, deviceIndex));
-    int version = deviceProp.major * 10 + deviceProp.minor;
-
-    if (useDoublePrecision && version < 13)
-    {
-        printf("Double precision not supported.\n");
-
-        // cudaDeviceReset causes the driver to clean up all state. While
-        // not mandatory in normal operation, it is good practice.  It is also
-        // needed to ensure correct operation when the application is being
-        // profiled. Calling cudaDeviceReset causes all profile data to be
-        // flushed before the application exits
-        cudaDeviceReset();
-        return 0;
-    }
 
     printf("Allocating GPU memory...\n");
     checkCudaErrors(cudaMalloc((void **)&d_Output, QRNG_DIMENSIONS * N * sizeof(float)));
@@ -120,14 +85,7 @@ int main(int argc, char **argv)
     printf("Initializing QRNG tables...\n\n");
     initQuasirandomGenerator(tableCPU);
 
-    if (useDoublePrecision)
-    {
-        initTable_SM13(tableCPU);
-    }
-    else
-    {
-        initTable_SM10(tableCPU);
-    }
+    initTableGPU(tableCPU);
 
     printf("Testing QRNG...\n\n");
     checkCudaErrors(cudaMemset(d_Output, 0, QRNG_DIMENSIONS * N * sizeof(float)));
@@ -142,14 +100,7 @@ int main(int argc, char **argv)
             sdkStartTimer(&hTimer);
         }
 
-        if (useDoublePrecision)
-        {
-            quasirandomGenerator_SM13(d_Output, 0, N);
-        }
-        else
-        {
-            quasirandomGenerator_SM10(d_Output, 0, N);
-        }
+        quasirandomGeneratorGPU(d_Output, 0, N);
     }
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -188,14 +139,7 @@ int main(int argc, char **argv)
             sdkStartTimer(&hTimer);
         }
 
-        if (useDoublePrecision)
-        {
-            inverseCND_SM13(d_Output, NULL, QRNG_DIMENSIONS * N);
-        }
-        else
-        {
-            inverseCND_SM10(d_Output, NULL, QRNG_DIMENSIONS * N);
-        }
+        inverseCNDgpu(d_Output, NULL, QRNG_DIMENSIONS * N);
     }
 
     checkCudaErrors(cudaDeviceSynchronize());

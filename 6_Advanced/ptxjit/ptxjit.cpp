@@ -58,13 +58,13 @@ void ptxJIT(int argc, char **argv, CUmodule *phModule, CUfunction *phKernel, CUl
     optionVals[1] = (void *) info_log;
     // Pass the size of the info buffer
     options[2] = CU_JIT_INFO_LOG_BUFFER_SIZE_BYTES;
-    optionVals[2] = (void *) logSize;
+    optionVals[2] = (void *) (long)logSize;
     // Pass a buffer for error message
     options[3] = CU_JIT_ERROR_LOG_BUFFER;
     optionVals[3] = (void *) error_log;
     // Pass the size of the error buffer
     options[4] = CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES;
-    optionVals[4] = (void *) logSize;
+    optionVals[4] = (void *) (long) logSize;
     // Make the linker verbose
     options[5] = CU_JIT_LOG_VERBOSE;
     optionVals[5] = (void *) 1;

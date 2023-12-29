@@ -170,7 +170,7 @@ void loadJpeg(const char *input_file, unsigned char *&pJpegData, int &nInputLeng
 
 void readFrameHeader(const unsigned char *pData, FrameHeader &header)
 {
-    unsigned short nLength = readAndAdvance<unsigned short>(pData);
+    readAndAdvance<unsigned short>(pData);
     header.nSamplePrecision = readAndAdvance<unsigned char>(pData);
     header.nHeight = readAndAdvance<unsigned short>(pData);
     header.nWidth = readAndAdvance<unsigned short>(pData);
@@ -213,7 +213,7 @@ void writeFrameHeader(const FrameHeader &header, unsigned char *&pData)
 
 void readScanHeader(const unsigned char *pData, ScanHeader &header)
 {
-    unsigned short nLength = readAndAdvance<unsigned short>(pData);
+    readAndAdvance<unsigned short>(pData);
 
     header.nComponents = readAndAdvance<unsigned char>(pData);
 
@@ -328,7 +328,7 @@ void writeHuffmanTable(const HuffmanTable &table, unsigned char *&pData)
 
 void readRestartInterval(const unsigned char *pData, int &nRestartInterval)
 {
-    unsigned short nSegmentLength = readAndAdvance<unsigned short>(pData);
+    readAndAdvance<unsigned short>(pData);
     nRestartInterval = readAndAdvance<unsigned short>(pData);
 }
 

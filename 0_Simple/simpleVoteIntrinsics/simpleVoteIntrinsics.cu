@@ -24,7 +24,7 @@
 #define MAX(a,b) (a > b ? a : b)
 #endif
 
-static char *sSDKsample = "[simpleVoteIntrinsics]\0";
+const static char *sSDKsample = "[simpleVoteIntrinsics]\0";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global types and parameters
@@ -64,7 +64,7 @@ void genVoteTestPattern(unsigned int *VOTE_PATTERN, int size)
     }
 }
 
-int checkErrors1(unsigned int *h_result, int start, int end, int warp_size, char *voteType)
+int checkErrors1(unsigned int *h_result, int start, int end, int warp_size, const char *voteType)
 {
     int i, sum=0;
 
@@ -88,7 +88,7 @@ int checkErrors1(unsigned int *h_result, int start, int end, int warp_size, char
     return (sum>0);
 }
 
-int checkErrors2(unsigned int *h_result, int start, int end, int warp_size, char *voteType)
+int checkErrors2(unsigned int *h_result, int start, int end, int warp_size, const char *voteType)
 {
     int i, sum=0;
 

@@ -371,6 +371,10 @@ main(int argc, char **argv)
 
     char *ref_file = NULL;
 
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", sSDKsample);
 
     if (checkCmdLineFlag(argc, (const char **)argv, "file"))

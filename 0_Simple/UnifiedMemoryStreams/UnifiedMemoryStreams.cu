@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <ctime>
 #include <vector>
+#include <algorithm>
 #include <omp.h>
 #include <stdlib.h>
 
@@ -50,8 +51,8 @@ struct Task
     T *result;
     T *vector;
 
-    Task() : size(0), data(NULL), result(NULL), vector(NULL) {};
-    Task(unsigned int s) : size(s), data(NULL), result(NULL)
+    Task() : size(0), id(0), data(NULL), result(NULL), vector(NULL) {};
+    Task(unsigned int s) : size(s), id(0), data(NULL), result(NULL)
     {
         // allocate unified memory -- the operation performed in this example will be a DGEMV
         checkCudaErrors(cudaMallocManaged(&data, sizeof(T)*size*size));
@@ -164,9 +165,15 @@ int main(int argc, char **argv)
     int dev_id = findCudaDevice(argc, (const char **) argv);
     checkCudaErrors(cudaGetDeviceProperties(&device_prop, dev_id));
 
-    if (!device_prop.managedMemory) { 
-        // This samples requires being run on a device that supports Unified Memory
-        fprintf(stderr, "Unified Memory not supported on this device\n");
+#if defined(__APPLE__) || defined(MACOSX)
+    fprintf(stderr, "Unified Memory not currently supported on OS X\n");
+    cudaDeviceReset();
+    exit(EXIT_WAIVED);
+#endif
+
+    if (sizeof(void *) != 8)
+    {
+        fprintf(stderr, "Unified Memory requires compiling for a 64 bit system.\n");
 
         // cudaDeviceReset causes the driver to clean up all state. While
         // not mandatory in normal operation, it is good practice.  It is also
@@ -174,13 +181,12 @@ int main(int argc, char **argv)
         // profiled. Calling cudaDeviceReset causes all profile data to be
         // flushed before the application exits
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
-    if (device_prop.computeMode == cudaComputeModeExclusive || device_prop.computeMode == cudaComputeModeProhibited)
+    if (((device_prop.major << 4) + device_prop.minor) < 0x30)
     {
-        // This sample requires being run with a default or process exclusive mode
-        fprintf(stderr, "This sample requires a device in either default or process exclusive mode\n");
+        fprintf(stderr, "UnifiedMemoryStreams requires Compute Capability of SM 3.0 or higher to run.\n");
 
         // cudaDeviceReset causes the driver to clean up all state. While
         // not mandatory in normal operation, it is good practice.  It is also
@@ -188,7 +194,7 @@ int main(int argc, char **argv)
         // profiled. Calling cudaDeviceReset causes all profile data to be
         // flushed before the application exits
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     // randomise task sizes

@@ -104,7 +104,7 @@ __global__ void freeVertexMem(BezierLine *bLines, int nLines)
         cudaFree(bLines[lidx].vertexPos);
 }
 
-bool checkCapableSM35Device(int argc, char** argv)
+unsigned int checkCapableSM35Device(int argc, char** argv)
 {
     // Get device properties
     cudaDeviceProp properties;
@@ -125,7 +125,7 @@ bool checkCapableSM35Device(int argc, char** argv)
         {
             printf("cdpBezierTessellation requires GPU devices with compute SM 3.5 or higher.");
             printf("Current GPU device has compute SM %d.%d. Exiting...\n",properties.major, properties.minor);
-            return false;
+            return EXIT_FAILURE;
         }
 
     }
@@ -151,10 +151,10 @@ bool checkCapableSM35Device(int argc, char** argv)
     if (device == -1)
     {
         fprintf(stderr, "cdpBezierTessellation requires GPU devices with compute SM 3.5 or higher.  Exiting...\n");
-        return false;
+        return EXIT_WAIVED;
     }
 
-    return true;
+    return EXIT_SUCCESS;
 }
 
 
@@ -181,9 +181,10 @@ int main(int argc, char **argv)
         bLines_h[i].nVertices = 0;
     }
 
-    if (checkCapableSM35Device(argc, argv) == false)
+    unsigned int sm35Ret = checkCapableSM35Device(argc, argv);
+    if (sm35Ret != EXIT_SUCCESS)
     {
-        exit(EXIT_SUCCESS);
+        exit(sm35Ret);
     }
 
     BezierLine *bLines_d;

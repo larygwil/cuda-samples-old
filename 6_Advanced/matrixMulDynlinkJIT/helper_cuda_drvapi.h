@@ -103,6 +103,8 @@ inline int _ConvertSMVer2CoresDRV(int major, int minor)
         { 0x30, 192}, // Kepler Generation (SM 3.0) GK10x class
         { 0x32, 192}, // Kepler Generation (SM 3.2) GK10x class
         { 0x35, 192}, // Kepler Generation (SM 3.5) GK11x class
+        { 0x37, 192}, // Kepler Generation (SM 3.7) GK21x class
+        { 0x50, 128}, // Maxwell Generation (SM 5.0) GM10x class
         {   -1, -1 }
     };
 
@@ -119,8 +121,8 @@ inline int _ConvertSMVer2CoresDRV(int major, int minor)
     }
 
     // If we don't find the values, we default use the previous one to run properly
-    printf("MapSMtoCores for SM %d.%d is undefined.  Default to use %d Cores/SM\n", major, minor, nGpuArchCoresPerSM[7].Cores);
-    return nGpuArchCoresPerSM[7].Cores;
+    printf("MapSMtoCores for SM %d.%d is undefined.  Default to use %d Cores/SM\n", major, minor, nGpuArchCoresPerSM[index-1].Cores);
+    return nGpuArchCoresPerSM[index-1].Cores;
 }
 // end of GPU Architecture definitions
 
@@ -188,6 +190,7 @@ inline int gpuGetMaxGflopsDeviceIdDRV()
     int device_count        = 0, sm_per_multiproc = 0;
     int max_compute_perf    = 0, best_SM_arch     = 0;
     int major = 0, minor = 0   , multiProcessorCount, clockRate;
+    int devices_prohibited = 0;
 
     cuInit(0, __CUDA_API_VERSION);
     checkCudaErrors(cuDeviceGetCount(&device_count));
@@ -259,9 +262,19 @@ inline int gpuGetMaxGflopsDeviceIdDRV()
                 }
             }
         }
+        else
+        {
+            devices_prohibited++;
+        }
 
         ++current_device;
     }
+
+    if (devices_prohibited == device_count)
+    {    
+        fprintf(stderr, "gpuGetMaxGflopsDeviceIdDRV error: all devices have compute mode prohibited.\n");
+        exit(EXIT_FAILURE);
+    }    
 
     return max_perf_device;
 }
@@ -274,6 +287,7 @@ inline int gpuGetMaxGflopsGLDeviceIdDRV()
     int max_compute_perf = 0, best_SM_arch     = 0;
     int major = 0, minor = 0, multiProcessorCount, clockRate;
     int bTCC = 0;
+    int devices_prohibited = 0;
     char deviceName[256];
 
     cuInit(0, __CUDA_API_VERSION);
@@ -316,8 +330,18 @@ inline int gpuGetMaxGflopsGLDeviceIdDRV()
                 }
             }
         }
+        else
+        {
+            devices_prohibited++;
+        }
 
         current_device++;
+    }
+
+    if (devices_prohibited == device_count)
+    {
+        fprintf(stderr, "gpuGetMaxGflopsGLDeviceIdDRV error: all devices have compute mode prohibited.\n");
+        exit(EXIT_FAILURE);
     }
 
     // Find the best CUDA capable GPU device

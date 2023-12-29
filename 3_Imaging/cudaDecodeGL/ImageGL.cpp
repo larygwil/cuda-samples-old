@@ -130,14 +130,14 @@ void
 ImageGL::setCUDAcontext(CUcontext oContext)
 {
     oContext_ = oContext;
-    printf("ImageGL::CUcontext = %08x\n", (unsigned long)oContext);
+    printf("ImageGL::CUcontext = %08lx\n", (unsigned long)oContext);
 }
 
 void
 ImageGL::setCUDAdevice(CUdevice oDevice)
 {
     oDevice_ = oDevice;
-    printf("ImageGL::CUdevice  = %08x\n", (unsigned long)oDevice);
+    printf("ImageGL::CUdevice  = %08lx\n", (unsigned long)oDevice);
 }
 
 bool

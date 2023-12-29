@@ -169,7 +169,6 @@ void timerEvent(int value);
 void runCuda();
 void runCudaTest(bool bHasDouble, char *exec_path);
 void generate_h0(float2 *h0);
-void generateFftInput();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -260,6 +259,10 @@ void runAutoTest(int argc, char **argv)
 ////////////////////////////////////////////////////////////////////////////////
 void runGraphicsTest(int argc, char **argv)
 {
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("[%s] ", sSDKsample);
     printf("\n");
 
@@ -394,7 +397,7 @@ float phillips(float Kx, float Ky, float Vdir, float V, float A, float dir_depen
     }
 
     // damp out waves with very small length w << l
-    float w = L / 10000;
+    //float w = L / 10000;
     //phillips *= expf(-k_squared * w * w);
 
     return phillips;

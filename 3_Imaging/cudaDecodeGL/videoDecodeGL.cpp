@@ -350,7 +350,7 @@ bool initCudaResources(int argc, char **argv, int *bTCC)
     CUdevice cuda_device;
 
     // Device is specified at the command line, we need to check if this it TCC or not, and then call the
-    // appropriate TCC/WDDM findCudaDevice in order to initialize the CUDA device
+    // appropriate TCC/non-TCC findCudaDevice in order to initialize the CUDA device
     if (checkCmdLineFlag(argc, (const char **)argv, "device"))
     {
         cuda_device = getCmdLineArgumentInt(argc, (const char **) argv, "device");
@@ -416,7 +416,7 @@ bool initCudaResources(int argc, char **argv, int *bTCC)
 
 
 
-    // Create CUDA Device w/ GL interop (if WDDM), otherwise CUDA w/o interop (if TCC)
+    // Create CUDA Device w/ GL interop (if not TCC), otherwise CUDA w/o interop (if TCC)
     // (use CU_CTX_BLOCKING_SYNC for better CPU synchronization)
     if (g_bUseInterop && !(*bTCC))
     {
@@ -653,6 +653,11 @@ void parseCommandLineArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("[%s]\n", sAppName);
 
     sdkCreateTimer(&frame_timer);
@@ -865,7 +870,9 @@ bool initGL(int argc, char **argv, int *pbTCC)
 
 #if CUDA_VERSION >= 3020
             checkCudaErrors(cuDeviceGetAttribute(pbTCC ,  CU_DEVICE_ATTRIBUTE_TCC_DRIVER, dev));
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
             printf("  -> GPU %d: < %s > driver mode is: %s\n", dev, device_name, *pbTCC ? "TCC" : "WDDM");
+#endif
 
             if (*pbTCC)
             {
@@ -873,7 +880,8 @@ bool initGL(int argc, char **argv, int *pbTCC)
             }
             else
             {
-                g_DeviceID = i; // we choose an available WDDM display device
+                g_DeviceID = i; // we choose an available non-TCC display device
+                break;
             }
 
 #else
@@ -909,7 +917,9 @@ bool initGL(int argc, char **argv, int *pbTCC)
 
 #if CUDA_VERSION >= 3020
         checkCudaErrors(cuDeviceGetAttribute(pbTCC ,  CU_DEVICE_ATTRIBUTE_TCC_DRIVER, dev));
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
         printf("  -> GPU %d: < %s > driver mode is: %s\n", dev, device_name, *pbTCC ? "TCC" : "WDDM");
+#endif
 #else
 
         // We don't know for sure if this is a TCC device or not, if it is Tesla we will not run

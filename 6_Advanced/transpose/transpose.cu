@@ -465,7 +465,7 @@ main(int argc, char **argv)
 
     // kernel pointer and descriptor
     void (*kernel)(float *, float *, int, int);
-    char *kernelName;
+    const char *kernelName;
 
     // execution configuration parameters
     dim3 grid(size_x/TILE_DIM, size_y/TILE_DIM), threads(TILE_DIM,BLOCK_ROWS);

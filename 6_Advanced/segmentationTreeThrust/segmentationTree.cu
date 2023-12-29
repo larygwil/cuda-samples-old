@@ -287,9 +287,6 @@ class Pyramid
                        uint height,
                        const char *filename) const
         {
-            uint levelIndex =
-                static_cast<uint>(std::distance(levels_.rbegin(), level));
-
             deque< std::pair<uint, uint> > nodesQueue;
 
             uint totalSegments;
@@ -393,7 +390,7 @@ class Pyramid
 class SegmentationTreeBuilder
 {
     public:
-        SegmentationTreeBuilder() {}
+        SegmentationTreeBuilder():verticesCount_(0),edgesCount_(0)  {}
 
         ~SegmentationTreeBuilder() {}
 
@@ -409,7 +406,7 @@ class SegmentationTreeBuilder
 
             cudaEventRecord(start, 0);
 
-            // Allocate requred memory pools. We need just 4 types of arrays.
+            // Allocate required memory pools. We need just 4 types of arrays.
             MemoryPoolsCollection pools =
             {
                 DeviceMemoryPool<uint>(
@@ -809,12 +806,11 @@ class SegmentationTreeBuilder
             // class for the details on the graph's internal structure.
 
             // Calculate vertices' offsets for the reduced graph.
-            uint *verticesEndPtr =
-                thrust::copy_if(thrust::make_counting_iterator(0U),
-                                thrust::make_counting_iterator(validEdgesCount),
-                                dEdgesFlags,
-                                dVertices_,
-                                thrust::identity<uint>()).get();
+            thrust::copy_if(thrust::make_counting_iterator(0U),
+                            thrust::make_counting_iterator(validEdgesCount),
+                            dEdgesFlags,
+                            dVertices_,
+                            thrust::identity<uint>()).get();
 
             pools.uintEdges.put(dEdgesFlags);
 
@@ -1008,7 +1004,7 @@ void buildGraph(const vector<uchar3> &image,
     }
 }
 
-static char *kDefaultImageName = "test.ppm";
+static char *kDefaultImageName = (char*)"test.ppm";
 
 int main(int argc, char **argv)
 {

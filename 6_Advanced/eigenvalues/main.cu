@@ -275,7 +275,7 @@ runTest(int argc, char **argv)
     // desired precision of eigenvalues
     float  precision = 0.00001f;
     unsigned int iters_timing = 100;
-    char  *result_file = "eigenvalues.dat";
+    char  *result_file = (char*)"eigenvalues.dat";
 
     // check if there is a command line request for the matrix size
     getMatrixSize(argc, argv, mat_size, user_defined);

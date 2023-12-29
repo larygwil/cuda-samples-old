@@ -246,7 +246,7 @@ int main(int argc, char **argv)
     else if (argc > 3)
     {
         print_usage(argv[0]);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_FAILURE);
     }
 
     // The test requires CUDA 5 or greater.
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
         // profiled. Calling cudaDeviceReset causes all profile data to be
         // flushed before the application exits
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     Parameters host_params;

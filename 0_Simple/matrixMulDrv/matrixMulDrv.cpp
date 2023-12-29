@@ -20,7 +20,7 @@
  * CUBLAS provides high-performance matrix multiplication.
  * See also:
  * V. Volkov and J. Demmel, "Benchmarking GPUs to tune dense linear algebra,"
- * in Proc. 2008 ACM/IEEE Conf. on Superconducting (SC '08),
+ * in Proc. 2008 ACM/IEEE Conf. on Supercomputing (SC '08),
  * Piscataway, NJ: IEEE Press, 2008, pp. Art. 31:1-11.
  *
  * Volkov, V. 2010. Better performance at lower occupancy,
@@ -64,7 +64,7 @@ void computeGold(float *, const float *, const float *, unsigned int, unsigned i
 static CUresult initCUDA(int argc, char **argv, CUfunction *pMatrixMul, int *block_size_out);
 
 //define input ptx file for different platforms
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
 #define PTX_FILE "matrixMul_kernel64.ptx"
 #define CUBIN_FILE "matrixMul_kernel64.cubin"
 #else

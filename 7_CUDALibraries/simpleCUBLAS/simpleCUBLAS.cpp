@@ -275,5 +275,14 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    exit(error_norm / ref_norm < 1e-6f ? EXIT_SUCCESS : EXIT_FAILURE);
+    if (error_norm / ref_norm < 1e-6f)
+    {
+        printf("simpleCUBLAS test passed.\n");
+        exit(EXIT_SUCCESS);
+    }
+    else
+    {
+        printf("simpleCUBLAS test failed.\n");
+        exit(EXIT_FAILURE);
+    }
 }

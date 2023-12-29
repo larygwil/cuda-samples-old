@@ -42,8 +42,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Define the files that are to be save and the reference images for validation
-char *imageFilename = "lena_bw.pgm";
-char *refFilename   = "ref_rotated.pgm";
+const char *imageFilename = "lena_bw.pgm";
+const char *refFilename   = "ref_rotated.pgm";
 float angle = 0.5f;    // angle to rotate image by (in radians)
 
 // Declare texture reference for 2D float texture
@@ -53,7 +53,7 @@ surface<void, 2> outputSurface;
 // Auto-Verification Code
 bool testResult = true;
 
-static char *sampleName = "simpleSurfaceWrite";
+static const char *sampleName = "simpleSurfaceWrite";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Kernels

@@ -225,7 +225,7 @@ bool shuffle_simple_test(int argc, char **argv)
     {
         printf("> __shfl() intrinsic requires device SM 3.0+\n");
         printf("> Waiving test.\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     checkCudaErrors(cudaMallocHost((void **)&h_data, sizeof(int)*n_elements));
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
     {
         printf("> __shfl() intrinsic requires device SM 3.0+\n");
         printf("> Waiving test.\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
 

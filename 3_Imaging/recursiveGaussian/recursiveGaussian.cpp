@@ -87,7 +87,7 @@ const char *sReference[] =
     NULL
 };
 
-char *image_filename = "lena.ppm";
+const char *image_filename = "lena.ppm";
 float sigma = 10.0f;
 int order = 0;
 int nthreads = 64;  // number of threads per block
@@ -423,6 +423,10 @@ main(int argc, char **argv)
     pArgc = &argc;
     pArgv = argv;
     char *ref_file = NULL;
+
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
 
     printf("%s Starting...\n\n", sSDKsample);
 

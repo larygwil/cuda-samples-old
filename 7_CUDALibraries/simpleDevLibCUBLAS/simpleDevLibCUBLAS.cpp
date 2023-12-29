@@ -127,7 +127,7 @@ int main(int argc, char **argv)
     float host_api_test_ratio, device_api_test_ratio;
 
     /* Initialize CUBLAS */
-    printf("simpleCUBLAS test running...\n");
+    printf("simpleDevLibCUBLAS test running...\n");
 
     dev_id = findCudaDevice(argc, (const char **) argv);
     checkCudaErrors(cudaGetDeviceProperties(&device_prop, dev_id));
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
         // profiled. Calling cudaDeviceReset causes all profile data to be
         // flushed before the application exits
         cudaDeviceReset();
-        return EXIT_SUCCESS;
+        return EXIT_WAIVED;
     }
 
     status = cublasCreate(&handle);
@@ -503,7 +503,7 @@ int main(int argc, char **argv)
                        device_api_test_ratio < 1e-6 :
                        host_api_test_ratio < 1e-6;
 
-    printf("simpleCUBLAS completed, returned %s\n",
+    printf("simpleDevLibCUBLAS completed, returned %s\n",
            test_result ? "OK" : "ERROR!");
 
     exit(test_result ? EXIT_SUCCESS : EXIT_FAILURE);

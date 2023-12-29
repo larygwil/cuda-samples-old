@@ -31,7 +31,7 @@
 #include <helper_functions.h>
 #include <helper_cuda.h>
 
-static char *sSDKname = "simpleCubemapTexture";
+static const char *sSDKname = "simpleCubemapTexture";
 
 // includes, kernels
 // declare texture reference for layered 2D float texture
@@ -140,7 +140,7 @@ main(int argc, char **argv)
         // profiled. Calling cudaDeviceReset causes all profile data to be
         // flushed before the application exits
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     // generate input data for layered texture

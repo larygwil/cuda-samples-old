@@ -30,7 +30,7 @@
 #include <helper_string.h>     // helper functions for string parsing
 
 
-static char *sSDKsample = "[stereoDisparity]\0";
+static const char *sSDKsample = "[stereoDisparity]\0";
 
 int iDivUp(int a, int b)
 {
@@ -204,7 +204,7 @@ runTest(int argc, char **argv)
     // write out the resulting disparity image.
     unsigned char *dispOut = (unsigned char *)malloc(numData);
     int mult = 20;
-    char *fnameOut = "output_GPU.pgm";
+    const char *fnameOut = "output_GPU.pgm";
 
     for (unsigned int i=0; i<numData; i++)
     {
@@ -225,7 +225,7 @@ runTest(int argc, char **argv)
     }
 
     printf("CPU Checksum = %u, ", cpuCheckSum);
-    char *cpuFnameOut = "output_CPU.pgm";
+    const char *cpuFnameOut = "output_CPU.pgm";
 
     for (unsigned int i=0; i<numData; i++)
     {

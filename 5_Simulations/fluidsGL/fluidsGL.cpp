@@ -127,7 +127,7 @@ bool g_bExitESC = false;
 // CheckFBO/BackBuffer class objects
 CheckRender       *g_CheckRender = NULL;
 
-void autoTest();
+void autoTest(char **);
 
 extern "C" void addForces(cData *v, int dx, int dy, int spx, int spy, float fx, float fy, int r);
 extern "C" void advectVelocity(cData *v, float *vx, float *vy, int dx, int pdx, int dy, float dt);
@@ -295,7 +295,12 @@ void keyboard(unsigned char key, int x, int y)
     {
         case 27:
             g_bExitESC = true;
-            exit(EXIT_SUCCESS);
+            #if defined (__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
             break;
 
         case 'r':
@@ -442,6 +447,11 @@ int main(int argc, char **argv)
 {
     int devID;
     cudaDeviceProp deviceProps;
+
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", sSDKname);
     printf("[%s] - [OpenGL/CUDA simulation] starting...\n", sSDKname);
 
@@ -494,8 +504,8 @@ int main(int argc, char **argv)
     initParticles(particles, DIM, DIM);
 
     // Create CUFFT transform plan configuration
-    cufftPlan2d(&planr2c, DIM, DIM, CUFFT_R2C);
-    cufftPlan2d(&planc2r, DIM, DIM, CUFFT_C2R);
+    checkCudaErrors(cufftPlan2d(&planr2c, DIM, DIM, CUFFT_R2C));
+    checkCudaErrors(cufftPlan2d(&planc2r, DIM, DIM, CUFFT_C2R));
     // TODO: update kernels to use the new unpadded memory layout for perf
     // rather than the old FFTW-compatible layout
     cufftSetCompatibilityMode(planr2c, CUFFT_COMPATIBILITY_FFTW_PADDING);

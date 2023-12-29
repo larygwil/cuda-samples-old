@@ -242,6 +242,10 @@ int main(int argc, char **argv)
     pArgc = &argc;
     pArgv = argv;
 
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s starting...\n", sSDKsample);
 
     if (argc > 1)

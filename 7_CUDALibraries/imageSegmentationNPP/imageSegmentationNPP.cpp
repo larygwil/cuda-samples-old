@@ -61,9 +61,6 @@
 #define STRNCASECMP strncasecmp
 #endif
 
-bool g_bQATest = false;
-int  g_nDevice = -1;
-
 #ifndef WIN32
 
 #define fscanf_s fscanf
@@ -231,7 +228,24 @@ int main(int argc, char *argv[])
     try
     {
         std::string sFilename;
-        char *filePath = sdkFindFilePath("person.txt", argv[0]);
+        char *filePath;
+
+        cudaDeviceInit(argc, (const char **)argv);
+
+        if (printfNPPinfo(argc, argv) == false)
+        {
+            cudaDeviceReset();
+            exit(EXIT_SUCCESS);
+        }
+
+        if (checkCmdLineFlag(argc, (const char **)argv, "input"))
+        {
+            getCmdLineArgumentString(argc, (const char **)argv, "input", &filePath);
+        }
+        else
+        {
+            filePath = sdkFindFilePath("person.txt", argv[0]);
+        }
 
         if (filePath)
         {
@@ -239,21 +253,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("Error %s was unable to find person.txt\n", argv[0]);
-            exit(EXIT_FAILURE);
-        }
-
-        cudaDeviceInit(argc, (const char **)argv);
-
-        if (printfNPPinfo(argc, argv) == false)
-		{
-			cudaDeviceReset();
-			exit(EXIT_SUCCESS);
-		}
-
-        if (g_bQATest == false && (g_nDevice == -1) && argc > 1)
-        {
-            sFilename = argv[1];
+            sFilename = "person.txt";
         }
 
         // if we specify the filename at the command line, then we only test sFilename
@@ -291,9 +291,11 @@ int main(int argc, char *argv[])
 
         sResultFilename += "_segmentation.pgm";
 
-        if (argc >= 3 && !g_bQATest)
+        if (checkCmdLineFlag(argc, (const char **)argv, "output"))
         {
-            sResultFilename = argv[2];
+            char *outputFilePath;
+            getCmdLineArgumentString(argc, (const char **)argv, "output", &outputFilePath);
+            sResultFilename = outputFilePath;
         }
 
         // load MRF declaration

@@ -84,7 +84,7 @@ bool Test<Real>::operator()()
     }
 
     // Print results
-    printf("MonteCarloEstimatePiInlineP, Performance = %.2f sims/s, Time = %.2f(ms), NumDevsUsed = %u, Blocksize = %u\n",
+    printf("MonteCarloEstimatePiInlineQ, Performance = %.2f sims/s, Time = %.2f(ms), NumDevsUsed = %u, Blocksize = %u\n",
            numSims / elapsedTime, elapsedTime*1000.0f, 1, threadBlockSize);
 
     sdkDeleteTimer(&timer);

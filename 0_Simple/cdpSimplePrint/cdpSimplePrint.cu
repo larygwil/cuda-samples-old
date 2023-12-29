@@ -103,7 +103,7 @@ int main(int argc, char **argv)
         if (max_depth < 1 || max_depth > 8)
         {
             printf("depth parameter has to be between 1 and 8\n");
-            exit(EXIT_SUCCESS);
+            exit(EXIT_FAILURE);
         }
     }
 
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
     if (device == -1)
     {
               std::cerr << "cdpSimplePrint requires GPU devices with compute SM 3.5 or higher.  Exiting..." << std::endl;
-              exit(EXIT_SUCCESS);
+              exit(EXIT_WAIVED);
      }
     cudaSetDevice(device);
 

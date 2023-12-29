@@ -9,8 +9,8 @@
  *
  */
 
-#pragma warning(disable:4819)
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#pragma warning(disable:4819)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -28,9 +28,6 @@
 
 #include <helper_cuda.h>       // helper for CUDA Error handling and initialization
 #include <helper_string.h>     // helper for string parsing
-
-int  g_nDevice = -1;
-
 
 inline int cudaDeviceInit(int argc, const char **argv)
 {
@@ -88,11 +85,9 @@ operator <<(std::ostream &rOutputStream, const FIBITMAP &rBitmap)
     unsigned int nBPP           = FreeImage_GetBPP(const_cast<FIBITMAP *>(&rBitmap));
 
     FREE_IMAGE_COLOR_TYPE eType = FreeImage_GetColorType(const_cast<FIBITMAP *>(&rBitmap));
-    BITMAPINFO *pInfo          = FreeImage_GetInfo(const_cast<FIBITMAP *>(&rBitmap));
 
-    rOutputStream << "Size  (" << FreeImage_GetWidth(const_cast<FIBITMAP *>(&rBitmap)) << ", "
-                  << FreeImage_GetHeight(const_cast<FIBITMAP *>(&rBitmap)) << ")\n";
-    rOutputStream << "Pitch "  << FreeImage_GetPitch(const_cast<FIBITMAP *>(&rBitmap)) << "\n";
+    rOutputStream << "Size  (" << nImageWidth << ", " << nImageHeight << ")\n";
+    rOutputStream << "Pitch "  << nPitch << "\n";
     rOutputStream << "Type  ";
 
     switch (eType)
@@ -138,7 +133,28 @@ main(int argc, char *argv[])
     try
     {
         std::string sFilename;
-        char *filePath = sdkFindFilePath("Lena.pgm", argv[0]);
+        char *filePath;
+
+        // set your own FreeImage error handler
+        FreeImage_SetOutputMessage(FreeImageErrorHandler);
+
+        cudaDeviceInit(argc, (const char **)argv);
+
+        // Min spec is SM 1.0 devices
+        if (printfNPPinfo(argc, argv, 1, 0) == false) 
+        {
+            cudaDeviceReset();
+            exit(EXIT_SUCCESS);
+        }
+
+        if (checkCmdLineFlag(argc, (const char **)argv, "input"))
+        {
+            getCmdLineArgumentString(argc, (const char **)argv, "input", &filePath);
+        }
+        else
+        {
+            filePath = sdkFindFilePath("Lena.pgm", argv[0]);
+        }
 
         if (filePath)
         {
@@ -146,25 +162,7 @@ main(int argc, char *argv[])
         }
         else
         {
-            printf("Error unable to find Lena.pgm\n");
-            exit(EXIT_FAILURE);
-        }
-
-        // set your own FreeImage error handler
-        FreeImage_SetOutputMessage(FreeImageErrorHandler);
-
-        cudaDeviceInit(argc, (const char **)argv);
-
-		// Min spec is SM 1.0 devices
-		if (printfNPPinfo(argc, argv, 1, 0) == false) 
-		{
-	        cudaDeviceReset();
-			exit(EXIT_SUCCESS);
-		}
-
-        if (argc > 1)
-        {
-            sFilename = argv[1];
+            sFilename = "Lena.pgm";
         }
 
         // if we specify the filename at the command line, then we only test sFilename
@@ -201,9 +199,11 @@ main(int argc, char *argv[])
 
         sResultFilename += "_boxFilterFII.pgm";
 
-        if (argc >= 3)
+        if (checkCmdLineFlag(argc, (const char **)argv, "output"))
         {
-            sResultFilename = argv[2];
+            char *outputFilePath;
+            getCmdLineArgumentString(argc, (const char **)argv, "output", &outputFilePath);
+            sResultFilename = outputFilePath;
         }
 
         FREE_IMAGE_FORMAT eFormat = FreeImage_GetFileType(sFilename.c_str());
@@ -247,8 +247,8 @@ main(int argc, char *argv[])
         const NppiSize  oMaskSize   = {7, 7};
         const NppiPoint oMaskAchnor = {0, 0};
         // compute maximal result image size
-        const NppiSize  oSizeROI = {nImageWidth  - (oMaskSize.width - 1),
-                                    nImageHeight - (oMaskSize.height - 1)
+        const NppiSize  oSizeROI = {(int)nImageWidth  - (oMaskSize.width - 1),
+                                    (int)nImageHeight - (oMaskSize.height - 1)
                                    };
         // allocate result image memory
         int nDstPitchCUDA;

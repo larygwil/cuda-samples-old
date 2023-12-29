@@ -264,7 +264,7 @@ ParticleSystem::addSphere(uint &index, vec3f pos, vec3f vel, int r, float spacin
 
                 if ((dist <= spacing*r) && (index < m_numParticles))
                 {
-                    vec3f p = pos + delta + svrand()*jitter;
+                    //vec3f p = pos + delta + svrand()*jitter;
 
                     posPtr[index] = make_float4(pos.x, pos.y, pos.z, 0.0f);
                     velPtr[index] = make_float4(vel.x, vel.y, vel.z, lifetime);

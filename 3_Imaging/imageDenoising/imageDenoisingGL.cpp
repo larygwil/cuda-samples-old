@@ -501,6 +501,10 @@ int main(int argc, char **argv)
 {
     char *dump_file = NULL;
 
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     pArgc = &argc;
     pArgv = argv;
 

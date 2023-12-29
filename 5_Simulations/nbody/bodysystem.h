@@ -12,6 +12,8 @@
 #ifndef __BODYSYSTEM_H__
 #define __BODYSYSTEM_H__
 
+#include <algorithm>
+
 enum NBodyConfig
 {
     NBODY_CONFIG_RANDOM,

@@ -25,7 +25,7 @@
 #include "histogram_common.h"
 
 const int numRuns = 16;
-static char *sSDKsample = "[histogram]\0";
+static const char *sSDKsample = "[histogram]\0";
 
 int main(int argc, char **argv)
 {

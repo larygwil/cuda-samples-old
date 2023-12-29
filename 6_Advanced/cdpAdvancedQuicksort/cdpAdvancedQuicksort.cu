@@ -470,11 +470,11 @@ int run_qsort(unsigned int size, int seed, int debug, int loop, int verbose)
 
         if (check != size)
         {
-            printf("    cdp_quicksort FAILED\n");
+            printf("    cdpAdvancedQuicksort FAILED\n");
             exit(EXIT_FAILURE);
         }
         else
-            printf("    cdp_quicksort PASSED\n");
+            printf("    cdpAdvancedQuicksort PASSED\n");
 
         // Display the time between event recordings
         printf("Sorted %u elems in %.3f ms (%.3f Melems/sec)\n", size, elapse, (float)size/(elapse*1000.0f));
@@ -508,7 +508,7 @@ int main(int argc, char *argv[])
         checkCmdLineFlag(argc, (const char **)argv, "h"))
     {
         usage();
-        printf("&&&& cdp_quicksort WAIVED\n");
+        printf("&&&& cdpAdvancedQuicksort WAIVED\n");
         exit(EXIT_WAIVED);
     }
 
@@ -547,8 +547,8 @@ int main(int argc, char *argv[])
 
     if (!cdpCapable)
     {
-        printf("cdpLUDecomposition requires SM 3.5 or higher to use CUDA Dynamic Parallelism.  Exiting...\n");
-        exit(EXIT_SUCCESS);
+        printf("cdpAdvancedQuicksort requires SM 3.5 or higher to use CUDA Dynamic Parallelism.  Exiting...\n");
+        exit(EXIT_WAIVED);
     }
 
     printf("Running qsort on %d elements with seed %d, on %s\n", size, seed, properties.name);

@@ -26,7 +26,6 @@
 #include <helper_functions.h>  // helper for shared functions common to CUDA Samples
 #include <helper_cuda.h>       // helper for CUDA Error handling
 
-/* Using updated (v2) interfaces to cublas and cusparse */
 #include <cuda_runtime.h>
 #include <curand.h>
 
@@ -119,7 +118,7 @@ int main(int argc, char **argv)
 
     double gpuTime = 1.0e-3 * sdkGetTimerValue(&hTimer)/(double)numIterations;
 
-    printf("MersenneTwister, Throughput = %.4f GNumbers/s, Time = %.5f s, Size = %u Numbers\n",
+    printf("MersenneTwisterGP11213, Throughput = %.4f GNumbers/s, Time = %.5f s, Size = %u Numbers\n",
            1.0e-9 * rand_n / gpuTime, gpuTime, rand_n);
 
     printf("Shutting down...\n");

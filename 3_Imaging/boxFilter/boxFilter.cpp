@@ -214,7 +214,12 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/)
     switch (key)
     {
         case 27:
-            exit(EXIT_SUCCESS);
+            #if defined (__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
             break;
 
         case 'a':
@@ -263,8 +268,11 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/)
 // Timer Event so we can refresh the display
 void timerEvent(int value)
 {
-    glutPostRedisplay();
-    glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    if(glutGetWindow())
+    {
+        glutPostRedisplay();
+        glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    }
 }
 
 // Resizing the window
@@ -324,6 +332,13 @@ void cleanup()
     glDeleteBuffersARB(1, &pbo);
     glDeleteTextures(1, &texid);
     glDeleteProgramsARB(1, &shader);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 // shader for displaying floating-point texture
@@ -621,6 +636,10 @@ main(int argc, char **argv)
     int devID = 0;
     char *ref_file = NULL;
 
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     pArgc = &argc;
     pArgv = argv;
 
@@ -721,13 +740,5 @@ main(int argc, char **argv)
 
         // Main OpenGL loop that will run visualization for every vsync
         glutMainLoop();
-
-        // cudaDeviceReset causes the driver to clean up all state. While
-        // not mandatory in normal operation, it is good practice.  It is also
-        // needed to ensure correct operation when the application is being
-        // profiled. Calling cudaDeviceReset causes all profile data to be
-        // flushed before the application exits
-        cudaDeviceReset();
-        exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     }
 }

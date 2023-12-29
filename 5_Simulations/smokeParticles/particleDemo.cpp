@@ -901,6 +901,10 @@ void initGL(int *argc, char **argv)
 int
 main(int argc, char **argv)
 {
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", sSDKsample);
 
     if (argc > 1)

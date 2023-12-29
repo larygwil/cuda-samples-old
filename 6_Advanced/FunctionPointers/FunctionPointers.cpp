@@ -54,7 +54,7 @@ void initializeData(char *file);
 
 #define MAX_EPSILON_ERROR 5.0f
 
-static char *sSDKsample = "CUDA Function Pointers (SobelFilter)";
+static const char *sSDKsample = "CUDA Function Pointers (SobelFilter)";
 
 const char *filterMode[] =
 {
@@ -173,8 +173,11 @@ void display(void)
 
 void timerEvent(int value)
 {
-    glutPostRedisplay();
-    glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    if(glutGetWindow())
+    {
+        glutPostRedisplay();
+        glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    }
 }
 
 void keyboard(unsigned char key, int /*x*/, int /*y*/)
@@ -184,7 +187,12 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/)
     switch (key)
     {
         case 27:
-            exit(EXIT_SUCCESS);
+            #if defined (__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
             break;
 
         case '-':
@@ -669,12 +677,4 @@ int main(int argc, char **argv)
         glutTimerFunc(REFRESH_DELAY, timerEvent,0);
         glutMainLoop();
     }
-
-    // cudaDeviceReset causes the driver to clean up all state. While
-    // not mandatory in normal operation, it is good practice.  It is also
-    // needed to ensure correct operation when the application is being
-    // profiled. Calling cudaDeviceReset causes all profile data to be
-    // flushed before the application exits
-    cudaDeviceReset();
-    exit(EXIT_SUCCESS);
 }

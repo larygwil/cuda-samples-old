@@ -153,7 +153,6 @@ float scale = 1.0f / 16.0f;     // image scale
 float cx, cy;                   // image centre
 
 void display();
-void displayImage();
 void initGLBuffers();
 void runBenchmark(int iterations);
 void cleanup();
@@ -798,6 +797,10 @@ main(int argc, char **argv)
 
     // parse arguments
     char *filename;
+
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
 
     printf("Starting bicubicTexture\n");
 

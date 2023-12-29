@@ -15,7 +15,7 @@
 #define INF (255.0f * 255.0f * 3 * 8 + 1)
 #define _FIXED(x) rintf(1e1f * (x))
 
-struct
+struct _GMM_t
 {
     float det;
     float sigma_inv[9];

@@ -9,9 +9,9 @@
 *
 */
 
-#pragma warning(disable:4819)
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#pragma warning(disable:4819)
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
@@ -65,7 +65,6 @@ const char *gold_image = "flower_gold.png";
 
 bool g_bQATest = false;
 bool g_bDisplay = true;
-int  g_nDevice = 0;
 std::string sFilename, sReferenceFile;
 
 const int handle_radius = 4;
@@ -98,7 +97,7 @@ bool verifyResult(const char *filename);
 cudaError_t TrimapFromRect(Npp8u *alpha, int alpha_pitch, NppiRect rect, int width, int height);
 cudaError_t ApplyMatte(int mode, uchar4 *result, int result_pitch, const uchar4 *image, int image_pitch, const unsigned char *matte, int matte_pitch, int width, int height);
 
-inline int cudaDeviceInit()
+inline int cudaDeviceInit(int argc, const char **argv)
 {
     int deviceCount;
     checkCudaErrors(cudaGetDeviceCount(&deviceCount));
@@ -109,25 +108,11 @@ inline int cudaDeviceInit()
         exit(EXIT_FAILURE);
     }
 
-    int dev = g_nDevice;
+    int dev = findCudaDevice(argc, argv);
 
-    if (dev < 0)
-    {
-        dev = 0;
-    }
-
-    if (dev > deviceCount-1)
-    {
-        std::cerr << std::endl << ">> %d CUDA capable GPU device(s) detected. <<" << deviceCount << std::endl;
-        std::cerr <<">> cudaDeviceInit (-device=" << dev << ") is not a valid GPU device. <<" << std::endl << std::endl;
-        return -dev;
-    }
-    else
-    {
-        cudaDeviceProp deviceProp;
-        cudaGetDeviceProperties(&deviceProp, dev);
-        std::cerr << "cudaSetDevice GPU" << dev << " = " << deviceProp.name << std::endl;
-    }
+    cudaDeviceProp deviceProp;
+    cudaGetDeviceProperties(&deviceProp, dev);
+    std::cerr << "cudaSetDevice GPU" << dev << " = " << deviceProp.name << std::endl;
 
     if (g_bDisplay)
     {
@@ -148,11 +133,6 @@ void parseCommandLineArguments(int argc, char *argv[])
         if (checkCmdLineFlag(argc, (const char **)argv, "nodisplay"))
         {
             g_bDisplay = false;
-        }
-
-        if (checkCmdLineFlag(argc, (const char **)argv, "device"))
-        {
-            g_nDevice = getCmdLineArgumentInt(argc, (const char **)argv, "device");
         }
 
         if (checkCmdLineFlag(argc, (const char **)argv, "input"))
@@ -216,7 +196,7 @@ int main(int argc, char **argv)
         }
     }
 
-    cudaDeviceInit();
+    cudaDeviceInit(argc, (const char **)argv);
 
 	// Min spec is SM 1.1 devices
     if (printfNPPinfo(argc, argv, 1, 1) == false)

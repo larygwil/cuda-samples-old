@@ -10,7 +10,7 @@
  */
 
 /*
- * This sample implements a conjugate graident solver on GPU
+ * This sample implements a conjugate gradient solver on GPU
  * using CUBLAS and CUSPARSE
  *
  */
@@ -20,14 +20,14 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Using updated (v2) interfaces to cublas and cusparse */
+/* Using updated (v2) interfaces to cublas */
 #include <cuda_runtime.h>
 #include <cusparse.h>
 #include <cublas_v2.h>
 
 // Utilities and system includes
 #include <helper_functions.h>  // helper for shared functions common to CUDA Samples
-#include <helper_cuda.h>       // helper function CUDA error checking and intialization
+#include <helper_cuda.h>       // helper function CUDA error checking and initialization
 
 const char *sSDKname     = "conjugateGradient";
 

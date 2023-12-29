@@ -77,7 +77,7 @@ typedef struct _CUDAContext_st
 CUDAContext g_ThreadParams[MAXTHREADS];
 
 //define input ptx file for different platforms
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
 #define PTX_FILE "threadMigration_kernel64.ptx"
 #define CUBIN_FILE "threadMigration_kernel64.cubin"
 #else

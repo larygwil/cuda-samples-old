@@ -31,10 +31,6 @@
 #include <helper_string.h>
 #include <helper_cuda.h>
 
-
-bool g_bQATest = false;
-int  g_nDevice = -1;
-
 inline int cudaDeviceInit(int argc, const char **argv)
 {
     int deviceCount;
@@ -82,7 +78,24 @@ int main(int argc, char *argv[])
     try
     {
         std::string sFilename;
-        char *filePath = sdkFindFilePath("Lena.pgm", argv[0]);
+        char *filePath;
+
+        cudaDeviceInit(argc, (const char **)argv);
+
+        if (printfNPPinfo(argc, argv) == false) 
+        {
+            cudaDeviceReset();
+            exit(EXIT_SUCCESS);
+        }
+
+        if (checkCmdLineFlag(argc, (const char **)argv, "input"))
+        {
+            getCmdLineArgumentString(argc, (const char **)argv, "input", &filePath);
+        }
+        else
+        {
+            filePath = sdkFindFilePath("Lena.pgm", argv[0]);
+        }
 
         if (filePath)
         {
@@ -90,21 +103,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("Error unable to find Lena.pgm\n");
-            exit(EXIT_FAILURE);
-        }
-
-        cudaDeviceInit(argc, (const char **)argv);
-
-		if (printfNPPinfo(argc, argv) == false) 
-		{
-	        cudaDeviceReset();
-			exit(EXIT_SUCCESS);
-		}
-
-        if (g_bQATest == false && (g_nDevice == -1) && argc > 1)
-        {
-            sFilename = argv[1];
+            sFilename = "Lena.pgm";
         }
 
         // if we specify the filename at the command line, then we only test sFilename[0].
@@ -141,9 +140,11 @@ int main(int argc, char *argv[])
 
         sResultFilename += "_boxFilter.pgm";
 
-        if (argc >= 3 && !g_bQATest)
+        if (checkCmdLineFlag(argc, (const char **)argv, "output"))
         {
-            sResultFilename = argv[2];
+            char *outputFilePath;
+            getCmdLineArgumentString(argc, (const char **)argv, "output", &outputFilePath);
+            sResultFilename = outputFilePath;
         }
 
         // declare a host image object for an 8-bit grayscale image
@@ -157,17 +158,16 @@ int main(int argc, char *argv[])
         // create struct with box-filter mask size
         NppiSize oMaskSize = {5, 5};
         // create struct with ROI size given the current mask
-        NppiSize oSizeROI = {oDeviceSrc.width() - oMaskSize.width + 1, oDeviceSrc.height() - oMaskSize.height + 1};
+        NppiSize oSizeROI = {(int)oDeviceSrc.width() - oMaskSize.width + 1, (int)oDeviceSrc.height() - oMaskSize.height + 1};
         // allocate device image of appropriatedly reduced size
         npp::ImageNPP_8u_C1 oDeviceDst(oSizeROI.width, oSizeROI.height);
         // set anchor point inside the mask to (0, 0)
         NppiPoint oAnchor = {0, 0};
         // run box filter
-        NppStatus eStatusNPP;
-        eStatusNPP = nppiFilterBox_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(),
+        NPP_CHECK_NPP (
+                     nppiFilterBox_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(),
                                           oDeviceDst.data(), oDeviceDst.pitch(),
-                                          oSizeROI, oMaskSize, oAnchor);
-        NPP_ASSERT(NPP_NO_ERROR == eStatusNPP);
+                                          oSizeROI, oMaskSize, oAnchor) );
         // declare a host image for the result
         npp::ImageCPU_8u_C1 oHostDst(oDeviceDst.size());
         // and copy the device result data into it

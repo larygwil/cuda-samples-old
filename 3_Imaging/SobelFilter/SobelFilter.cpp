@@ -168,8 +168,11 @@ void display(void)
 
 void timerEvent(int value)
 {
-    glutPostRedisplay();
-    glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    if(glutGetWindow())
+    {
+        glutPostRedisplay();
+        glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    }
 }
 
 void keyboard(unsigned char key, int /*x*/, int /*y*/)
@@ -182,7 +185,12 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/)
         case 'q':
         case 'Q':
             printf("Shutting down...\n");
-            exit(EXIT_SUCCESS);
+            #if defined (__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
             break;
 
         case '-':
@@ -241,6 +249,13 @@ void cleanup(void)
     deleteTexture();
 
     sdkDeleteTimer(&timer);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 void initializeData(char *file)
@@ -435,6 +450,10 @@ int main(int argc, char **argv)
     pArgc = &argc;
     pArgv = argv;
 
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", sSDKsample);
 
     if (checkCmdLineFlag(argc, (const char **)argv, "help"))
@@ -491,12 +510,4 @@ int main(int argc, char **argv)
 
     glutTimerFunc(REFRESH_DELAY, timerEvent,0);
     glutMainLoop();
-
-    // cudaDeviceReset causes the driver to clean up all state. While
-    // not mandatory in normal operation, it is good practice.  It is also
-    // needed to ensure correct operation when the application is being
-    // profiled. Calling cudaDeviceReset causes all profile data to be
-    // flushed before the application exits
-    cudaDeviceReset();
-    exit(EXIT_SUCCESS);
 }

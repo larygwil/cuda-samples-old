@@ -506,6 +506,10 @@ deleteTexture(GLuint *tex)
 int
 main(int argc, char **argv)
 {
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", argv[0]);
 
     if (checkCmdLineFlag(argc, (const char **)argv, "file"))
@@ -572,7 +576,7 @@ void FreeResource()
     }
 
     // finalize logs and leave
-    printf("postProcessGL.exe Exiting...\n");
+    printf("simpleCUDA2GL Exiting...\n");
 }
 
 void Cleanup(int iExitCode)

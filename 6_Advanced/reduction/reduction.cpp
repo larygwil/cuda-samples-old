@@ -577,13 +577,13 @@ runTest(int argc, char **argv, ReduceType datatype)
 
         if (datatype == REDUCE_INT)
         {
-            printf("\nGPU result = %d\n", gpu_result);
-            printf("CPU result = %d\n\n", cpu_result);
+            printf("\nGPU result = %d\n", (int)gpu_result);
+            printf("CPU result = %d\n\n", (int)cpu_result);
         }
         else
         {
-            printf("\nGPU result = %f\n", gpu_result);
-            printf("CPU result = %f\n\n", cpu_result);
+            printf("\nGPU result = %f\n", (double)gpu_result);
+            printf("CPU result = %f\n\n", (double)cpu_result);
 
             if (datatype == REDUCE_FLOAT)
             {

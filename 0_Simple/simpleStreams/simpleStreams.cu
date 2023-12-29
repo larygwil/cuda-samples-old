@@ -97,7 +97,7 @@ inline void
 AllocateHostMemory(bool bPinGenericMemory, int **pp_a, int **ppAligned_a, int nbytes)
 {
 #if CUDART_VERSION >= 4000
-
+#ifndef __arm__
     if (bPinGenericMemory)
     {
         // allocate a generic page-aligned chunk of system memory
@@ -117,6 +117,7 @@ AllocateHostMemory(bool bPinGenericMemory, int **pp_a, int **ppAligned_a, int nb
     }
     else
 #endif
+#endif
     {
         printf("> cudaMallocHost() allocating %4.2f Mbytes of system memory\n", (float)nbytes/1048576.0f);
         // allocate host memory (pinned is required for achieve asynchronicity)
@@ -129,7 +130,7 @@ inline void
 FreeHostMemory(bool bPinGenericMemory, int **pp_a, int **ppAligned_a, int nbytes)
 {
 #if CUDART_VERSION >= 4000
-
+#ifndef __arm__
     // CUDA 4.0 support pinning of generic host memory
     if (bPinGenericMemory)
     {
@@ -143,12 +144,13 @@ FreeHostMemory(bool bPinGenericMemory, int **pp_a, int **ppAligned_a, int nbytes
     }
     else
 #endif
+#endif
     {
         cudaFreeHost(*pp_a);
     }
 }
 
-static char *sSyncMethod[] =
+static const char *sSyncMethod[] =
 {
     "0 (Automatic Blocking)",
     "1 (Spin Blocking)",
@@ -377,7 +379,7 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaEventRecord(stop_event, 0));
     checkCudaErrors(cudaEventSynchronize(stop_event));
     checkCudaErrors(cudaEventElapsedTime(&elapsed_time, start_event, stop_event));
-    printf("non-streamed:\t%.2f (%.2f expected)\n", elapsed_time / nreps, time_kernel + time_memcpy);
+    printf("non-streamed:\t%.2f\n", elapsed_time / nreps);
 
     //////////////////////////////////////////////////////////////////////
     // time execution with nstreams streams
@@ -406,7 +408,7 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaEventRecord(stop_event, 0));
     checkCudaErrors(cudaEventSynchronize(stop_event));
     checkCudaErrors(cudaEventElapsedTime(&elapsed_time, start_event, stop_event));
-    printf("%d streams:\t%.2f (%.2f expected with compute capability 1.1 or later)\n", nstreams, elapsed_time / nreps, time_kernel + time_memcpy / nstreams);
+    printf("%d streams:\t%.2f\n", nstreams, elapsed_time / nreps);
 
     // check whether the output is correct
     printf("-------------------------------\n");

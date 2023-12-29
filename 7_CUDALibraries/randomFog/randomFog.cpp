@@ -626,7 +626,7 @@ void showHelp(void)
     ss << "\t" << setw(10) << "+"       << "Increment the number of displayed points by 8,000 (up to maximum 200,000)\n";
     ss << "\t" << setw(10) << "-"       << "Decrement the number of displayed points by 8,000 (down to minimum 8,000)\n\n";
     ss << "\t" << setw(10) << "q/[ESC]" << "Quit the application.\n\n";
-    printf(ss.str().c_str());
+    puts(ss.str().c_str());
 }
 
 int main(int argc, char **argv)

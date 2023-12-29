@@ -32,7 +32,7 @@
 #include <iostream>
 #include <cassert>
 
-static char *sSDKsample = "CUDA Bandwidth Test";
+const static char *sSDKsample = "CUDA Bandwidth Test";
 
 // defines, project
 #define MEMCOPY_ITERATIONS  10

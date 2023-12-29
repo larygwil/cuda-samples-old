@@ -11,7 +11,7 @@
 
 /*
  * This sample implements multi-threaded heterogeneous computing workloads with the new CPU callbacks for CUDA streams and events introduced with CUDA 5.0.
- * Together with the thread safety of the CUDA API implementing heterogenous workloads that float between CPU threads and GPUs has become simple and efficient.
+ * Together with the thread safety of the CUDA API implementing heterogeneous workloads that float between CPU threads and GPUs has become simple and efficient.
  *
  * The workloads in the sample follow the form CPU preprocess -> GPU process -> CPU postprocess.
  * Each CPU processing step is handled by its own dedicated thread. GPU workloads are sent to all available GPUs in the system.

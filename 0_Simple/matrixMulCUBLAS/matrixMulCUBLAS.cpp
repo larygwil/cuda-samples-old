@@ -25,26 +25,26 @@
 
 // CUBLAS library uses column-major storage, but C/C++ use row-major storage.
 // When passing the matrix pointer to CUBLAS, the memory layout alters from
-// row-major to column-major, which is equivalent to an implict transpose.
+// row-major to column-major, which is equivalent to an implicit transpose.
 
 // In the case of row-major C/C++ matrix A, B, and a simple matrix multiplication
 // C = A * B, we can't use the input order like cublasSgemm(A, B)  because of
-// implict transpose. The actual result of cublasSegemm(A, B) is A(T) * B(T).
+// implicit transpose. The actual result of cublasSegemm(A, B) is A(T) * B(T).
 // If col(A(T)) != row(B(T)), equal to row(A) != col(B), A(T) and B(T) are not
 // multipliable. Moreover, even if A(T) and B(T) are multipliable, the result C
 // is a column-based cublas matrix, which means C(T) in C/C++, we need extra
 // transpose code to convert it to a row-based C/C++ matrix.
 
 // To solve the problem, let's consider our desired result C, a row-major matrix.
-// In cublas format, it is C(T) actually (becuase of the implict transpose).
+// In cublas format, it is C(T) actually (because of the implicit transpose).
 // C = A * B, so C(T) = (A * B) (T) = B(T) * A(T). Cublas matrice B(T) and A(T)
-// happen to be C/C++ matrice B and A (still becuase of the implict transpose)!
+// happen to be C/C++ matrice B and A (still because of the implicit transpose)!
 // We don't need extra transpose code, we only need alter the input order!
 //
 // CUBLAS provides high-performance matrix multiplication.
 // See also:
 // V. Volkov and J. Demmel, "Benchmarking GPUs to tune dense linear algebra,"
-// in Proc. 2008 ACM/IEEE Conf. on Superconducting (SC '08),
+// in Proc. 2008 ACM/IEEE Conf. on Supercomputing (SC '08),
 // Piscataway, NJ: IEEE Press, 2008, pp. Art. 31:1-11.
 //
 
@@ -58,6 +58,7 @@
 
 // CUDA and CUBLAS functions
 #include <helper_functions.h>
+#include <helper_cuda.h>
 
 #ifndef min
 #define min(a,b) ((a < b) ? a : b)
@@ -98,19 +99,6 @@ matrixMulCPU(float *C, const float *A, const float *B, unsigned int hA, unsigned
             C[i * wB + j] = (float)sum;
         }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// These are CUDA Helper functions (in addition to helper_cuda.h)
-
-void inline checkError(cublasStatus_t status, const char *msg)
-{
-    if (status != CUBLAS_STATUS_SUCCESS)
-    {
-        printf("%s", msg);
-        exit(EXIT_FAILURE);
-    }
-}
-// end of CUDA Helper Functions
 
 // Allocates a matrix with random float entries.
 void randomInit(float *data, int size)
@@ -222,15 +210,8 @@ void initializeCUDA(int argc, char **argv, int &devID, int &iSizeMultiple, sMatr
 int matrixMultiply(int argc, char **argv, int devID, sMatrixSize &matrix_size)
 {
     cudaDeviceProp deviceProp;
-    cudaError_t error;
 
-    error = cudaGetDeviceProperties(&deviceProp, devID);
-
-    if (error != cudaSuccess)
-    {
-        printf("cudaGetDeviceProperties returned error code %d, line(%d)\n", error, __LINE__);
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID));
 
     // use a larger block size for Fermi and above
     int block_size = (deviceProp.major < 2) ? 16 : 32;
@@ -262,46 +243,11 @@ int matrixMultiply(int argc, char **argv, int devID, sMatrixSize &matrix_size)
     float *h_C      = (float *) malloc(mem_size_C);
     float *h_CUBLAS = (float *) malloc(mem_size_C);
 
-    error = cudaMalloc((void **) &d_A, mem_size_A);
-
-    if (error != cudaSuccess)
-    {
-        printf("cudaMalloc d_A returned error code %d, line(%d)\n", error, __LINE__);
-        exit(EXIT_FAILURE);
-    }
-
-    error = cudaMalloc((void **) &d_B, mem_size_B);
-
-    if (error != cudaSuccess)
-    {
-        printf("cudaMalloc d_B returned error code %d, line(%d)\n", error, __LINE__);
-        exit(EXIT_FAILURE);
-    }
-
-    // copy host memory to device
-    error = cudaMemcpy(d_A, h_A, mem_size_A, cudaMemcpyHostToDevice);
-
-    if (error != cudaSuccess)
-    {
-        printf("cudaMemcpy d_A h_A returned error code %d, line(%d)\n", error, __LINE__);
-        exit(EXIT_FAILURE);
-    }
-
-    error = cudaMemcpy(d_B, h_B, mem_size_B, cudaMemcpyHostToDevice);
-
-    if (error != cudaSuccess)
-    {
-        printf("cudaMemcpy d_B h_B returned error code %d, line(%d)\n", error, __LINE__);
-        exit(EXIT_FAILURE);
-    }
-
-    error = cudaMalloc((void **) &d_C, mem_size_C);
-
-    if (error != cudaSuccess)
-    {
-        printf("cudaMalloc d_C returned error code %d, line(%d)\n", error, __LINE__);
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cudaMalloc((void **) &d_A, mem_size_A));
+    checkCudaErrors(cudaMalloc((void **) &d_B, mem_size_B));
+    checkCudaErrors(cudaMemcpy(d_A, h_A, mem_size_A, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_B, h_B, mem_size_B, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMalloc((void **) &d_C, mem_size_C));
 
     // setup execution parameters
     dim3 threads(block_size, block_size);
@@ -315,98 +261,41 @@ int matrixMultiply(int argc, char **argv, int devID, sMatrixSize &matrix_size)
 
     // CUBLAS version 2.0
     {
-        cublasHandle_t handle;
-
-        cublasStatus_t ret;
-
-        ret = cublasCreate(&handle);
-
-        if (ret != CUBLAS_STATUS_SUCCESS)
-        {
-            printf("cublasCreate returned error code %d, line(%d)\n", ret, __LINE__);
-            exit(EXIT_FAILURE);
-        }
-
         const float alpha = 1.0f;
         const float beta  = 0.0f;
-        //Perform warmup operation with cublas
-        ret = cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B, matrix_size.uiWB, d_A, matrix_size.uiWA, &beta, d_C, matrix_size.uiWA);
+        cublasHandle_t handle;
+        cudaEvent_t start, stop;
 
-        if (ret != CUBLAS_STATUS_SUCCESS)
-        {
-            printf("cublasSgemm returned error code %d, line(%d)\n", ret, __LINE__);
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cublasCreate(&handle));
+
+        //Perform warmup operation with cublas
+        checkCudaErrors(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B, matrix_size.uiWB, d_A, matrix_size.uiWA, &beta, d_C, matrix_size.uiWA));
 
         // Allocate CUDA events that we'll use for timing
-        cudaEvent_t start;
-        error = cudaEventCreate(&start);
-
-        if (error != cudaSuccess)
-        {
-            fprintf(stderr, "Failed to create start event (error code %s)!\n", cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-        }
-
-        cudaEvent_t stop;
-        error = cudaEventCreate(&stop);
-
-        if (error != cudaSuccess)
-        {
-            fprintf(stderr, "Failed to create stop event (error code %s)!\n", cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cudaEventCreate(&start));
+        checkCudaErrors(cudaEventCreate(&stop));
 
         // Record the start event
-        error = cudaEventRecord(start, NULL);
-
-        if (error != cudaSuccess)
-        {
-            fprintf(stderr, "Failed to record start event (error code %s)!\n", cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cudaEventRecord(start, NULL));
 
         for (int j = 0; j < nIter; j++)
         {
             //note cublas is column primary!
             //need to transpose the order
-            ret = cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B, matrix_size.uiWB, d_A, matrix_size.uiWA, &beta, d_C, matrix_size.uiWA);
+            checkCudaErrors(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B, matrix_size.uiWB, d_A, matrix_size.uiWA, &beta, d_C, matrix_size.uiWA));
 
-            if (ret != CUBLAS_STATUS_SUCCESS)
-            {
-                printf("cublasSgemm returned error code %d, line(%d)\n", ret, __LINE__);
-                exit(EXIT_FAILURE);
-            }
         }
 
         printf("done.\n");
 
         // Record the stop event
-        error = cudaEventRecord(stop, NULL);
-
-        if (error != cudaSuccess)
-        {
-            fprintf(stderr, "Failed to record stop event (error code %s)!\n", cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cudaEventRecord(stop, NULL));
 
         // Wait for the stop event to complete
-        error = cudaEventSynchronize(stop);
-
-        if (error != cudaSuccess)
-        {
-            fprintf(stderr, "Failed to synchronize on the stop event (error code %s)!\n", cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cudaEventSynchronize(stop));
 
         float msecTotal = 0.0f;
-        error = cudaEventElapsedTime(&msecTotal, start, stop);
-
-        if (error != cudaSuccess)
-        {
-            fprintf(stderr, "Failed to get time elapsed between events (error code %s)!\n", cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
 
         // Compute and print the performance
         float msecPerMatrixMul = msecTotal / nIter;
@@ -419,15 +308,10 @@ int matrixMultiply(int argc, char **argv, int devID, sMatrixSize &matrix_size)
             flopsPerMatrixMul);
 
         // copy result from device to host
-        error = cudaMemcpy(h_CUBLAS, d_C, mem_size_C, cudaMemcpyDeviceToHost);
+        checkCudaErrors(cudaMemcpy(h_CUBLAS, d_C, mem_size_C, cudaMemcpyDeviceToHost));
 
-        if (error != cudaSuccess)
-        {
-            printf("cudaMemcpy h_CUBLAS d_C returned error code %d, line(%d)\n", error, __LINE__);
-            exit(EXIT_FAILURE);
-        }
-
-        checkError(cublasDestroy(handle), "cublasDestroy() error!\n");
+        // Destroy the handle
+        checkCudaErrors(cublasDestroy(handle));
     }
 
     // compute reference solution
@@ -451,9 +335,9 @@ int matrixMultiply(int argc, char **argv, int devID, sMatrixSize &matrix_size)
     free(h_B);
     free(h_C);
     free(reference);
-    cudaFree(d_A);
-    cudaFree(d_B);
-    cudaFree(d_C);
+    checkCudaErrors(cudaFree(d_A));
+    checkCudaErrors(cudaFree(d_B));
+    checkCudaErrors(cudaFree(d_C));
 
     // cudaDeviceReset causes the driver to clean up all state. While
     // not mandatory in normal operation, it is good practice.  It is also
@@ -486,5 +370,5 @@ int main(int argc, char **argv)
 
     int matrix_result = matrixMultiply(argc, argv, devID, matrix_size);
 
-    exit(matrix_result);
+    return matrix_result;
 }

@@ -16,6 +16,7 @@
 //
 
 #include <stdio.h>
+//#include <omp.h>
 #include "cdp_lu.h"
 #include "cdp_lu_utils.h"
 extern __global__ void dgetrf_cdpentry(Parameters *device_params);

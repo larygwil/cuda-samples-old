@@ -16,7 +16,9 @@
 #ifndef CPU_INTERVAL_H
 #define CPU_INTERVAL_H
 
+#ifndef __USE_ISOC99
 #define __USE_ISOC99
+#endif
 
 #include <iostream>
 #include <vector>

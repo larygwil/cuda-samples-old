@@ -110,24 +110,24 @@ struct DirectHistogram
 #if __CUDA_ARCH__ >= 200
 
 __device__
-unsigned int warpHistogramWarpReduce(unsigned int myKey, volatile int *iwarpKey, unsigned int *threadKey, const int laneID)
+unsigned int warpHistogramWarpReduce(unsigned long myKey, volatile long *iwarpKey, unsigned long *threadKey, const int laneID)
 {
-    volatile unsigned int *warpKey = (volatile unsigned int *)iwarpKey;
-    unsigned int *pThreadKey = &threadKey[laneID];
+    volatile unsigned long *warpKey = (volatile unsigned long *)iwarpKey;
+    unsigned long *pThreadKey = &threadKey[laneID];
 
     *pThreadKey = myKey;
 
-    unsigned int myBallot;
+    unsigned long myBallot;
 
     for (int i=0; i<32; ++i)
     {
-        unsigned int *pCurrentKey;
+        unsigned long *pCurrentKey;
 
         // Find master thread: all active threads write to same location, one will win
         if (i > 0)
         {
-            *warpKey = (unsigned int)pThreadKey;
-            pCurrentKey = (unsigned int *)*warpKey;
+            *warpKey = (unsigned long)pThreadKey;
+            pCurrentKey = (unsigned long *)*warpKey;
         }
         else
         {
@@ -136,7 +136,7 @@ unsigned int warpHistogramWarpReduce(unsigned int myKey, volatile int *iwarpKey,
         }
 
         // Current Key is the one from the master thread, compare against mine
-        int currentKey = *pCurrentKey;
+        unsigned long currentKey = *pCurrentKey;
 
         // Cast vote over all threads and get the ballot
         unsigned int ballot = __ballot(myKey == currentKey);
@@ -144,7 +144,7 @@ unsigned int warpHistogramWarpReduce(unsigned int myKey, volatile int *iwarpKey,
         // Housekeeping
         if (myKey == currentKey)
         {
-            myBallot = (((int)pCurrentKey) == ((int) pThreadKey)) ? ballot : 0;
+            myBallot = (((long)pCurrentKey) == ((long) pThreadKey)) ? ballot : 0;
 
             break;
         }
@@ -156,7 +156,7 @@ unsigned int warpHistogramWarpReduce(unsigned int myKey, volatile int *iwarpKey,
 #endif
 
 __device__
-unsigned int warpHistogramNaive(unsigned int myKey, volatile int *warpKey, unsigned int *threadKey, const int laneID)
+unsigned int warpHistogramNaive(unsigned long myKey, volatile long *warpKey, unsigned long *threadKey, const int laneID)
 {
     return 1;
 }
@@ -167,8 +167,8 @@ __global__
 void largeHistogramKernel(in_T keys, int *bins, int n_bins)
 {
 
-    __shared__ unsigned int threadKey[WARPS_PER_BLOCK * 32];
-    __shared__ int warpKeys[WARPS_PER_BLOCK];
+    __shared__ unsigned long threadKey[WARPS_PER_BLOCK * 32];
+    __shared__ long warpKeys[WARPS_PER_BLOCK];
 
     const int laneID = __laneID();
     const int warpID = keys.warpID();
@@ -178,7 +178,7 @@ void largeHistogramKernel(in_T keys, int *bins, int n_bins)
 
     for (int i=0; i < ELEMENTS_PER_THREAD; ++ i)
     {
-        int myKey = keys[i];
+        long myKey = keys[i];
 
 #if __CUDA_ARCH__ < 300 && __CUDA_ARCH__ >= 200
         int count = warpHistogramWarpReduce(myKey, &warpKeys[warpID], &threadKey[warpID*32], laneID);

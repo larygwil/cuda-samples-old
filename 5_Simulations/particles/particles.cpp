@@ -687,6 +687,10 @@ void initMenus()
 int
 main(int argc, char **argv)
 {
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", sSDKsample);
 
     numParticles = NUM_PARTICLES;

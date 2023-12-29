@@ -293,7 +293,7 @@ int main(int argc, char **argv)
     // select problem size
     int scale = (strongScaling) ? 1 : GPU_N;
     int OPT_N = nOptions * scale;
-    int PATH_N = 262144;
+    int PATH_N = 65536;
     const unsigned long long SEED = 777;
 
     // initialize the timers

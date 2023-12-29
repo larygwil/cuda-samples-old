@@ -34,13 +34,14 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/usr/local/cuda-6.0"
+CUDA_PATH ?= "/usr/local/cuda-6.5"
 
 OSUPPER = $(shell uname -s 2>/dev/null | tr "[:lower:]" "[:upper:]")
 OSLOWER = $(shell uname -s 2>/dev/null | tr "[:upper:]" "[:lower:]")
 
-OS_SIZE = $(shell uname -m | sed -e "s/i.86/32/" -e "s/x86_64/64/" -e "s/armv7l/32/")
-OS_ARCH = $(shell uname -m | sed -e "s/i386/i686/")
+OS_SIZE    = $(shell uname -m | sed -e "s/x86_64/64/" -e "s/armv7l/32/" -e "s/aarch64/64/")
+OS_ARCH    = $(shell uname -m)
+ARCH_FLAGS =
 
 DARWIN = $(strip $(findstring DARWIN, $(OSUPPER)))
 ifneq ($(DARWIN),)
@@ -48,17 +49,19 @@ ifneq ($(DARWIN),)
 endif
 
 # Take command line flags that override any of these settings
-ifeq ($(i386),1)
-	OS_SIZE = 32
-	OS_ARCH = i686
-endif
 ifeq ($(x86_64),1)
 	OS_SIZE = 64
 	OS_ARCH = x86_64
 endif
 ifeq ($(ARMv7),1)
-	OS_SIZE = 32
-	OS_ARCH = armv7l
+	OS_SIZE    = 32
+	OS_ARCH    = armv7l
+	ARCH_FLAGS = -target-cpu-arch ARM
+endif
+ifeq ($(aarch64),1)
+	OS_SIZE    = 64
+	OS_ARCH    = aarch64
+	ARCH_FLAGS = -target-cpu-arch ARM
 endif
 
 # Common binaries
@@ -69,12 +72,16 @@ else
   GCC ?= g++
 endif
 else
+ifeq ($(ARMv7),1)
+  GCC ?= arm-linux-gnueabihf-g++
+else
   GCC ?= g++
+endif
 endif
 NVCC := $(CUDA_PATH)/bin/nvcc -ccbin $(GCC)
 
 # internal flags
-NVCCFLAGS   := -m${OS_SIZE}
+NVCCFLAGS   := -m${OS_SIZE} ${ARCH_FLAGS}
 CCFLAGS     :=
 LDFLAGS     :=
 
@@ -89,21 +96,27 @@ ifneq ($(DARWIN),)
   CCFLAGS += -arch $(OS_ARCH)
 else
   ifeq ($(OS_ARCH),armv7l)
-    ifeq ($(abi),gnueabi)
-      CCFLAGS += -mfloat-abi=softfp
+    ifeq ($(abi),androideabi)
+      NVCCFLAGS += -target-os-variant Android
     else
-      # default to gnueabihf
-      override abi := gnueabihf
-      LDFLAGS += --dynamic-linker=/lib/ld-linux-armhf.so.3
-      CCFLAGS += -mfloat-abi=hard
+      ifeq ($(abi),gnueabi)
+        CCFLAGS += -mfloat-abi=softfp
+      else
+        # default to gnueabihf
+        override abi := gnueabihf
+        LDFLAGS += --dynamic-linker=/lib/ld-linux-armhf.so.3
+        CCFLAGS += -mfloat-abi=hard
+      endif
     endif
   endif
 endif
 
 ifeq ($(ARMv7),1)
-NVCCFLAGS += -target-cpu-arch ARM
 ifneq ($(TARGET_FS),)
+GCCVERSIONLTEQ46 := $(shell expr `$(GCC) -dumpversion` \<= 4.6)
+ifeq ($(GCCVERSIONLTEQ46),1)
 CCFLAGS += --sysroot=$(TARGET_FS)
+endif
 LDFLAGS += --sysroot=$(TARGET_FS)
 LDFLAGS += -rpath-link=$(TARGET_FS)/lib
 LDFLAGS += -rpath-link=$(TARGET_FS)/usr/lib
@@ -138,56 +151,62 @@ LIBRARIES :=
 
 UBUNTU = $(shell lsb_release -i -s 2>/dev/null | grep -i ubuntu)
 
-EXEC   ?=
+SAMPLE_ENABLED := 1
 
+# This sample is not supported on Mac OSX
 ifneq ($(DARWIN),)
-  ifeq ($(OS_SIZE),32)
-    OPENMPDIR   ?= /usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1
-  else
-    OPENMPDIR   ?= /usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/x86_64
-  endif
-else
-  ifneq ($(UBUNTU),)
-    ifeq ($(OS_SIZE),32)
-      OPENMPDIR   ?= /usr/lib/i386-linux-gnu
-    else
-      OPENMPDIR   ?= /usr/lib/x86_64-linux-gnu
-    endif
-  else
-    ifeq ($(OS_SIZE),32)
-      OPENMPDIR   ?= /usr/lib
-    else
-      OPENMPDIR   ?= /usr/lib64
-    endif
-  endif
+  $(info >>> WARNING - UnifiedMemoryStreams is not supported on Mac OSX - waiving sample <<<)
+  SAMPLE_ENABLED := 0
 endif
 
-GOMPLIB         ?= $(shell find $(OPENMPDIR)/libgomp* 2>/dev/null)
+# Attempt to compile a minimal OpenMP application. If a.out exists, OpenMP is properly set up.
+$(shell echo "int main() { omp_get_num_threads(); return 0; }" > test.c ; $(NVCC) -Xcompiler -fopenmp test.c)
+OPENMP ?= $(shell find a.out 2>/dev/null)
 
-ifeq ($(GOMPLIB),)
+ifeq ($(OPENMP),)
       $(info -----------------------------------------------------------------------------------------------)
-      $(info WARNING - CUDA OpenMP Libraries are not found)
+      $(info WARNING - OpenMP is unable to compile)
       $(info -----------------------------------------------------------------------------------------------)
-      $(info   This CUDA Sample cannot be built without libgomp libraries.)
+      $(info   This CUDA Sample cannot be built if the OpenMP compiler is not set up correctly.)
       $(info   This will be a dry-run of the Makefile.)
       $(info   For more information on how to set up your environment to build and run this )
       $(info   sample, please refer the CUDA Samples documentation and release notes)
       $(info -----------------------------------------------------------------------------------------------)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
 endif
 
-# CUDA code generation flags
+$(shell rm a.out test.c 2>/dev/null)
 
-GENCODE_SM30    := -gencode arch=compute_30,code=sm_30
-GENCODE_SM32    := -gencode arch=compute_32,code=sm_32
-GENCODE_SM35    := -gencode arch=compute_35,code=sm_35
-GENCODE_SM50    := -gencode arch=compute_50,code=sm_50
-GENCODE_SMXX    := -gencode arch=compute_50,code=compute_50
-GENCODE_FLAGS   ?= $(GENCODE_SM30) $(GENCODE_SM32) $(GENCODE_SM35) $(GENCODE_SM50) $(GENCODE_SMXX)
+# Gencode arguments
+ifeq ($(OS_ARCH),armv7l)
+SMS ?= 30 32 35 37 50
+else
+SMS ?= 30 35 37 50
+endif
+
+ifeq ($(SMS),)
+$(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
+SAMPLE_ENABLED := 0
+endif
+
+ifeq ($(GENCODE_FLAGS),)
+# Generate SASS code for each SM architecture listed in $(SMS)
+$(foreach sm,$(SMS),$(eval GENCODE_FLAGS += -gencode arch=compute_$(sm),code=sm_$(sm)))
+
+# Generate PTX code from the highest SM architecture in $(SMS) to guarantee forward-compatibility
+HIGHEST_SM := $(lastword $(sort $(SMS)))
+ifneq ($(HIGHEST_SM),)
+GENCODE_FLAGS += -gencode arch=compute_$(HIGHEST_SM),code=compute_$(HIGHEST_SM)
+endif
+endif
 
 ALL_CCFLAGS += -Xcompiler -fopenmp
 
 LIBRARIES += -lcublas -lgomp
+
+ifeq ($(SAMPLE_ENABLED),0)
+EXEC ?= @echo "[@]"
+endif
 
 ################################################################################
 
@@ -195,6 +214,13 @@ LIBRARIES += -lcublas -lgomp
 all: build
 
 build: UnifiedMemoryStreams
+
+check.deps:
+ifeq ($(SAMPLE_ENABLED),0)
+	@echo "Sample will be waived due to the above missing dependencies"
+else
+	@echo "Sample is ready - all dependencies have been met"
+endif
 
 UnifiedMemoryStreams.o:UnifiedMemoryStreams.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<

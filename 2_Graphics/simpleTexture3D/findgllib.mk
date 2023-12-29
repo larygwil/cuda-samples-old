@@ -54,7 +54,7 @@ endif
 ifeq ("$(OSUPPER)","LINUX")
     # $(info) >> findgllib.mk -> LINUX path <<<)
     # Each set of Linux Distros have different paths for where to find their OpenGL libraries reside
-    UBUNTU_PKG_NAME = "nvidia-331"
+    UBUNTU_PKG_NAME = "nvidia-340"
 	UBUNTU = $(shell echo $(DISTRO) | grep -i ubuntu >/dev/null 2>&1; echo $$?)
 	FEDORA = $(shell echo $(DISTRO) | grep -i fedora >/dev/null 2>&1; echo $$?)
 	RHEL   = $(shell echo $(DISTRO) | grep -i red    >/dev/null 2>&1; echo $$?)
@@ -71,113 +71,77 @@ ifeq ("$(OSUPPER)","LINUX")
           GLLINK += -L$(TARGET_FS)/usr/lib/arm-linux-gnueabihf
         endif 
       else
-        ifeq ($(OS_SIZE),64)
-          GLPATH    ?= /usr/lib/$(UBUNTU_PKG_NAME)
-          GLLINK    ?= -L/usr/lib/$(UBUNTU_PKG_NAME)
-          DFLT_PATH ?= /usr/lib
-        else
-          ifeq ($(i386),1)
-            GLPATH    ?= /usr/lib32/$(UBUNTU_PKG_NAME)
-            GLLINK    ?= -L/usr/lib32/$(UBUNTU_PKG_NAME)
-            DFLT_PATH ?= /usr/lib
-          else
-            GLPATH    ?= /usr/lib/$(UBUNTU_PKG_NAME)
-            GLLINK    ?= -L/usr/lib/$(UBUNTU_PKG_NAME)
-            DFLT_PATH ?= /usr/lib
-          endif
-        endif
+        GLPATH    ?= /usr/lib/$(UBUNTU_PKG_NAME)
+        GLLINK    ?= -L/usr/lib/$(UBUNTU_PKG_NAME)
+        DFLT_PATH ?= /usr/lib
       endif
     endif
     ifeq ("$(SUSE)","0")
-      ifeq ($(OS_SIZE),64)
-        GLPATH    ?= /usr/X11R6/lib64
-        GLLINK    ?= -L/usr/X11R6/lib64
-        DFLT_PATH ?= /usr/lib64
-      else
-        GLPATH    ?= /usr/X11R6/lib
-        GLLINK    ?= -L/usr/X11R6/lib
-        DFLT_PATH ?= /usr/lib
-      endif
+      GLPATH    ?= /usr/X11R6/lib64
+      GLLINK    ?= -L/usr/X11R6/lib64
+      DFLT_PATH ?= /usr/lib64
     endif
     ifeq ("$(FEDORA)","0")
-      ifeq ($(OS_SIZE),64)
-        GLPATH    ?= /usr/lib64/nvidia
-        GLLINK    ?= -L/usr/lib64/nvidia
-        DFLT_PATH ?= /usr/lib64
-      else
-        GLPATH    ?= /usr/lib/nvidia
-        GLLINK    ?= -L/usr/lib/nvidia
-        DFLT_PATH ?= /usr/lib
-      endif
+      GLPATH    ?= /usr/lib64/nvidia
+      GLLINK    ?= -L/usr/lib64/nvidia
+      DFLT_PATH ?= /usr/lib64
     endif
     ifeq ("$(RHEL)","0")
-      ifeq ($(OS_SIZE),64)
-        GLPATH    ?= /usr/lib64/nvidia
-        GLLINK    ?= -L/usr/lib64/nvidia
-        DFLT_PATH ?= /usr/lib64
-      else
-        GLPATH    ?= /usr/lib/nvidia
-        GLLINK    ?= -L/usr/lib/nvidia
-        DFLT_PATH ?= /usr/lib
-      endif
+      GLPATH    ?= /usr/lib64/nvidia
+      GLLINK    ?= -L/usr/lib64/nvidia
+      DFLT_PATH ?= /usr/lib64
     endif
     ifeq ("$(CENTOS)","0")
-      ifeq ($(OS_SIZE),64)
-        GLPATH    ?= /usr/lib64/nvidia
-        GLLINK    ?= -L/usr/lib64/nvidia
-        DFLT_PATH ?= /usr/lib64
-      else
-        GLPATH    ?= /usr/lib/nvidia
-        GLLINK    ?= -L/usr/lib/nvidia
-        DFLT_PATH ?= /usr/lib
-      endif
+      GLPATH    ?= /usr/lib64/nvidia
+      GLLINK    ?= -L/usr/lib64/nvidia
+      DFLT_PATH ?= /usr/lib64
     endif
   
   # find libGL, libGLU, libXi, 
-  GLLIB  := $(shell find $(GLPATH) $(DFLT_PATH) -name libGL.so  -print 2>/dev/null)
-  GLULIB := $(shell find $(GLPATH) $(DFLT_PATH) -name libGLU.so -print 2>/dev/null)
-  X11LIB := $(shell find $(GLPATH) $(DFLT_PATH) -name libX11.so -print 2>/dev/null)
-  XILIB  := $(shell find $(GLPATH) $(DFLT_PATH) -name libXi.so  -print 2>/dev/null)
-  XMULIB := $(shell find $(GLPATH) $(DFLT_PATH) -name libXmu.so -print 2>/dev/null)
+  GLLIB  := $(shell find -L $(GLPATH) $(DFLT_PATH) -name libGL.so  -print 2>/dev/null)
+  GLULIB := $(shell find -L $(GLPATH) $(DFLT_PATH) -name libGLU.so -print 2>/dev/null)
+  X11LIB := $(shell find -L $(GLPATH) $(DFLT_PATH) -name libX11.so -print 2>/dev/null)
+  XILIB  := $(shell find -L $(GLPATH) $(DFLT_PATH) -name libXi.so  -print 2>/dev/null)
+  XMULIB := $(shell find -L $(GLPATH) $(DFLT_PATH) -name libXmu.so -print 2>/dev/null)
 
   ifeq ("$(GLLIB)","")
       $(info >>> WARNING - libGL.so not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
   ifeq ("$(GLULIB)","")
       $(info >>> WARNING - libGLU.so not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
   ifeq ("$(X11LIB)","")
       $(info >>> WARNING - libX11.so not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
   ifeq ("$(XILIB)","")
       $(info >>> WARNING - libXi.so not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
   ifeq ("$(XMULIB)","")
       $(info >>> WARNING - libXmu.so not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
 
   HEADER_SEARCH_PATH ?= /usr/include
 
-  GLHEADER  := $(shell find $(HEADER_SEARCH_PATH) -name gl.h -print 2>/dev/null)
-  GLUHEADER := $(shell find $(HEADER_SEARCH_PATH) -name glu.h -print 2>/dev/null)
-  X11HEADER := $(shell find $(HEADER_SEARCH_PATH) -name Xlib.h -print 2>/dev/null)
+  GLHEADER  := $(shell find -L $(HEADER_SEARCH_PATH) -name gl.h -print 2>/dev/null)
+  GLUHEADER := $(shell find -L $(HEADER_SEARCH_PATH) -name glu.h -print 2>/dev/null)
+  X11HEADER := $(shell find -L $(HEADER_SEARCH_PATH) -name Xlib.h -print 2>/dev/null)
 
   ifeq ("$(GLHEADER)","")
       $(info >>> WARNING - gl.h not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
   ifeq ("$(GLUHEADER)","")
       $(info >>> WARNING - glu.h not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
   ifeq ("$(X11HEADER)","")
       $(info >>> WARNING - Xlib.h not found, refer to CUDA Samples release notes for how to find and install them. <<<)
-      EXEC=@echo "[@]"
+      SAMPLE_ENABLED := 0
   endif
 else
     # This would be the Mac OS X path if we had to do anything special

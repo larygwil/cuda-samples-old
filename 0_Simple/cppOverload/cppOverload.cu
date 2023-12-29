@@ -94,7 +94,7 @@ int main(int argc, const char *argv[])
     {
         printf("ERROR: cppOverload requires GPU devices with compute SM 2.0 or higher.\n");
         printf("Current GPU device has compute SM%d.%d, Exiting...", prop.major, prop.minor);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 	
     checkCudaErrors(cudaSetDevice(deviceID));

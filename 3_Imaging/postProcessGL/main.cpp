@@ -779,6 +779,10 @@ deleteFramebuffer(GLuint *fbo)
 int
 main(int argc, char **argv)
 {
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", argv[0]);
 
     if (checkCmdLineFlag(argc, (const char **)argv, "radius") &&

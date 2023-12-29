@@ -367,7 +367,12 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
         case 27:
-            exit(EXIT_SUCCESS);
+            #if defined (__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
             break;
 
         case ' ':
@@ -575,6 +580,13 @@ void cleanup()
         glDeleteBuffersARB(1, &pbo);
         glDeleteTextures(1, &volumeTex);
     }
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 // Load raw data from disk
@@ -863,6 +875,10 @@ main(int argc, char **argv)
 
     char *ref_file = NULL;
 
+#if defined(__linux__)
+    setenv ("DISPLAY", ":0", 0);
+#endif
+
     printf("%s Starting...\n\n", sSDKsample);
 
     //start logs
@@ -977,11 +993,4 @@ main(int argc, char **argv)
 
         glutMainLoop();
     }
-
-    // cudaDeviceReset causes the driver to clean up all state. While
-    // not mandatory in normal operation, it is good practice.  It is also
-    // needed to ensure correct operation when the application is being
-    // profiled. Calling cudaDeviceReset causes all profile data to be
-    // flushed before the application exits
-    cudaDeviceReset();
 }

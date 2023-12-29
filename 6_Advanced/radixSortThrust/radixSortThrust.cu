@@ -150,7 +150,7 @@ bool testSort(int argc, char **argv)
     }
 
     totalTime /= (1.0e3f * numIterations);
-    printf("radixSort, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u elements\n",
+    printf("radixSortThrust, Throughput = %.4f MElements/s, Time = %.5f s, Size = %u elements\n",
            1.0e-6f * numElements / totalTime, totalTime, numElements);
 
     getLastCudaError("after radixsort");

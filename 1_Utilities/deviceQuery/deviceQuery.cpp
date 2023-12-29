@@ -58,7 +58,7 @@ inline bool IsGPUCapableP2P(cudaDeviceProp *pProp)
 
 inline bool IsAppBuiltAs64()
 {
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
     return 1;
 #else
     return 0;

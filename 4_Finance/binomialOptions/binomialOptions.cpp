@@ -45,22 +45,14 @@ extern "C" void binomialOptionsCPU(
     TOptionData optionData
 );
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Process an array of OptN options on GPU
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" void binomialOptions_SM10(
+extern "C" void binomialOptionsGPU(
     float *callValue,
     TOptionData  *optionData,
     int optN
 );
-
-extern "C" void binomialOptions_SM13(
-    float *callValue,
-    TOptionData  *optionData,
-    int optN
-);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper function, returning uniformly distributed
@@ -80,42 +72,20 @@ float randData(float low, float high)
 int main(int argc, char **argv)
 {
     const unsigned int OPT_N_MAX = 512;
-    unsigned int useDoublePrecision;
 
     printf("[%s] - Starting...\n", argv[0]);
 
-    int devID = findCudaDevice(argc, (const char **)argv);
-
-    if (devID < 0)
-    {
-        printf("No CUDA Capable devices found, exiting...\n");
-        exit(EXIT_SUCCESS);
-    }
-
-    checkCudaErrors(cudaGetDevice(&devID));
     cudaDeviceProp deviceProp;
+    int devID = findCudaDevice(argc, (const char **)argv);
     checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID));
 
-    char *precisionChoice;
-    getCmdLineArgumentString(argc, (const char **)argv, "type", &precisionChoice);
-
-    if (precisionChoice == NULL)
+    if (((deviceProp.major << 4) + deviceProp.minor) < 0x20)
     {
-        useDoublePrecision = 0;
-    }
-    else
-    {
-        if (!STRCASECMP(precisionChoice, "double"))
-        {
-            useDoublePrecision = 1;
-        }
-        else
-        {
-            useDoublePrecision = 0;
-        }
+        fprintf(stderr, "binomialOptions requires Compute Capability of SM 2.0 or higher to run.\n");
+        cudaDeviceReset();
+        exit(EXIT_WAIVED);
     }
 
-    printf(useDoublePrecision ? "Using double precision...\n" : "Using single precision...\n");
     const int OPT_N = OPT_N_MAX;
 
     TOptionData optionData[OPT_N_MAX];
@@ -131,14 +101,6 @@ int main(int argc, char **argv)
     int i;
 
     sdkCreateTimer(&hTimer);
-
-    int version = deviceProp.major * 10 + deviceProp.minor;
-
-    if (useDoublePrecision && version < 13)
-    {
-        printf("Double precision is not supported.\n");
-        return 0;
-    }
 
     printf("Generating input data...\n");
     //Generate options set
@@ -159,14 +121,7 @@ int main(int argc, char **argv)
     sdkResetTimer(&hTimer);
     sdkStartTimer(&hTimer);
 
-    if (useDoublePrecision)
-    {
-        binomialOptions_SM13(callValueGPU, optionData, OPT_N);
-    }
-    else
-    {
-        binomialOptions_SM10(callValueGPU, optionData, OPT_N);
-    }
+    binomialOptionsGPU(callValueGPU, optionData, OPT_N);
 
     checkCudaErrors(cudaDeviceSynchronize());
     sdkStopTimer(&hTimer);

@@ -31,7 +31,7 @@
 #include <helper_cuda.h>
 #include <helper_functions.h>  // helper for shared that are common to CUDA Samples
 
-static char *sSDKname = "simpleLayeredTexture";
+static const char *sSDKname = "simpleLayeredTexture";
 
 // includes, kernels
 // declare texture reference for layered 2D float texture

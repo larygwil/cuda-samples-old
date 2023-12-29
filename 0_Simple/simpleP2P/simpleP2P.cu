@@ -44,7 +44,7 @@ inline bool IsGPUCapableP2P(cudaDeviceProp *pProp)
 
 inline bool IsAppBuiltAs64()
 {
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
     return 1;
 #else
     return 0;
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     {
         printf("Two or more GPUs with SM 2.0 or higher capability are required for %s.\n", argv[0]);
         printf("Waiving test.\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     // Query device properties
@@ -101,9 +101,9 @@ int main(int argc, char **argv)
     // Check for TCC for Windows
     if (gpu_count < 2)
     {
-        printf("\nThis sample requires two SM 2.0 GPUs to use P2P/UVA functionality.\n");
+        printf("\nTwo or more GPUs with SM 2.0 or higher capability are required for %s.\n", argv[0]);
 #ifdef _WIN32
-        printf("\nFor Windows Vista/Win7, a TCC driver must be installed and enabled to use P2P/UVA functionality.\n");
+        printf("\nAlso, a TCC driver must be installed and enabled to run %s.\n", argv[0]);
 #endif
         checkCudaErrors(cudaSetDevice(0));
 
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
         // profiled. Calling cudaDeviceReset causes all profile data to be
         // flushed before the application exits
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
 #if CUDART_VERSION >= 4000
@@ -134,8 +134,7 @@ int main(int argc, char **argv)
 
     if (can_access_peer_0_1 == 0 || can_access_peer_1_0 == 0)
     {
-        printf("Two or more SM 2.0 class GPUs are required for %s to run.\n", argv[0]);
-        printf("Support for UVA requires a GPU with SM 2.0 capabilities.\n");
+        printf("Two or more GPUs with SM 2.0 or higher capability are required for %s.\n", argv[0]);
         printf("Peer to Peer access is not available between GPU%d <-> GPU%d, waiving test.\n", gpuid[0], gpuid[1]);
         checkCudaErrors(cudaSetDevice(gpuid[0]));
 
@@ -147,7 +146,7 @@ int main(int argc, char **argv)
         cudaDeviceReset();
         checkCudaErrors(cudaSetDevice(gpuid[1]));
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     // Enable peer access
@@ -171,7 +170,7 @@ int main(int argc, char **argv)
     else
     {
         printf("At least one of the two GPUs does NOT support UVA, waiving test.\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     // Allocate buffers
@@ -315,7 +314,7 @@ int main(int argc, char **argv)
 
 #else // Using CUDA 3.2 or older
     printf("simpleP2P requires CUDA 4.0 to build and run, waiving testing\n");
-    exit(EXIT_SUCCESS);
+    exit(EXIT_WAIVED);
 #endif
 
 }

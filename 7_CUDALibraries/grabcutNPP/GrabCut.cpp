@@ -9,7 +9,9 @@
  *
  */
 
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #pragma warning(disable:4819)
+#endif
 
 #include <stdio.h>
 #include <math.h>
@@ -28,7 +30,7 @@
 #define DOWNSAMPLE_FIRST
 //#define PREFILTER
 
-//NOTE: Alternativ color model to GMM model proposed in the orginial paper.
+//NOTE: Alternative color model to GMM model proposed in the original paper.
 //#define USE_HISTOGRAM_MODEL
 
 #define CLUSTER_ALWAYS

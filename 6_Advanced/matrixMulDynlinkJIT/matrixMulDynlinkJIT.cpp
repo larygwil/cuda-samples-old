@@ -182,7 +182,7 @@ CUresult initCUDA(int argc, char **argv, CUfunction *pMatrixMul, int *block_size
         // compile with set parameters
         printf("> Compiling CUDA module\n");
 
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
         status = cuModuleLoadDataEx(&cuModule, matrixMul_kernel_64_ptxdump, jitNumOptions, jitOptions, (void **)jitOptVals);
 #else
         status = cuModuleLoadDataEx(&cuModule, matrixMul_kernel_32_ptxdump, jitNumOptions, jitOptions, (void **)jitOptVals);

@@ -39,8 +39,8 @@ extern struct cudaGraphicsResource *cuda_vbo_resource; // handles OpenGL-CUDA ex
 extern size_t tPitch;
 extern cufftHandle planr2c;
 extern cufftHandle planc2r;
-extern cData *vxfield = NULL;
-extern cData *vyfield = NULL;
+cData *vxfield = NULL;
+cData *vyfield = NULL;
 
 void setupTexture(int x, int y)
 {
@@ -325,8 +325,8 @@ extern "C"
 void diffuseProject(cData *vx, cData *vy, int dx, int dy, float dt, float visc)
 {
     // Forward FFT
-    cufftExecR2C(planr2c, (cufftReal *)vx, (cufftComplex *)vx);
-    cufftExecR2C(planr2c, (cufftReal *)vy, (cufftComplex *)vy);
+    checkCudaErrors(cufftExecR2C(planr2c, (cufftReal *)vx, (cufftComplex *)vx));
+    checkCudaErrors(cufftExecR2C(planr2c, (cufftReal *)vy, (cufftComplex *)vy));
 
     uint3 grid = make_uint3((dx/TILEX)+(!(dx%TILEX)?0:1),
                             (dy/TILEY)+(!(dy%TILEY)?0:1), 1);
@@ -336,8 +336,8 @@ void diffuseProject(cData *vx, cData *vy, int dx, int dy, float dt, float visc)
     getLastCudaError("diffuseProject_k failed.");
 
     // Inverse FFT
-    cufftExecC2R(planc2r, (cufftComplex *)vx, (cufftReal *)vx);
-    cufftExecC2R(planc2r, (cufftComplex *)vy, (cufftReal *)vy);
+    checkCudaErrors(cufftExecC2R(planc2r, (cufftComplex *)vx, (cufftReal *)vx));
+    checkCudaErrors(cufftExecC2R(planc2r, (cufftComplex *)vy, (cufftReal *)vy));
 }
 
 extern "C"
