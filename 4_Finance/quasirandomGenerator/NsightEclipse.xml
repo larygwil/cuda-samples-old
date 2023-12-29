@@ -4,7 +4,9 @@
     <name>Niederreiter Quasirandom Sequence Generator</name>
     <description><![CDATA[This sample implements Niederreiter Quasirandom Sequence Generator and Inverse Cumulative Normal Distribution functions for the generation of Standard Normal Distributions.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 2.0</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,Advanced Topics,Quasi-Monte Carlo Integration,Computational Finance.</keywords>
     <scope>1:CUDA Advanced Topics,3:Computational Finance</scope>
     <files>
@@ -21,7 +23,9 @@
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>quasirandomGenerator.cpp</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

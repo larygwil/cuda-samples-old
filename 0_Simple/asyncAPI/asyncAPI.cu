@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -35,16 +35,16 @@ __global__ void increment_kernel(int *g_data, int inc_value)
     g_data[idx] = g_data[idx] + inc_value;
 }
 
-int correct_output(int *data, const int n, const int x)
+bool correct_output(int *data, const int n, const int x)
 {
     for (int i = 0; i < n; i++)
         if (data[i] != x)
         {
             printf("Error! data[%d] = %d, ref = %d\n", i, data[i], x);
-            return 0;
+            return false;
         }
 
-    return 1;
+    return true;
 }
 
 int main(int argc, char *argv[])
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     printf("CPU executed %lu iterations while waiting for GPU to finish\n", counter);
 
     // check the output for correctness
-    bool bFinalResults = (bool)correct_output(a, n, value);
+    bool bFinalResults = correct_output(a, n, value);
 
     // release resources
     checkCudaErrors(cudaEventDestroy(start));

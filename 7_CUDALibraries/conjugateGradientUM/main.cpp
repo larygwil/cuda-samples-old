@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -92,23 +92,15 @@ int main(int argc, char **argv)
     int devID = findCudaDevice(argc, (const char **)argv);
     checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID));
 
-#if defined(__APPLE__) || defined(MACOSX)
-    fprintf(stderr, "Unified Memory not currently supported on OS X\n");
-    cudaDeviceReset();
-    exit(EXIT_WAIVED);
-#endif
+    if (!deviceProp.managedMemory) { 
+        // This samples requires being run on a device that supports Unified Memory
+        fprintf(stderr, "Unified Memory not supported on this device\n");
 
-    if (sizeof(void *) != 8)
-    {
-        fprintf(stderr, "Unified Memory requires compiling for a 64-bit system.\n");
-        cudaDeviceReset();
-        exit(EXIT_WAIVED);
-    }
-
-    if (((deviceProp.major << 4) + deviceProp.minor) < 0x30)
-    {
-        fprintf(stderr, "%s requires Compute Capability of SM 3.0 or higher to run.\nexiting...\n", argv[0]);
-
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
         cudaDeviceReset();
         exit(EXIT_WAIVED);
     }
@@ -240,6 +232,7 @@ int main(int argc, char **argv)
     cudaFree(J);
     cudaFree(val);
     cudaFree(x);
+    cudaFree(rhs);
     cudaFree(r);
     cudaFree(p);
     cudaFree(Ax);

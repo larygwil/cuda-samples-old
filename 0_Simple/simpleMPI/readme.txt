@@ -1,6 +1,9 @@
 Sample: simpleMPI
-Minimum spec: SM 1.1
+Minimum spec: SM 2.0
 
-Simple example demonstrating how to use MPI in combination with CUDA.  This executable is not pre-built with the SDK installer.
+Simple example demonstrating how to use MPI in combination with CUDA.
 
 Key concepts:
+CUDA Systems Integration
+MPI
+Multithreading

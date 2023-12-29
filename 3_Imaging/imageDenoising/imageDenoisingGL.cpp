@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -25,6 +25,7 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined(__APPLE__) || defined(MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -119,6 +120,8 @@ char **pArgv = NULL;
 
 #define MAX_EPSILON_ERROR 5
 #define REFRESH_DELAY     10 //ms
+
+void cleanup();
 
 void computeFPS()
 {
@@ -241,35 +244,36 @@ void displayFunc(void)
     }
 
     glutSwapBuffers();
+    glutReportErrors();
 
     sdkStopTimer(&timer);
+
     computeFPS();
 }
 
 void timerEvent(int value)
 {
-    glutPostRedisplay();
-    glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    if (glutGetWindow())
+    {
+        glutPostRedisplay();
+        glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    }
 }
 
 
-void shutDown(unsigned char k, int /*x*/, int /*y*/)
+void keyboard(unsigned char k, int /*x*/, int /*y*/)
 {
     switch (k)
     {
-        case '\033':
+        case 27:
         case 'q':
         case 'Q':
-            printf("Shutting down...\n");
-
-            sdkStopTimer(&timer);
-            sdkDeleteTimer(&timer);
-
-            checkCudaErrors(CUDA_FreeArray());
-            free(h_Src);
-
-            exit(EXIT_SUCCESS);
-            break;
+            #if defined(__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
 
         case '1':
             printf("Passthrough.\n");
@@ -340,7 +344,16 @@ int initGL(int *argc, char **argv)
     glutInitWindowSize(imageW, imageH);
     glutInitWindowPosition(512 - imageW / 2, 384 - imageH / 2);
     glutCreateWindow(argv[0]);
+    glutDisplayFunc(displayFunc);
+    glutKeyboardFunc(keyboard);
+    glutTimerFunc(REFRESH_DELAY, timerEvent,0);
     printf("OpenGL window created.\n");
+
+#if defined (__APPLE__) || defined(MACOSX)
+    atexit(cleanup);
+#else
+    glutCloseFunc(cleanup);
+#endif
 
     glewInit();
     printf("Loading extensions: %s\n", glewGetErrorString(glewInit()));
@@ -436,9 +449,20 @@ void initOpenGLBuffers()
 
 void cleanup()
 {
-    sdkDeleteTimer(&timer);
+    free(h_Src);
+    checkCudaErrors(CUDA_FreeArray());
+    checkCudaErrors(cudaGraphicsUnregisterResource(cuda_pbo_resource));
 
     glDeleteProgramsARB(1, &shader);
+
+    sdkDeleteTimer(&timer);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 void runAutoTest(int argc, char **argv, const char *filename, int kernel_param)
@@ -572,20 +596,8 @@ int main(int argc, char **argv)
     printf("Press [?] to print Noise and Lerp Ct's\n");
     printf("Press [q] to exit\n");
 
-    glutDisplayFunc(displayFunc);
-    glutKeyboardFunc(shutDown);
-
     sdkCreateTimer(&timer);
     sdkStartTimer(&timer);
 
-    glutTimerFunc(REFRESH_DELAY, timerEvent,0);
     glutMainLoop();
-
-    // cudaDeviceReset causes the driver to clean up all state. While
-    // not mandatory in normal operation, it is good practice.  It is also
-    // needed to ensure correct operation when the application is being
-    // profiled. Calling cudaDeviceReset causes all profile data to be
-    // flushed before the application exits
-    cudaDeviceReset();
-    exit(EXIT_SUCCESS);
 }

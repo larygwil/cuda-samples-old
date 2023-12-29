@@ -4,7 +4,9 @@
     <name>Matrix Multiplication (CUBLAS)</name>
     <description><![CDATA[This sample implements matrix multiplication from Chapter 3 of the programming guide. To illustrate GPU performance for matrix multiply, this sample also shows how to use the new CUDA 4.0 interface for CUBLAS to demonstrate high-performance performance for matrix multiplication.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,CUBLAS,matrix multiply</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
@@ -28,14 +30,18 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>matrixMulCUBLAS.cpp</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <required_dependencies>
+        <dependency>CUBLAS</dependency>
+    </required_dependencies>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

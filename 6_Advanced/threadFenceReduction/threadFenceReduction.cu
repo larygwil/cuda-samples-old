@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -95,7 +95,6 @@ main(int argc, char **argv)
     cudaDeviceProp deviceProp;
     deviceProp.major = 0;
     deviceProp.minor = 0;
-    int minimumComputeVersion = 11;
     int dev;
 
     printf("%s Starting...\n\n", sSDKsample);
@@ -104,23 +103,7 @@ main(int argc, char **argv)
 
     checkCudaErrors(cudaGetDeviceProperties(&deviceProp, dev));
 
-    if ((deviceProp.major * 10 + deviceProp.minor) >= minimumComputeVersion)
-    {
-        printf("GPU Device supports SM %d.%d compute capability\n\n", deviceProp.major, deviceProp.minor);
-    }
-    else
-    {
-        printf("GPU Device %d: %s\nDoes not support minimum compute capability SM %d.%d, exiting...\n\n",
-               dev, deviceProp.name, minimumComputeVersion / 10, minimumComputeVersion % 10);
-
-        // cudaDeviceReset causes the driver to clean up all state. While
-        // not mandatory in normal operation, it is good practice.  It is also
-        // needed to ensure correct operation when the application is being
-        // profiled. Calling cudaDeviceReset causes all profile data to be
-        // flushed before the application exits
-        cudaDeviceReset();
-        exit(EXIT_SUCCESS);
-    }
+    printf("GPU Device supports SM %d.%d compute capability\n\n", deviceProp.major, deviceProp.minor);
 
     bool bTestResult = false;
 

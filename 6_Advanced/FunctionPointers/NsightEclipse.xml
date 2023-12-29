@@ -4,7 +4,9 @@
     <name>Function Pointers</name>
     <description><![CDATA[This sample illustrates how to use function pointers and implements the Sobel Edge Detection filter for 8-bit monochrome images.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 2.0</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,GPGPU,convolution,separable convolution,Image Processing,filter,finite impulse-response filter</keywords>
     <scope>1:CUDA Advanced Topics,2:Graphics Interop,2:Image Processing</scope>
     <files>
@@ -45,7 +47,13 @@
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>FunctionPointers.cpp</primary-file>
+    <required_dependencies>
+        <dependency>X11</dependency>
+        <dependency>GL</dependency>
+    </required_dependencies>
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
 </entry>

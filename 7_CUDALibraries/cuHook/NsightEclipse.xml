@@ -4,7 +4,9 @@
     <name>CUDA Interception Library</name>
     <description><![CDATA[This sample demonstrates how to build and use an intercept library with CUDA.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 2.0</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA</keywords>
     <scope>1:CUDA Systems Integration,1:Performance Strategies</scope>
     <files>
@@ -19,15 +21,16 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>cuHook.cpp</primary-file>
-    <supported-env>linux:x86_64, linux:i686</supported-env>
+    <supported-env>linux:x86_64, linux:i686, linux:ppc64le</supported-env>
     <no-nsight-eclipse/>
 </entry>

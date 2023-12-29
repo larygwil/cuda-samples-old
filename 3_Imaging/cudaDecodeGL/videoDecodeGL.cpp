@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -17,6 +17,7 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined(__APPLE__) || defined(__MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -392,14 +393,24 @@ bool initCudaResources(int argc, char **argv, int *bTCC)
         if (g_bUseInterop && !(*bTCC))
         {
             initGL(argc, argv, bTCC);
-            cuda_device = findCudaGLDeviceDRV(argc, (const char **)argv);
-            checkCudaErrors(cuDeviceGet(&g_oDevice, cuda_device));
+            // If we have found only TCC devices while trying to init OpenGL
+            // don't try to use OpenGL
+            if (!(*bTCC))
+            {
+                cuda_device = findCudaGLDeviceDRV(argc, (const char **)argv);
+            }
+            else
+            {
+                cuda_device = findCudaDeviceDRV(argc, (const char **)argv);
+                g_bUseInterop = false;
+            }
         }
         else
         {
             cuda_device = findCudaDeviceDRV(argc, (const char **)argv);
-            checkCudaErrors(cuDeviceGet(&g_oDevice, cuda_device));
+            g_bUseInterop = false;
         }
+        checkCudaErrors(cuDeviceGet(&g_oDevice, cuda_device));
     }
 
     // get compute capabilities and the devicename

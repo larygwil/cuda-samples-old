@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -24,6 +24,7 @@
 #include <GL/wglew.h>
 #endif
 #if defined(__APPLE__) || defined(__MACOSX)
+  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   #include <GLUT/glut.h>
   #ifndef glutCloseFunc
   #define glutCloseFunc glutWMCloseFunc
@@ -941,6 +942,11 @@ void initOpenGLBuffers(int w, int h)
     {
         return;
     }
+    else if(h==0)
+    {
+        // keeping height non null
+        h = 1;
+    }
 
     // allocate new buffers
     h_Src = (uchar4 *)malloc(w * h * 4);
@@ -1251,7 +1257,8 @@ int main(int argc, char **argv)
     // Set the initial parameters for either Mandelbrot and Julia sets and reset all parameters
     if (g_isJuliaSet)      // settings for Julia
     {
-        startJulia("params.txt") ;
+        char *ref_path = sdkFindFilePath("params.txt", argv[0]);
+        startJulia(ref_path) ;
     }
     else                    // settings for Mandelbrot
     {
@@ -1319,11 +1326,14 @@ int main(int argc, char **argv)
         cudaDeviceReset();
         exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
     }
-
     // use command-line specified CUDA device, otherwise use device with highest Gflops/s
-    if ((argc == 2) && checkCmdLineFlag(argc, (const char **)argv, "device"))
+    else if (checkCmdLineFlag(argc, (const char **)argv, "device"))
     {
-        printHelp();
+        printf("[%s]\n", argv[0]);
+        printf("   Does not explicitly support -device=n in OpenGL mode\n");
+        printf("   To use -device=n, the sample must be running w/o OpenGL\n\n");
+        printf(" > %s -device=n -file=<image_name>.ppm\n", argv[0]);
+        printf("exiting...\n");
         exit(EXIT_SUCCESS);
     }
 
@@ -1349,6 +1359,8 @@ int main(int argc, char **argv)
     // Initialize OpenGL context first before the CUDA context is created.  This is needed
     // to achieve optimal performance with OpenGL/CUDA interop.
     initGL(&argc, argv);
+    initOpenGLBuffers(imageW, imageH);
+
 
     printf("Starting GLUT main loop...\n");
     printf("\n");

@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -68,7 +68,13 @@ int adjustProblemSize(int GPU_N, int default_nOptions)
     return nOptions;
 }
 
-
+int adjustGridSize(int GPUIndex, int defaultGridSize)
+{
+    cudaDeviceProp deviceProp;
+    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, GPUIndex));
+    int maxGridSize = deviceProp.multiProcessorCount * 40;
+    return ((defaultGridSize > maxGridSize) ? maxGridSize : defaultGridSize);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // CPU reference functions
@@ -163,6 +169,12 @@ static void multiSolver(TOptionPlan *plan, int nPlans)
         initMonteCarloGPU(&plan[i]);
     }
 
+    for (int i=0 ; i<nPlans ; i++)
+    {
+        checkCudaErrors(cudaSetDevice(plan[i].device));
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+
     //Start the timer
     sdkResetTimer(&hTimer[0]);
     sdkStartTimer(&hTimer[0]);
@@ -174,7 +186,7 @@ static void multiSolver(TOptionPlan *plan, int nPlans)
         //Main computations
         MonteCarloGPU(&plan[i], streams[i]);
 
-        checkCudaErrors(cudaEventRecord(events[i]));
+        checkCudaErrors(cudaEventRecord(events[i], streams[i]));
     }
 
     for (int i=0; i<nPlans; i++)
@@ -247,7 +259,7 @@ int main(int argc, char **argv)
 
     if (multiMethodChoice == NULL)
     {
-        use_threads = true;
+        use_threads = false;
     }
     else
     {
@@ -286,15 +298,14 @@ int main(int argc, char **argv)
     //GPU number present in the system
     int GPU_N;
     checkCudaErrors(cudaGetDeviceCount(&GPU_N));
-    int nOptions = 256;
+    int nOptions = 8 * 1024;
 
     nOptions = adjustProblemSize(GPU_N, nOptions);
 
     // select problem size
     int scale = (strongScaling) ? 1 : GPU_N;
     int OPT_N = nOptions * scale;
-    int PATH_N = 65536;
-    const unsigned long long SEED = 777;
+    int PATH_N = 262144;
 
     // initialize the timers
     hTimer = new StopWatchInterface*[GPU_N];
@@ -369,10 +380,8 @@ int main(int argc, char **argv)
         optionSolver[i].device     = i;
         optionSolver[i].optionData = optionData   + gpuBase;
         optionSolver[i].callValue  = callValueGPU + gpuBase;
-        // all devices use the same global seed, but start
-        // the sequence at a different offset
-        optionSolver[i].seed       = SEED;
         optionSolver[i].pathN      = PATH_N;
+        optionSolver[i].gridSize   = adjustGridSize(optionSolver[i].device, optionSolver[i].optionCount);
         gpuBase += optionSolver[i].optionCount;
     }
 
@@ -525,6 +534,7 @@ int main(int argc, char **argv)
     printf("Test Summary...\n");
     printf("L1 norm        : %E\n", sumDelta / sumRef);
     printf("Average reserve: %f\n", sumReserve);
+    printf("\nNOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
     printf(sumReserve > 1.0f ? "Test passed\n" : "Test failed!\n");
     exit(sumReserve > 1.0f ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -80,7 +80,7 @@ __global__ void shfl_scan_test(int *data, int width, int *partial_sums=NULL)
     // scan sum the warp sums
     // the same shfl scan operation, but performed on warp sums
     //
-    if (warp_id == 0)
+    if (warp_id == 0 && lane_id < (blockDim.x / warpSize))
     {
         int warp_sum = sums[lane_id];
 

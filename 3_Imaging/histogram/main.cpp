@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -25,7 +25,7 @@
 #include "histogram_common.h"
 
 const int numRuns = 16;
-static const char *sSDKsample = "[histogram]\0";
+const static char *sSDKsample = "[histogram]\0";
 
 int main(int argc, char **argv)
 {
@@ -52,21 +52,6 @@ int main(int argc, char **argv)
 
     printf("CUDA device [%s] has %d Multi-Processors, Compute %d.%d\n",
            deviceProp.name, deviceProp.multiProcessorCount, deviceProp.major, deviceProp.minor);
-
-    int version = deviceProp.major * 0x10 + deviceProp.minor;
-
-    if (version < 0x11)
-    {
-        printf("There is no device supporting a minimum of CUDA compute capability 1.1 for this CUDA Sample\n");
-
-        // cudaDeviceReset causes the driver to clean up all state. While
-        // not mandatory in normal operation, it is good practice.  It is also
-        // needed to ensure correct operation when the application is being
-        // profiled. Calling cudaDeviceReset causes all profile data to be
-        // flushed before the application exits
-        cudaDeviceReset();
-        exit(EXIT_SUCCESS);
-    }
 
     sdkCreateTimer(&hTimer);
 
@@ -213,6 +198,9 @@ int main(int argc, char **argv)
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
     cudaDeviceReset();
+
+    printf("\nNOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
+
     printf("%s - Test Summary\n", sSDKsample);
 
     // pass or fail (for both 64 bit and 256 bit histograms)

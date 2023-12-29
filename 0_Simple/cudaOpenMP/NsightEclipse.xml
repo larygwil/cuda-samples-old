@@ -4,7 +4,9 @@
     <name>cudaOpenMP</name>
     <description><![CDATA[This sample demonstrates how to use OpenMP API to write an application for multiple GPUs.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,OpenMP,cluster,multi-GPU Support,openMP</keywords>
     <scope>1:CUDA Basic Topics,1:CUDA Systems Integration</scope>
     <files>
@@ -19,15 +21,19 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>cudaOpenMP.cu</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <required_dependencies>
+        <dependency>OpenMP</dependency>
+    </required_dependencies>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
     <no-nsight-eclipse/>
 </entry>

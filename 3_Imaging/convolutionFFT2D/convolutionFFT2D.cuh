@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -267,6 +267,12 @@ __global__ void spPostprocess2D_kernel(
     udivmod(i, DX / 2, x);
     udivmod(i, DY, y);
 
+    //Avoid overwrites in columns DX / 2 by different threads
+    if ((x == 0) && (y > DY / 2))
+    {
+        return;
+    }
+    
     const uint srcOffset = i * DY * DX;
     const uint dstOffset = i * DY * (DX + padding);
 

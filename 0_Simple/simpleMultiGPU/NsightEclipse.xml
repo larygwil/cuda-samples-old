@@ -4,7 +4,9 @@
     <name>Simple Multi-GPU</name>
     <description><![CDATA[This application demonstrates how to use the new CUDA 4.0 API for CUDA context management and multi-threaded access to run CUDA kernels on multiple-GPUs.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>Performance,multi-GPU support</keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
@@ -23,14 +25,15 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>simpleMultiGPU.cu</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

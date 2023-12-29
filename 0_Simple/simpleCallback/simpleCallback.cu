@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     int N_gpus, max_gpus = 0;
     int gpuInfo[32]; // assume a maximum of 32 GPUs in a system configuration
 
-    printf("Starting simpleCallback (requires SM 1.1 or higher)\n");
+    printf("Starting simpleCallback\n");
 
     checkCudaErrors(cudaGetDeviceCount(&N_gpus));
     printf("Found %d CUDA capable GPUs\n", N_gpus);

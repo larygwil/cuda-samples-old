@@ -4,7 +4,9 @@
     <name>simpleIPC</name>
     <description><![CDATA[This CUDA Runtime API sample is a very basic sample that demonstrates Inter Process Communication with one process per GPU for computation.  Requires Compute Capability 2.0 or higher and a Linux Operating System]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 2.0</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>GPGPU</keywords>
     <scope>1:CUDA Basic Topics,1:CUDA Systems Integration</scope>
     <files>
@@ -27,7 +29,12 @@
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>simpleIPC.cu</primary-file>
-    <supported-env>linux:x86_64, linux:i686, linux:aarch64</supported-env>
+    <required_dependencies>
+        <dependency>IPC</dependency>
+    </required_dependencies>
+    <supported-env>linux:x86_64, linux:i686, linux:ppc64le</supported-env>
 </entry>

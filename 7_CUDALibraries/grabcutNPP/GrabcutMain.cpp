@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -40,6 +40,7 @@
 #include <GL/glew.h>
 
 #if defined(__APPLE__) || defined(MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -271,6 +272,9 @@ int main(int argc, char **argv)
 
     if (!g_bQATest && g_bDisplay)
     {
+#if defined(__linux__)
+        setenv ("DISPLAY", ":0", 0);
+#endif
         initGL(&argc, argv, width, height);
     }
 
@@ -365,7 +369,8 @@ void display()
     checkCudaErrors(ApplyMatte(display_mode, pbo_pointer, width*4, d_image, (int) image_pitch, grabcut->getAlpha(), grabcut->getAlphaPitch(), width, height));
 
     checkCudaErrors(cudaGraphicsUnmapResources(1, &pbo_resource, 0));
-
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -410,6 +415,22 @@ void reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+}
+
+void cleanup()
+{
+    // Cleanup GrabCut and Other buffers
+    if (grabcut)
+    {
+        delete grabcut;
+    }
+
+    checkCudaErrors(cudaGraphicsUnregisterResource(pbo_resource));
+
+    checkCudaErrors(cudaFree(d_image));
+    checkCudaErrors(cudaFree(d_trimap));
+
+    cudaDeviceReset();
 }
 
 bool inside_rect(int x, int y, int x1, int y1, int x2, int y2)
@@ -553,8 +574,12 @@ void keyboard(unsigned char key, int x, int y)
 {
     if (key == 27)
     {
-        cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        #if defined(__APPLE__) || defined(MACOSX)
+            exit(EXIT_SUCCESS);
+        #else
+            glutDestroyWindow(glutGetWindow());
+            return;
+        #endif
     }
 
     if (key == ' ')
@@ -607,6 +632,12 @@ void initGL(int *argc, char **argv, int w, int h)
     glutMouseFunc(mouseClick);
     glutMotionFunc(mouseMotion);
     glutKeyboardFunc(keyboard);
+
+#if defined (__APPLE__) || defined(MACOSX)
+    atexit(cleanup);
+#else
+    glutCloseFunc(cleanup);
+#endif
 
     // Create Texture
     glGenTextures(1, &texture);

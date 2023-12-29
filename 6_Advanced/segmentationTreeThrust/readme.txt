@@ -1,6 +1,8 @@
 Sample: CUDA Segmentation Tree Thrust Library
-Minimum spec: SM 1.3
+Minimum spec: SM 2.0
 
 This sample demonstrates an approach to the image segmentation trees construction.  This method is based on Boruvka's MST algorithm.
 
 Key concepts:
+Data-Parallel Algorithms
+Performance Strategies

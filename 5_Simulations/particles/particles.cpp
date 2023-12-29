@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -26,6 +26,7 @@
 #include <GL/wglew.h>
 #endif
 #if defined(__APPLE__) || defined(__MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   #include <GLUT/glut.h>
   #ifndef glutCloseFunc
   #define glutCloseFunc glutWMCloseFunc
@@ -142,6 +143,18 @@ void initParticleSystem(int numParticles, uint3 gridSize, bool bUseOpenGL)
 void cleanup()
 {
     sdkDeleteTimer(&timer);
+
+    if (psystem)
+    {
+        delete psystem;
+    }
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
+    return;
 }
 
 // initialize OpenGL
@@ -513,15 +526,12 @@ void key(unsigned char key, int /*x*/, int /*y*/)
 
         case '\033':
         case 'q':
-            // cudaDeviceReset causes the driver to clean up all state. While
-            // not mandatory in normal operation, it is good practice.  It is also
-            // needed to ensure correct operation when the application is being
-            // profiled. Calling cudaDeviceReset causes all profile data to be
-            // flushed before the application exits
-            cudaDeviceReset();
-            exit(EXIT_SUCCESS);
-            break;
-
+            #if defined(__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
         case 'v':
             mode = M_VIEW;
             break;
@@ -692,6 +702,8 @@ main(int argc, char **argv)
 #endif
 
     printf("%s Starting...\n\n", sSDKsample);
+
+    printf("NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
 
     numParticles = NUM_PARTICLES;
     uint gridDim = GRID_SIZE;

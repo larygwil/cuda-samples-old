@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -16,14 +16,18 @@
 #include <memory>
 #include <iostream>
 
-// CUDA-C includes
-#include <cuda.h>
 #include <cuda_runtime.h>
-
 #include <helper_cuda.h>
+
+
 
 int *pArgc = NULL;
 char **pArgv = NULL;
+
+#if CUDART_VERSION < 5000
+
+// CUDA-C includes
+#include <cuda.h>
 
 // This function wraps the CUDA Driver API into a template function
 template <class T>
@@ -46,24 +50,7 @@ inline void getCudaAttribute(T *attribute, CUdevice_attribute device_attribute, 
     }
 }
 
-
-inline bool IsGPUCapableP2P(cudaDeviceProp *pProp)
-{
-#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
-    return (bool)(pProp->tccDriver ? true : false);
-#else
-    return (bool)(pProp->major >= 2);
-#endif
-}
-
-inline bool IsAppBuiltAs64()
-{
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
-    return 1;
-#else
-    return 0;
-#endif
-}
+#endif /* CUDART_VERSION < 5000 */
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -122,7 +109,7 @@ main(int argc, char **argv)
                deviceProp.multiProcessorCount,
                _ConvertSMVer2Cores(deviceProp.major, deviceProp.minor),
                _ConvertSMVer2Cores(deviceProp.major, deviceProp.minor) * deviceProp.multiProcessorCount);
-        printf("  GPU Clock rate:                                %.0f MHz (%0.2f GHz)\n", deviceProp.clockRate * 1e-3f, deviceProp.clockRate * 1e-6f);
+        printf("  GPU Max Clock rate:                            %.0f MHz (%0.2f GHz)\n", deviceProp.clockRate * 1e-3f, deviceProp.clockRate * 1e-6f);
 
 
 #if CUDART_VERSION >= 5000
@@ -188,7 +175,7 @@ main(int argc, char **argv)
         printf("  CUDA Device Driver Mode (TCC or WDDM):         %s\n", deviceProp.tccDriver ? "TCC (Tesla Compute Cluster Driver)" : "WDDM (Windows Display Driver Model)");
 #endif
         printf("  Device supports Unified Addressing (UVA):      %s\n", deviceProp.unifiedAddressing ? "Yes" : "No");
-        printf("  Device PCI Bus ID / PCI location ID:           %d / %d\n", deviceProp.pciBusID, deviceProp.pciDeviceID);
+        printf("  Device PCI Domain ID / Bus ID / location ID:   %d / %d / %d\n", deviceProp.pciDomainID, deviceProp.pciBusID, deviceProp.pciDeviceID);
 
         const char *sComputeMode[] =
         {

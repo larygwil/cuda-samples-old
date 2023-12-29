@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -52,7 +52,7 @@ CUresult  updateConstantMemory_drvapi(CUmodule module, float *hueCSC)
 
     uint32 cudaAlpha      = ((uint32)0xff<< 24);
 
-    cuMemcpyHtoD(constAlpha,
+    cuMemcpyHtoD(d_constAlpha,
                  reinterpret_cast<const void *>(&cudaAlpha),
                  d_alphaBytes);
     getLastCudaDrvErrorMsg("cuMemcpyHtoD (constAlpha) copy to Constant Memory failed");

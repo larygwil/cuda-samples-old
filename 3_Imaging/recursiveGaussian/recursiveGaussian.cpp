@@ -1,7 +1,7 @@
 #pragma warning(disable:4819)
 
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -38,6 +38,7 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined (__APPLE__) || defined(MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   #include <GLUT/glut.h>
   #ifndef glutCloseFunc
   #define glutCloseFunc glutWMCloseFunc
@@ -137,7 +138,7 @@ void computeFPS()
         glutSetWindowTitle(fps);
         fpsCount = 0;
 
-        fpsLimit = MAX(ifps, 1.f);
+        fpsLimit = ftoi(MAX(ifps, 1.f));
         sdkResetTimer(&timer);
     }
 }
@@ -210,6 +211,13 @@ void cleanup()
             glDeleteTextures(1, &texid);
         }
     }
+	
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -217,7 +225,12 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
         case 27:
-            exit(EXIT_SUCCESS);
+            #if defined(__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
             break;
 
         case '=':
@@ -326,6 +339,12 @@ void initGL(int *argc, char **argv)
     glutReshapeFunc(reshape);
     glutIdleFunc(idle);
 
+#if defined (__APPLE__) || defined(MACOSX)
+    atexit(cleanup);
+#else
+    glutCloseFunc(cleanup);
+#endif
+
     printf("Press '+' and '-' to change filter width\n");
     printf("0, 1, 2 - change filter order\n");
 
@@ -430,6 +449,8 @@ main(int argc, char **argv)
 
     printf("%s Starting...\n\n", sSDKsample);
 
+    printf("NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
+
     // use command-line specified CUDA device, otherwise use device with highest Gflops/s
     if (argc > 1)
     {
@@ -477,7 +498,7 @@ main(int argc, char **argv)
         sigma = getCmdLineArgumentFloat(argc, (const char **) argv, "sigma");
     }
 
-    runBenchmark = (float)checkCmdLineFlag(argc, (const char **) argv, "benchmark");
+    runBenchmark = checkCmdLineFlag(argc, (const char **) argv, "benchmark");
 
     int device;
     struct cudaDeviceProp prop;
@@ -541,17 +562,7 @@ main(int argc, char **argv)
     }
 
     initGLBuffers();
-    glutCloseFunc(cleanup);
     glutMainLoop();
-
-    cleanup();
-
-    // cudaDeviceReset causes the driver to clean up all state. While
-    // not mandatory in normal operation, it is good practice.  It is also
-    // needed to ensure correct operation when the application is being
-    // profiled. Calling cudaDeviceReset causes all profile data to be
-    // flushed before the application exits
-    cudaDeviceReset();
 
     exit(EXIT_SUCCESS);
 }

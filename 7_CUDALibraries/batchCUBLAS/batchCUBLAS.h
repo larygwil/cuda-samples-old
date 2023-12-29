@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -127,7 +127,7 @@ static __inline__ __device__ __host__  bool cuEqual(double x, double y)
 }
 
 //============================================================================================
-// Platform dependent timing/systemMemory utilities
+// Platform dependent timing utility
 //============================================================================================
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
@@ -159,39 +159,15 @@ static __inline__ double second(void)
         return (double)GetTickCount() / 1000.0;
     }
 }
-
-static size_t getSystemMemory()
-{
-    MEMORYSTATUSEX state; // Requires >= win2k
-    memset(&state, 0, sizeof(state));
-    state.dwLength = sizeof(state);
-
-    if (0 == GlobalMemoryStatusEx(&state))
-    {
-        return 0;
-    }
-    else
-    {
-        return (size_t)state.ullTotalPhys;
-    }
-}
-#elif defined(__linux)
+#elif defined(__linux) || defined(__QNX__)
 #include <stddef.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <sys/sysinfo.h>
 static double second(void)
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
-}
-
-static size_t getSystemMemory(void)
-{
-    struct sysinfo s_info;
-    sysinfo(&s_info);
-    return (size_t)s_info.totalram * (size_t)s_info.mem_unit;
 }
 #elif defined(__APPLE__)
 #include <stddef.h>
@@ -204,23 +180,6 @@ static double second(void)
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
-}
-
-static size_t getSystemMemory(void)
-{
-    int memmib[2] = { CTL_HW, HW_PHYSMEM };
-    size_t mem = (size_t)0;
-    size_t memsz = sizeof(mem);
-
-    /* NOTE: This may cap memory reported at 2GB */
-    if (sysctl(memmib, 2, &mem, &memsz, NULL, 0) == -1)
-    {
-        return (size_t)0;
-    }
-    else
-    {
-        return mem;
-    }
 }
 #else
 #error unsupported platform

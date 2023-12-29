@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -12,6 +12,7 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined (__APPLE__) || defined(MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -373,7 +374,7 @@ void reCreate(void)
     display();
 }
 
-void cleanup(int code, int argc = 0, const char **argv = NULL)
+void cleanup(int code)
 {
     if (g_pRng)
     {
@@ -400,6 +401,11 @@ void cleanup(int code, int argc = 0, const char **argv = NULL)
     // flushed before the application exits
     cudaDeviceReset();
     exit(code);
+}
+
+void glutClose()
+{
+    cleanup(EXIT_SUCCESS);
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -587,8 +593,12 @@ void keyboard(unsigned char key, int x, int y)
         case 27:
         case 'q':
         case 'Q':
+        #if defined(__APPLE__) || defined(MACOSX)
             exit(EXIT_SUCCESS);
-            break;
+        #else
+            glutDestroyWindow(glutGetWindow());
+            return;
+        #endif
     }
 }
 
@@ -652,6 +662,9 @@ int main(int argc, char **argv)
         }
         else
         {
+#if defined(__linux__)
+            setenv ("DISPLAY", ":0", 0);
+#endif
             // Initialize GL
             glutInit(&argc, argv);
             glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -689,11 +702,11 @@ int main(int argc, char **argv)
 
             if (g_pCheckRender->compareBin2BinFloat("randomFog.bin", "ref_randomFog.bin", g_nVerticesPopulated * sizeof(SVertex) / sizeof(float), 0.25f, 0.35f))
             {
-                cleanup(EXIT_SUCCESS, argc, (const char **)argv);
+                cleanup(EXIT_SUCCESS);
             }
             else
             {
-                cleanup(EXIT_FAILURE, argc, (const char **)argv);
+                cleanup(EXIT_FAILURE);
             }
         }
         else
@@ -724,12 +737,15 @@ int main(int argc, char **argv)
             glutKeyboardFunc(keyboard);
             glutIdleFunc(idle);
 
+#if defined (__APPLE__) || defined(MACOSX)
+        atexit(glutClose);
+#else
+        glutCloseFunc(glutClose);
+#endif
+
             // Let's get started!
             glutMainLoop();
         }
-
-        // Cleanup
-        cleanup(0, argc, (const char **)argv);
     }
     catch (runtime_error &e)
     {

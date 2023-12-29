@@ -4,7 +4,9 @@
     <name>CUDA FFT Ocean Simulation</name>
     <description><![CDATA[This sample simulates an Ocean height field using CUFFT Library and renders the result using OpenGL.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,CUFFT,Ocean,OpenGL,Height Field</keywords>
     <scope>1:CUDA Advanced Topics,2:Graphics Interop,3:Physically-Based Simulation</scope>
     <files>
@@ -13,8 +15,6 @@
         <file>data\reference.ppm</file>
         <file>data\ref_slopeShading.bin</file>
         <file>data\ref_spatialDomain.bin</file>
-        <file>data\ref_slopeShading_sm13.bin</file>
-        <file>data\ref_spatialDomain_sm13.bin</file>
     </files>
     <qatests>
         <qatest>-qatest</qatest>
@@ -52,14 +52,20 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>oceanFFT.cpp</primary-file>
+    <required_dependencies>
+        <dependency>X11</dependency>
+        <dependency>GL</dependency>
+        <dependency>CUFFT</dependency>
+    </required_dependencies>
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
 </entry>

@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 *
 * NOTICE TO USER:
 *
@@ -134,7 +134,7 @@ struct HookInfo
 
 };
 
-static HookInfo cuhl("libcuda.so");
+static HookInfo cuhl("libcuda.so.1");
 
 // Exposed API
 void cuHookRegisterCallback(HookSymbols symbol, HookTypes type, void* callback)

@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -358,11 +358,18 @@ void VolumeRender_setVolume(const Volume *vol)
     checkCudaErrors(cudaBindTextureToArray(volumeTex, vol->content, vol->channelDesc));
 }
 
-
-static int iDivUp(int a, int b)
+static unsigned int iDivUp(size_t a, size_t b)
 {
-    return (a % b != 0) ? (a / b + 1) : (a / b);
+    size_t val = (a % b != 0) ? (a / b + 1) : (a / b);
+    if (val > UINT_MAX)
+    {
+        fprintf(stderr, "\nUINT_MAX limit exceeded in iDivUp() exiting.....\n");
+        exit(EXIT_FAILURE);    // val exceeds limit
+    }
+
+    return static_cast<unsigned int>(val);
 }
+
 void VolumeRender_updateTF(int tfIdx, int numColors, float4 *colors)
 {
 

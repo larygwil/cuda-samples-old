@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -64,7 +64,7 @@ void computeGold(float *, const float *, const float *, unsigned int, unsigned i
 static CUresult initCUDA(int argc, char **argv, CUfunction *pMatrixMul, int *block_size_out);
 
 //define input ptx file for different platforms
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
+#if defined(_WIN64) || defined(__LP64__)
 #define PTX_FILE "matrixMul_kernel64.ptx"
 #define CUBIN_FILE "matrixMul_kernel64.cubin"
 #else
@@ -279,6 +279,8 @@ runTest(int argc, char **argv)
     }
 
     printf("%s\n", correct ? "Result = PASS" : "Result = FAIL");
+
+    printf("\nNOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n");
 
     // clean up memory
     if (use_64bit_memory_address)

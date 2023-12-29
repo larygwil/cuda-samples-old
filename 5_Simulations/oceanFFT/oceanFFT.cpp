@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -47,6 +47,7 @@
 #include <math_constants.h>
 
 #if defined(__APPLE__) || defined(MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -167,7 +168,7 @@ void timerEvent(int value);
 
 // Cuda functionality
 void runCuda();
-void runCudaTest(bool bHasDouble, char *exec_path);
+void runCudaTest(char *exec_path);
 void generate_h0(float2 *h0);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +176,8 @@ void generate_h0(float2 *h0);
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+    printf("NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
+
     // check for command line arguments
     if (checkCmdLineFlag(argc, (const char **)argv, "qatest"))
     {
@@ -215,8 +218,6 @@ void runAutoTest(int argc, char **argv)
     cudaDeviceProp deviceProp;
     checkCudaErrors(cudaGetDeviceProperties(&deviceProp, dev));
     printf("Compute capability %d.%d\n", deviceProp.major, deviceProp.minor);
-    int version = deviceProp.major*10 + deviceProp.minor;
-    g_hasDouble = (version >= 13);
 
     // create FFT plan
     checkCudaErrors(cufftPlan2d(&fftPlan, meshSize, meshSize, CUFFT_C2C));
@@ -236,7 +237,7 @@ void runAutoTest(int argc, char **argv)
     sdkStartTimer(&timer);
     prevTime = sdkGetTimerValue(&timer);
 
-    runCudaTest(g_hasDouble, argv[0]);
+    runCudaTest(argv[0]);
 
     checkCudaErrors(cudaFree(d_ht));
     checkCudaErrors(cudaFree(d_slope));
@@ -465,21 +466,7 @@ void runCuda()
     checkCudaErrors(cudaGraphicsUnmapResources(1, &cuda_slopeVB_resource, 0));
 }
 
-const char *sSpatialDomain[] =
-{
-    "ref_spatialDomain.bin",
-    "ref_spatialDomain_sm13.bin",
-    NULL
-};
-
-const char *sSlopeShading[] =
-{
-    "ref_slopeShading.bin",
-    "ref_slopeShading_sm13.bin",
-    NULL
-};
-
-void runCudaTest(bool bHasDouble, char *exec_path)
+void runCudaTest(char *exec_path)
 {
     checkCudaErrors(cudaMalloc((void **)&g_hptr, meshSize*meshSize*sizeof(float)));
     checkCudaErrors(cudaMalloc((void **)&g_sptr, meshSize*meshSize*sizeof(float2)));
@@ -498,7 +485,7 @@ void runCudaTest(bool bHasDouble, char *exec_path)
         cudaMemcpy((void *)hptr, (void *)g_hptr, meshSize*meshSize*sizeof(float), cudaMemcpyDeviceToHost);
         sdkDumpBin((void *)hptr, meshSize*meshSize*sizeof(float), "spatialDomain.bin");
 
-        if (!sdkCompareBin2BinFloat("spatialDomain.bin", sSpatialDomain[bHasDouble], meshSize*meshSize*sizeof(float),
+        if (!sdkCompareBin2BinFloat("spatialDomain.bin", "ref_spatialDomain.bin", meshSize*meshSize*sizeof(float),
                                     MAX_EPSILON, THRESHOLD, exec_path))
         {
             g_TotalErrors++;
@@ -515,7 +502,7 @@ void runCudaTest(bool bHasDouble, char *exec_path)
         cudaMemcpy((void *)sptr, (void *)g_sptr, meshSize*meshSize*sizeof(float2), cudaMemcpyDeviceToHost);
         sdkDumpBin(sptr, meshSize*meshSize*sizeof(float2), "slopeShading.bin");
 
-        if (!sdkCompareBin2BinFloat("slopeShading.bin", sSlopeShading[bHasDouble], meshSize*meshSize*sizeof(float2),
+        if (!sdkCompareBin2BinFloat("slopeShading.bin", "ref_slopeShading.bin", meshSize*meshSize*sizeof(float2),
                                     MAX_EPSILON, THRESHOLD, exec_path))
         {
             g_TotalErrors++;
@@ -661,6 +648,7 @@ void cleanup()
 
     checkCudaErrors(cudaFree(d_h0));
     checkCudaErrors(cudaFree(d_slope));
+    checkCudaErrors(cudaFree(d_ht));
     free(h_h0);
     cufftDestroy(fftPlan);
 }

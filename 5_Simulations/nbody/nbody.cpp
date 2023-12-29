@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -16,6 +16,7 @@
 #endif
 
 #if defined(__APPLE__) || defined(MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -1075,6 +1076,8 @@ main(int argc, char **argv)
 
     printf("Run \"nbody -benchmark [-numbodies=<numBodies>]\" to measure perfomance.\n");
     showHelp();
+
+    printf("NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
 
     bFullscreen  = (checkCmdLineFlag(argc, (const char **) argv, "fullscreen") != 0);
 

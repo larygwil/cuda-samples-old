@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -134,6 +134,8 @@ GrabCut::~GrabCut()
     nppiGraphcutFree(pState);
 #ifdef DOWNSAMPLE_FIRST
     checkCudaErrors(cudaFree(d_small_image));
+    checkCudaErrors(cudaFree(d_small_trimap[0]));
+    checkCudaErrors(cudaFree(d_small_trimap[1]));
 #endif
 
     checkCudaErrors(cudaEventDestroy(start));

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -219,6 +219,7 @@ ParticleSystem::_finalize()
 
     if (m_bUseOpenGL)
     {
+        unregisterGLBufferObject(m_cuda_colorvbo_resource);
         unregisterGLBufferObject(m_cuda_posvbo_resource);
         glDeleteBuffers(1, (const GLuint *)&m_posVbo);
         glDeleteBuffers(1, (const GLuint *)&m_colorVBO);

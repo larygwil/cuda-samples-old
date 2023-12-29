@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -811,4 +811,6 @@ int main(int argc, char **argv)
 
     printf("RMS(reference, result) = %f\n\n", rms);
     printf(rms <= ERROR_THRESHOLD ? "Test passed\n" : "Test failed!\n");
+    /* Return zero if test passed, one otherwise */
+    return rms > ERROR_THRESHOLD;
 }

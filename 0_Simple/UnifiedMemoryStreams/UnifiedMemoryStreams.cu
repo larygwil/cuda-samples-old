@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -165,15 +165,9 @@ int main(int argc, char **argv)
     int dev_id = findCudaDevice(argc, (const char **) argv);
     checkCudaErrors(cudaGetDeviceProperties(&device_prop, dev_id));
 
-#if defined(__APPLE__) || defined(MACOSX)
-    fprintf(stderr, "Unified Memory not currently supported on OS X\n");
-    cudaDeviceReset();
-    exit(EXIT_WAIVED);
-#endif
-
-    if (sizeof(void *) != 8)
-    {
-        fprintf(stderr, "Unified Memory requires compiling for a 64 bit system.\n");
+    if (!device_prop.managedMemory) { 
+        // This samples requires being run on a device that supports Unified Memory
+        fprintf(stderr, "Unified Memory not supported on this device\n");
 
         // cudaDeviceReset causes the driver to clean up all state. While
         // not mandatory in normal operation, it is good practice.  It is also
@@ -184,9 +178,10 @@ int main(int argc, char **argv)
         exit(EXIT_WAIVED);
     }
 
-    if (((device_prop.major << 4) + device_prop.minor) < 0x30)
+    if (device_prop.computeMode == cudaComputeModeExclusive || device_prop.computeMode == cudaComputeModeProhibited)
     {
-        fprintf(stderr, "UnifiedMemoryStreams requires Compute Capability of SM 3.0 or higher to run.\n");
+        // This sample requires being run with a default or process exclusive mode
+        fprintf(stderr, "This sample requires a device in either default or process exclusive mode\n");
 
         // cudaDeviceReset causes the driver to clean up all state. While
         // not mandatory in normal operation, it is good practice.  It is also
@@ -232,6 +227,16 @@ int main(int argc, char **argv)
     }
 
     cudaDeviceSynchronize();
+
+    // Destroy CUDA Streams, cuBlas handles
+    for (int i=0; i<nthreads+1; i++)
+    {
+        cudaStreamDestroy(streams[i]);
+        cublasDestroy(handles[i]);
+    }
+
+    // Free TaskList
+    std::vector< Task<double> >().swap(TaskList);
 
     // cudaDeviceReset causes the driver to clean up all state. While
     // not mandatory in normal operation, it is good practice.  It is also

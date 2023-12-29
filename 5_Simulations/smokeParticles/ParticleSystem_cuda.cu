@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -73,12 +73,12 @@ extern "C"
     void createNoiseTexture(int w, int h, int d)
     {
         cudaExtent size = make_cudaExtent(w, h, d);
-        uint elements = (uint) size.width*size.height*size.depth;
+        size_t elements = size.width*size.height*size.depth;
 
         float *volumeData = (float *)malloc(elements*4*sizeof(float));
         float *ptr = volumeData;
 
-        for (uint i=0; i<elements; i++)
+        for (size_t i=0; i<elements; i++)
         {
             *ptr++ = frand()*2.0f-1.0f;
             *ptr++ = frand()*2.0f-1.0f;

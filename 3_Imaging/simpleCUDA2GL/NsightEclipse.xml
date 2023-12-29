@@ -4,7 +4,9 @@
     <name>CUDA and OpenGL Interop of Images</name>
     <description><![CDATA[This sample shows how to copy CUDA image back to OpenGL using the most efficient methods.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>GPGPU,CUDA,Image Processing,Opengl</keywords>
     <scope>2:Graphics Interop,2:Image Processing,2:Performance Strategies</scope>
     <files>
@@ -41,14 +43,19 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>main.cpp</primary-file>
+    <required_dependencies>
+        <dependency>X11</dependency>
+        <dependency>GL</dependency>
+    </required_dependencies>
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
 </entry>

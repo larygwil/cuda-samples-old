@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -32,7 +32,7 @@
 #include <iostream>
 #include <cassert>
 
-const static char *sSDKsample = "CUDA Bandwidth Test";
+static const char *sSDKsample = "CUDA Bandwidth Test";
 
 // defines, project
 #define MEMCOPY_ITERATIONS  10
@@ -127,6 +127,9 @@ int main(int argc, char **argv)
 
     // finish
     printf("%s\n", (iRetVal==0) ? "Result = PASS" : "Result = FAIL");
+
+    printf("\nNOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n");
+
     exit((iRetVal==0) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 

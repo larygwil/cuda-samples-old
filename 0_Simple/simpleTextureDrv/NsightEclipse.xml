@@ -4,7 +4,9 @@
     <name>Simple Texture (Driver Version)</name>
     <description><![CDATA[Simple example that demonstrates use of Textures in CUDA.  This sample uses the new CUDA 4.0 kernel launch Driver API.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,2:Texture,2:Image Processing</scope>
     <files>
@@ -42,8 +44,9 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
+    <sm-arch>sm20</sm-arch>
     <type>exe</type>
     <primary-file>simpleTextureDrv.cpp</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
     <no-nsight-eclipse/>
 </entry>

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -91,7 +91,7 @@ int main(int argc,char *argv[])
 
     interval_gpu<T> *d_result;
     int *d_nresults;
-    int h_nresults[THREADS];
+    int *h_nresults = new int[THREADS];
     cudaEvent_t start, stop;
 
     CHECKED_CALL(cudaSetDevice(devID));
@@ -154,14 +154,16 @@ int main(int argc,char *argv[])
     // Compute the results using a CPU implementation based on the Boost library
     I_CPU i_cpu(0.01f, 4.0f);
     I_CPU *h_result_cpu = new I_CPU[THREADS * DEPTH_RESULT];
-    int h_nresults_cpu[THREADS];
+    int *h_nresults_cpu = new int[THREADS];
     test_interval_newton_cpu<I_CPU>(h_result_cpu, h_nresults_cpu, i_cpu);
 
     // Compare the CPU and GPU results
     bool bTestResult = checkAgainstHost(h_nresults, h_nresults_cpu, h_result, h_result_cpu);
 
     delete [] h_result_cpu;
+    delete [] h_nresults_cpu;
     delete [] h_result;
+    delete [] h_nresults;
 
     // cudaDeviceReset causes the driver to clean up all state. While
     // not mandatory in normal operation, it is good practice.  It is also

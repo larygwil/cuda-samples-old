@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -75,6 +75,20 @@ bool isPow2(unsigned int x)
     return ((x&(x-1))==0);
 }
 
+const char * getReduceTypeString(const ReduceType type)
+{
+    switch (type)
+    {
+    case REDUCE_INT:
+        return "int";
+    case REDUCE_FLOAT:
+        return "float";
+    case REDUCE_DOUBLE:
+        return "double";
+    default:
+        return "unknown";
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -84,24 +98,24 @@ main(int argc, char **argv)
 {
     printf("%s Starting...\n\n", argv[0]);
 
-    char *typeChoice = 0;
-    getCmdLineArgumentString(argc, (const char **) argv, "type", &typeChoice);
+    char *typeInput = 0;
+    getCmdLineArgumentString(argc, (const char **) argv, "type", &typeInput);
 
     ReduceType datatype = REDUCE_INT;
 
-    if (0 != typeChoice)
+    if (0 != typeInput)
     {
-        if (!strcasecmp(typeChoice, "float"))
+        if (!strcasecmp(typeInput, "float"))
         {
             datatype = REDUCE_FLOAT;
         }
-        else if (!strcasecmp(typeChoice, "double"))
+        else if (!strcasecmp(typeInput, "double"))
         {
             datatype = REDUCE_DOUBLE;
         }
-        else
+        else if (strcasecmp(typeInput, "int"))
         {
-            datatype = REDUCE_INT;
+            printf("Type %s is not recoginized. Using default type int.\n\n", typeInput);
         }
     }
 
@@ -141,7 +155,7 @@ main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    printf("Reducing array of type %s\n\n", typeChoice);
+    printf("Reducing array of type %s\n\n", getReduceTypeString(datatype));
 
     bool bResult = false;
 
@@ -572,7 +586,8 @@ runTest(int argc, char **argv, ReduceType datatype)
         // compute reference solution
         T cpu_result = reduceCPU<T>(h_idata, size);
 
-        double threshold = 1e-12;
+        int precision = 0;
+        double threshold = 0;
         double diff = 0;
 
         if (datatype == REDUCE_INT)
@@ -582,13 +597,19 @@ runTest(int argc, char **argv, ReduceType datatype)
         }
         else
         {
-            printf("\nGPU result = %f\n", (double)gpu_result);
-            printf("CPU result = %f\n\n", (double)cpu_result);
-
             if (datatype == REDUCE_FLOAT)
             {
+                precision = 8;
                 threshold = 1e-8 * size;
             }
+            else
+            {
+                precision = 12;
+                threshold = 1e-12 * size;
+            }
+
+            printf("\nGPU result = %.*f\n", precision, (double)gpu_result);
+            printf("CPU result = %.*f\n\n", precision, (double)cpu_result);
 
             diff = fabs((double)gpu_result - (double)cpu_result);
         }

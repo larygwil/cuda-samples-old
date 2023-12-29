@@ -4,7 +4,9 @@
     <name>Interval Computing</name>
     <description><![CDATA[Interval arithmetic operators example.  Uses various C++ features (templates and recursion).  The recursive mode requires Compute SM 2.0 capabilities.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.3</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>newdelete arithmetic,rounding modes</keywords>
     <scope>1:CUDA Advanced Topics</scope>
     <files>
@@ -17,14 +19,15 @@
     <include-path>../../common/inc</include-path>
     <include-path>.</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm13</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>interval.cu</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

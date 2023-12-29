@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -19,34 +19,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Shortcut shared memory atomic addition functions
 ////////////////////////////////////////////////////////////////////////////////
-#define USE_SMEM_ATOMICS 0
-
-#if(!USE_SMEM_ATOMICS)
-#define TAG_MASK ( (1U << (UINT_BITS - LOG2_WARP_SIZE)) - 1U )
-
-inline __device__ void addByte(volatile uint *s_WarpHist, uint data, uint threadTag)
-{
-    uint count;
-
-    do
-    {
-        count = s_WarpHist[data] & TAG_MASK;
-        count = threadTag | (count + 1);
-        s_WarpHist[data] = count;
-    }
-    while (s_WarpHist[data] != count);
-}
-#else
-#ifdef CUDA_NO_SM12_ATOMIC_INTRINSICS
-#error Compilation target does not support shared-memory atomics
-#endif
 
 #define TAG_MASK 0xFFFFFFFFU
 inline __device__ void addByte(uint *s_WarpHist, uint data, uint threadTag)
 {
     atomicAdd(s_WarpHist + data, 1);
 }
-#endif
 
 inline __device__ void addWord(uint *s_WarpHist, uint data, uint tag)
 {

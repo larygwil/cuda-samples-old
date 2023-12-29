@@ -4,7 +4,9 @@
     <name>Volumetric Filtering with 3D Textures and Surface Writes</name>
     <description><![CDATA[This sample demonstrates 3D Volumetric Filtering using 3D Textures and 3D Surface Writes.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 2.0</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA 3D Volume Filtering</keywords>
     <scope>1:CUDA Basic Topics,2:Texture,2:Graphics Interop,2:Image Processing,3:Volume Processing</scope>
     <files>
@@ -49,7 +51,13 @@
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>volumeFiltering.cpp</primary-file>
+    <required_dependencies>
+        <dependency>X11</dependency>
+        <dependency>GL</dependency>
+    </required_dependencies>
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
 </entry>

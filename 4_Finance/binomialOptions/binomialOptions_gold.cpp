@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -14,26 +14,26 @@
 #include <stdio.h>
 #include <math.h>
 #include "binomialOptions_common.h"
-
+#include "realtype.h"
 
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Polynomial approximation of cumulative normal distribution function
 ///////////////////////////////////////////////////////////////////////////////
-static double CND(double d)
+static real CND(real d)
 {
-    const double       A1 = 0.31938153;
-    const double       A2 = -0.356563782;
-    const double       A3 = 1.781477937;
-    const double       A4 = -1.821255978;
-    const double       A5 = 1.330274429;
-    const double RSQRT2PI = 0.39894228040143267793994605993438;
+    const real       A1 = 0.31938153;
+    const real       A2 = -0.356563782;
+    const real       A3 = 1.781477937;
+    const real       A4 = -1.821255978;
+    const real       A5 = 1.330274429;
+    const real RSQRT2PI = 0.39894228040143267793994605993438;
 
-    double
+    real
     K = 1.0 / (1.0 + 0.2316419 * fabs(d));
 
-    double
+    real
     cnd = RSQRT2PI * exp(- 0.5 * d * d) *
           (K * (A1 + K * (A2 + K * (A3 + K * (A4 + K * A5)))));
 
@@ -44,25 +44,25 @@ static double CND(double d)
 }
 
 extern "C" void BlackScholesCall(
-    float &callResult,
+    real &callResult,
     TOptionData optionData
 )
 {
-    double S = optionData.S;
-    double X = optionData.X;
-    double T = optionData.T;
-    double R = optionData.R;
-    double V = optionData.V;
+    real S = optionData.S;
+    real X = optionData.X;
+    real T = optionData.T;
+    real R = optionData.R;
+    real V = optionData.V;
 
-    double sqrtT = sqrt(T);
-    double    d1 = (log(S / X) + (R + 0.5 * V * V) * T) / (V * sqrtT);
-    double    d2 = d1 - V * sqrtT;
-    double CNDD1 = CND(d1);
-    double CNDD2 = CND(d2);
+    real sqrtT = sqrt(T);
+    real    d1 = (log(S / X) + (R + (real)0.5 * V * V) * T) / (V * sqrtT);
+    real    d2 = d1 - V * sqrtT;
+    real CNDD1 = CND(d1);
+    real CNDD2 = CND(d2);
 
     //Calculate Call and Put simultaneously
-    double expRT = exp(- R * T);
-    callResult   = (float)(S * CNDD1 - X * expRT * CNDD2);
+    real expRT = exp(- R * T);
+    callResult   = (real)(S * CNDD1 - X * expRT * CNDD2);
 }
 
 
@@ -71,38 +71,38 @@ extern "C" void BlackScholesCall(
 // Process an array of OptN options on CPU
 // Note that CPU code is for correctness testing only and not for benchmarking.
 ////////////////////////////////////////////////////////////////////////////////
-static double expiryCallValue(double S, double X, double vDt, int i)
+static real expiryCallValue(real S, real X, real vDt, int i)
 {
-    double d = S * exp(vDt * (2.0 * i - NUM_STEPS)) - X;
-    return (d > 0) ? d : 0;
+    real d = S * exp(vDt * (real)(2 * i - NUM_STEPS)) - X;
+    return (d > (real)0) ? d : (real)0;
 }
 
 extern "C" void binomialOptionsCPU(
-    float &callResult,
+    real &callResult,
     TOptionData optionData
 )
 {
-    static double Call[NUM_STEPS + 1];
+    static real Call[NUM_STEPS + 1];
 
-    const double       S = optionData.S;
-    const double       X = optionData.X;
-    const double       T = optionData.T;
-    const double       R = optionData.R;
-    const double       V = optionData.V;
+    const real       S = optionData.S;
+    const real       X = optionData.X;
+    const real       T = optionData.T;
+    const real       R = optionData.R;
+    const real       V = optionData.V;
 
-    const double      dt = T / (double)NUM_STEPS;
-    const double     vDt = V * sqrt(dt);
-    const double     rDt = R * dt;
+    const real      dt = T / (real)NUM_STEPS;
+    const real     vDt = V * sqrt(dt);
+    const real     rDt = R * dt;
     //Per-step interest and discount factors
-    const double      If = exp(rDt);
-    const double      Df = exp(-rDt);
+    const real      If = exp(rDt);
+    const real      Df = exp(-rDt);
     //Values and pseudoprobabilities of upward and downward moves
-    const double       u = exp(vDt);
-    const double       d = exp(-vDt);
-    const double      pu = (If - d) / (u - d);
-    const double      pd = 1.0 - pu;
-    const double  puByDf = pu * Df;
-    const double  pdByDf = pd * Df;
+    const real       u = exp(vDt);
+    const real       d = exp(-vDt);
+    const real      pu = (If - d) / (u - d);
+    const real      pd = 1.0 - pu;
+    const real  puByDf = pu * Df;
+    const real  pdByDf = pd * Df;
 
     ///////////////////////////////////////////////////////////////////////
     // Compute values at expiration date:
@@ -120,5 +120,5 @@ extern "C" void binomialOptionsCPU(
         for (int j = 0; j <= i - 1; j++)
             Call[j] = puByDf * Call[j + 1] + pdByDf * Call[j];
 
-    callResult = (float)Call[0];
+    callResult = (real)Call[0];
 }

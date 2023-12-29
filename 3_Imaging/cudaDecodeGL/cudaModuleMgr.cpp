@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -159,7 +159,11 @@ CUresult modGetCudaFunction(sCtxModule *pCtx, const char *func_name,    CUfuncti
 
     CUresult cuStatus = cuModuleGetFunction(&(pCtx->pCudaKernels_[idx].fpCuda), pCtx->cuModule_, func_name);
     printf(">> modGetCudaFunction< CUDA file: %36s >\n", pCtx->mModuleName.c_str());
-    printf("   CUDA Kernel Function (0x%08x) = <%20s >\n", (size_t)(pCtx->pCudaKernels_[idx].fpCuda), func_name);
+#if defined(_MSC_VER_)
+    printf("   CUDA Kernel Function (0x%08Ix) = <%20s >\n", (size_t)(pCtx->pCudaKernels_[idx].fpCuda), func_name);
+#else
+    printf("   CUDA Kernel Function (0x%08zx) = <%20s >\n", (size_t)(pCtx->pCudaKernels_[idx].fpCuda), func_name);
+#endif
     pCtx->pCudaKernels_[idx].func_name = func_name;
 
     if (fpCudaKernel)
@@ -195,7 +199,11 @@ CUresult modGetTexRef(sCtxModule *pCtx, const char *texref_name,  CUtexref    *p
 
     CUresult cuStatus = cuModuleGetTexRef(&(pCtx->pTexRef_[idx].texRef), pCtx->cuModule_, texref_name);
     printf(">> modGetTexRef<%36s>\n", pCtx->mModuleName.c_str());
-    printf("   CUDA TextureReference (0x%08x) <24%s >\n", (size_t)(pCtx->pTexRef_[idx].texRef), texref_name);
+#if defined(_MSC_VER_)
+    printf("   CUDA TextureReference (0x%08Ix) <24%s >\n", (size_t)(pCtx->pTexRef_[idx].texRef), texref_name);
+#else
+    printf("   CUDA TextureReference (0x%08zx) <24%s >\n", (size_t)(pCtx->pTexRef_[idx].texRef), texref_name);
+#endif
     pCtx->pTexRef_[idx].texref_name = texref_name;
 
     if (pTexRef)

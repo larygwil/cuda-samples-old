@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -268,9 +268,11 @@ int main(int argc, char *argv[])
         npp::ImageCPU_8u_C1 oHostDst(oDeviceDst.size());
         oDeviceDst.copyTo(oHostDst.data(), oHostDst.pitch());
 
-        cudaFree((void **)&histDevice);
-        cudaFree((void **)&levelsDevice);
-        cudaFree((void **)&pDeviceBuffer);
+        cudaFree(histDevice);
+        cudaFree(levelsDevice);
+        cudaFree(pDeviceBuffer);
+        nppiFree(oDeviceSrc.data());
+        nppiFree(oDeviceDst.data());
 
         // save the result
         npp::saveImage(dstFileName.c_str(), oHostDst);

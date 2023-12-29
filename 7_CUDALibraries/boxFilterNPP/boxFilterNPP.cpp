@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -157,17 +157,25 @@ int main(int argc, char *argv[])
 
         // create struct with box-filter mask size
         NppiSize oMaskSize = {5, 5};
-        // create struct with ROI size given the current mask
-        NppiSize oSizeROI = {(int)oDeviceSrc.width() - oMaskSize.width + 1, (int)oDeviceSrc.height() - oMaskSize.height + 1};
+
+        NppiSize oSrcSize = {(int)oDeviceSrc.width(), (int)oDeviceSrc.height()};
+        NppiPoint oSrcOffset = {0, 0};
+
+        // create struct with ROI size
+        NppiSize oSizeROI = {(int)oDeviceSrc.width() , (int)oDeviceSrc.height() };
         // allocate device image of appropriatedly reduced size
         npp::ImageNPP_8u_C1 oDeviceDst(oSizeROI.width, oSizeROI.height);
-        // set anchor point inside the mask to (0, 0)
-        NppiPoint oAnchor = {0, 0};
+        // set anchor point inside the mask to (oMaskSize.width / 2, oMaskSize.height / 2)
+        // It should round down when odd
+        NppiPoint oAnchor = {oMaskSize.width / 2, oMaskSize.height / 2};
+
         // run box filter
         NPP_CHECK_NPP (
-                     nppiFilterBox_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(),
-                                          oDeviceDst.data(), oDeviceDst.pitch(),
-                                          oSizeROI, oMaskSize, oAnchor) );
+                           nppiFilterBoxBorder_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(),
+                                                      oSrcSize, oSrcOffset,
+                                                      oDeviceDst.data(), oDeviceDst.pitch(),
+                                                      oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE) );
+
         // declare a host image for the result
         npp::ImageCPU_8u_C1 oHostDst(oDeviceDst.size());
         // and copy the device result data into it
@@ -175,6 +183,9 @@ int main(int argc, char *argv[])
 
         saveImage(sResultFilename, oHostDst);
         std::cout << "Saved image: " << sResultFilename << std::endl;
+
+        nppiFree(oDeviceSrc.data());
+        nppiFree(oDeviceDst.data());
 
         cudaDeviceReset();
         exit(EXIT_SUCCESS);

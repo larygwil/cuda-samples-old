@@ -4,7 +4,9 @@
     <name>Random Fog</name>
     <description><![CDATA[This sample illustrates pseudo- and quasi- random numbers produced by CURAND.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,CURAND,GPGPU,rng,prng,qrng,random number</keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
@@ -35,7 +37,13 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
+    <sm-arch>sm20</sm-arch>
     <type>exe</type>
     <primary-file>randomFog.cpp</primary-file>
+    <required_dependencies>
+        <dependency>X11</dependency>
+        <dependency>GL</dependency>
+        <dependency>CURAND</dependency>
+    </required_dependencies>
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
 </entry>

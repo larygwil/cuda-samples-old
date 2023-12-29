@@ -4,7 +4,9 @@
     <name>ConjugateGradient</name>
     <description><![CDATA[This sample implements a conjugate gradient solver on GPU using CUBLAS and CUSPARSE library.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,CUBLAS,CUSPARSE,Sparse Matrix</keywords>
     <scope>1:CUDA Advanced Topics,3:Linear Algebra</scope>
     <files>
@@ -20,7 +22,12 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
+    <sm-arch>sm20</sm-arch>
     <type>exe</type>
     <primary-file>main.cpp</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <required_dependencies>
+        <dependency>CUBLAS</dependency>
+        <dependency>CUSPARSE</dependency>
+    </required_dependencies>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

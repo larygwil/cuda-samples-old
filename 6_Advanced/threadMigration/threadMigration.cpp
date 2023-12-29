@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -77,7 +77,7 @@ typedef struct _CUDAContext_st
 CUDAContext g_ThreadParams[MAXTHREADS];
 
 //define input ptx file for different platforms
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
+#if defined(_WIN64) || defined(__LP64__)
 #define PTX_FILE "threadMigration_kernel64.ptx"
 #define CUBIN_FILE "threadMigration_kernel64.cubin"
 #else

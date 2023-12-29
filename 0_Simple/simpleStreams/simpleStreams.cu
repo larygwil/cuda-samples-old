@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -79,18 +79,18 @@ __global__ void init_array(int *g_data, int *factor, int num_iterations)
     }
 }
 
-int correct_data(int *a, const int n, const int c)
+bool correct_data(int *a, const int n, const int c)
 {
     for (int i = 0; i < n; i++)
     {
         if (a[i] != c)
         {
             printf("%d: %d %d\n", i, a[i], c);
-            return 0;
+            return false;
         }
     }
 
-    return 1;
+    return true;
 }
 
 inline void

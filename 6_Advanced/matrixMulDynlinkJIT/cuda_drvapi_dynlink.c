@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.
@@ -270,14 +270,14 @@ static CUresult LOAD_LIBRARY(CUDADRIVER *pInstance)
         return CUDA_ERROR_UNKNOWN;                                      \
     }
 
-#elif defined(__unix__) || defined(__APPLE__) || defined(__MACOSX)
+#elif defined(__unix__) || defined (__QNX__) || defined(__APPLE__) || defined(__MACOSX)
 
 #include <dlfcn.h>
 
 #if defined(__APPLE__) || defined(__MACOSX)
 static char __CudaLibName[] = "/usr/local/cuda/lib/libcuda.dylib";
 #else
-static char __CudaLibName[] = "libcuda.so";
+static char __CudaLibName[] = "libcuda.so.1";
 #endif
 
 typedef void *CUDADRIVER;

@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -46,9 +46,6 @@ CUTThread cutStartThread(CUT_THREADROUTINE, void *data);
 
 //Wait for thread to finish.
 void cutEndThread(CUTThread thread);
-
-//Destroy thread.
-void cutDestroyThread(CUTThread thread);
 
 //Wait for multiple threads.
 void cutWaitForThreads(const CUTThread *threads, int num);

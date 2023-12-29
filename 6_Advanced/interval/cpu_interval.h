@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -169,7 +169,7 @@ void newton_interval_cpu(global_stack_cpu<I, DEPTH_RESULT, THREADS> &result,
             has_part2 = true;
         }
 
-        if (!empty(part1))
+		if ((part1.lower() <= part1.upper()) && !empty(part1))
         {
             // At least 1 solution
             // We will compute part1 next
@@ -240,7 +240,7 @@ void newton_interval_rec_cpu(global_stack_cpu<I, DEPTH_RESULT, THREADS> &result,
         has_part2 = true;
     }
 
-    if (!empty(part1))
+    if ((part1.lower() <= part1.upper()) && (!empty(part1)))
     {
         newton_interval_rec_cpu<I, THREADS, DEPTH_RESULT>(result, part1, thread_id);
     }

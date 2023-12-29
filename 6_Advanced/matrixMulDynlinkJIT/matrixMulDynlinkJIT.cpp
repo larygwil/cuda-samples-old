@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -182,7 +182,7 @@ CUresult initCUDA(int argc, char **argv, CUfunction *pMatrixMul, int *block_size
         // compile with set parameters
         printf("> Compiling CUDA module\n");
 
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
+#if defined(_WIN64) || defined(__LP64__)
         status = cuModuleLoadDataEx(&cuModule, matrixMul_kernel_64_ptxdump, jitNumOptions, jitOptions, (void **)jitOptVals);
 #else
         status = cuModuleLoadDataEx(&cuModule, matrixMul_kernel_32_ptxdump, jitNumOptions, jitOptions, (void **)jitOptVals);

@@ -1,5 +1,5 @@
 /**
-* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -47,7 +47,7 @@ const int BSZ_Y     = 4;
 const int BSZ_X     = 4;
 
 // Forward Declaration
-void  solvePoissonEquation(cudaLibXtDesc *, cudaLibXtDesc *, float *, int, int );
+void  solvePoissonEquation(cudaLibXtDesc *, cudaLibXtDesc *, float **, int, int );
 
 __global__ void solvePoisson(cufftComplex *, cufftComplex *, float *, int, int, int n_gpu);
 
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
         exit(EXIT_WAIVED);
     }
     
-    int N = 16;
+    int N = 64;
     float xMAX = 1.0f, xMIN = 0.0f, yMIN = 0.0f,h = (xMAX - xMIN)/((float)N), s = 0.1, s2 = s*s;
     float *x, *y, *f, *u_a, r2;
 
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     
     }
     
-    float *k, *d_k;
+    float *k, *d_k[GPU_COUNT];
     k = (float*)malloc(sizeof(float) *N);
     for (int i=0; i<=N/2; i++)
     { 
@@ -165,8 +165,8 @@ int main(int argc, char **argv)
     for(int i=0; i<nGPUs; i++)
     {
         cudaSetDevice(whichGPUs[i]);
-        cudaMalloc ((void**)&d_k, sizeof(float)*N);
-        cudaMemcpy(d_k, k, sizeof(float)*N, cudaMemcpyHostToDevice);
+        cudaMalloc ((void**)&d_k[i], sizeof(float)*N);
+        cudaMemcpy(d_k[i], k, sizeof(float)*N, cudaMemcpyHostToDevice);
     }
 
     // Create a variable on device
@@ -237,7 +237,9 @@ int main(int argc, char **argv)
     free(worksize);
 
     // cudaXtFree() - Free GPU memory
-    cudaFree(d_k);
+    for (int i=0; i<GPU_COUNT; i++) {
+        cudaFree(d_k[i]);
+    }
     result = cufftXtFree(d_out);
     if (result != CUFFT_SUCCESS) { printf ("*XtFree failed\n"); exit (EXIT_FAILURE); }
     result = cufftXtFree(d_f);
@@ -256,7 +258,7 @@ int main(int argc, char **argv)
 ////////////////////////////////////////////////////////////////////////////////////
 //Launch kernel on  multiple GPU
 ///////////////////////////////////////////////////////////////////////////////////
-void  solvePoissonEquation(cudaLibXtDesc *d_ft,cudaLibXtDesc *d_ft_k, float *k, int N, int nGPUs)
+void  solvePoissonEquation(cudaLibXtDesc *d_ft,cudaLibXtDesc *d_ft_k, float **k, int N, int nGPUs)
 {
     int device ;
     dim3 dimGrid (int(N/BSZ_X), int((N/2)/BSZ_Y));
@@ -268,7 +270,7 @@ void  solvePoissonEquation(cudaLibXtDesc *d_ft,cudaLibXtDesc *d_ft_k, float *k, 
         cudaSetDevice(device) ;
         solvePoisson<<<dimGrid,dimBlock>>>((cufftComplex*) d_ft->descriptor->data[i],
                                            (cufftComplex*) d_ft_k->descriptor->data[i], 
-                                           k, N, device, nGPUs);
+                                           k[i], N, i, nGPUs);
     }
     
     // Wait for device to finish all operation

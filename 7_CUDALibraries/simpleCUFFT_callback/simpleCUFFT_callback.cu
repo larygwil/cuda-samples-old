@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -216,6 +216,7 @@ void runTest(int argc, char **argv)
 
     //Destroy CUFFT context
     checkCudaErrors(cufftDestroy(plan));
+    checkCudaErrors(cufftDestroy(cb_plan));
 
     // cleanup memory
     free(h_signal);
@@ -225,6 +226,7 @@ void runTest(int argc, char **argv)
     free(h_convolved_signal_ref);
     checkCudaErrors(cudaFree(d_signal));
     checkCudaErrors(cudaFree(d_filter_kernel));
+    checkCudaErrors(cudaFree(d_params));
 
     // cudaDeviceReset causes the driver to clean up all state. While
     // not mandatory in normal operation, it is good practice.  It is also

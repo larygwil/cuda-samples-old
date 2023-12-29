@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -23,6 +23,7 @@
 #include <GL/glew.h>
 
 #if defined (__APPLE__) || defined(MACOSX)
+  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   #include <GLUT/glut.h>
   #ifndef glutCloseFunc
   #define glutCloseFunc glutWMCloseFunc
@@ -107,7 +108,7 @@ void computeFPS()
         glutSetWindowTitle(fps);
         fpsCount = 0;
 
-        fpsLimit = MAX(1.0f, ifps);
+        fpsLimit = ftoi(MAX(1.0f, ifps));
         sdkResetTimer(&timer);
     }
 }
@@ -173,8 +174,14 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
         case 27:
-            exit(EXIT_SUCCESS);
-            break;
+            #if defined(__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
 
         case '=':
         case '+':
@@ -220,12 +227,12 @@ void cleanup()
     // add extra check to unmap the resource before unregistering it
     if (g_GraphicsMapFlag)
     {
-        cudaGraphicsUnmapResources(1, &cuda_pbo_resource, 0);
+        checkCudaErrors(cudaGraphicsUnmapResources(1, &cuda_pbo_resource, 0));
         g_GraphicsMapFlag--;
     }
 
     // unregister this buffer object from CUDA C
-    cudaGraphicsUnregisterResource(cuda_pbo_resource);
+    checkCudaErrors(cudaGraphicsUnregisterResource(cuda_pbo_resource));
     glDeleteBuffersARB(1, &pbo);
 
     // cudaDeviceReset causes the driver to clean up all state. While
@@ -233,7 +240,7 @@ void cleanup()
     // needed to ensure correct operation when the application is being
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
-    cudaDeviceReset();
+    checkCudaErrors(cudaDeviceReset());
 }
 
 void initGLBuffers()

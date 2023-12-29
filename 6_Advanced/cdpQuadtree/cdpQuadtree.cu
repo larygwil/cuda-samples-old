@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -582,7 +582,11 @@ struct Random_generator
 
     __host__ __device__ __forceinline__ thrust::tuple<float, float> operator()()
     {
+#ifdef __CUDA_ARCH__
         unsigned seed = hash(blockIdx.x*blockDim.x + threadIdx.x);
+#else
+        unsigned seed = hash(0);
+#endif
         thrust::default_random_engine rng(seed);
         thrust::random::uniform_real_distribution<float> distrib;
         return thrust::make_tuple(distrib(rng), distrib(rng));

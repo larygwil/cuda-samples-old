@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -44,10 +44,8 @@ int MUL_FACTOR    = TILE_DIM;
 
 #define FLOOR(a,b) (a-(a%b))
 
-// Compute the tile size necessary to illustrate performance cases for SM12+ hardware
-int MAX_TILES_SM12 = (FLOOR(MATRIX_SIZE_X,512) * FLOOR(MATRIX_SIZE_Y,512)) / (TILE_DIM *TILE_DIM);
-// Compute the tile size necessary to illustrate performance cases for SM10,SM11 hardware
-int MAX_TILES_SM10 = (FLOOR(MATRIX_SIZE_X,384) * FLOOR(MATRIX_SIZE_Y,384)) / (TILE_DIM *TILE_DIM);
+// Compute the tile size necessary to illustrate performance cases for SM20+ hardware
+int MAX_TILES = (FLOOR(MATRIX_SIZE_X,512) * FLOOR(MATRIX_SIZE_Y,512)) / (TILE_DIM *TILE_DIM);
 
 // Number of repetitions used for timing.  Two sets of repetitions are performed:
 // 1) over kernel launches and 2) inside the kernel over just the loads and stores
@@ -321,16 +319,7 @@ void getParams(int argc, char **argv, cudaDeviceProp &deviceProp, int &size_x, i
     else
     {
         size_x = max_tile_dim;
-
-        // If this is SM12 hardware, we want to round down to a multiple of 512
-        if ((deviceProp.major == 1 && deviceProp.minor >= 2) || deviceProp.major > 1)
-        {
-            size_x = FLOOR(size_x, 512);
-        }
-        else     // else for SM10,SM11 we round down to a multiple of 384
-        {
-            size_x = FLOOR(size_x, 384);
-        }
+        size_x = FLOOR(size_x, 512);
     }
 
     if (checkCmdLineFlag(argc, (const char **)argv, "dimY"))
@@ -407,16 +396,8 @@ main(int argc, char **argv)
     // Calculate number of tiles we will run for the Matrix Transpose performance tests
     int size_x, size_y, max_matrix_dim, matrix_size_test;
 
-    if ((deviceProp.major == 1 && deviceProp.minor >= 2) || deviceProp.major > 1)
-    {
-        matrix_size_test = 512;  // we round down max_matrix_dim for this perf test
-        total_tiles = (float)MAX_TILES_SM12 / scale_factor;
-    }
-    else
-    {
-        matrix_size_test = 384;  // we round down max_matrix_dim for this perf test
-        total_tiles = (float)MAX_TILES_SM10 / scale_factor;
-    }
+    matrix_size_test = 512;  // we round down max_matrix_dim for this perf test
+    total_tiles = (float)MAX_TILES / scale_factor;
 
     max_matrix_dim = FLOOR((int)(floor(sqrt(total_tiles))* TILE_DIM), matrix_size_test);
 
@@ -487,7 +468,7 @@ main(int argc, char **argv)
     cudaEvent_t start, stop;
 
     // size of memory required to store the matrix
-    const  int mem_size = sizeof(float) * size_x*size_y;
+    size_t mem_size = static_cast<size_t>(sizeof(float) * size_x*size_y);
 
     if (2*mem_size > deviceProp.totalGlobalMem)
     {

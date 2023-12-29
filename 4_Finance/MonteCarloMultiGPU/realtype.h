@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -12,12 +12,7 @@
 #ifndef REALTYPE_H
 #define REALTYPE_H
 
-
-
-//Throw out an error for unsupported target
-#if defined(DOUBLE_PRECISION) && defined(__CUDACC__) && defined(CUDA_NO_SM_13_DOUBLE_INTRINSICS)
-#error -arch sm_13 nvcc flag is required to compile in double-precision mode
-#endif
+//#define DOUBLE_PRECISION
 
 
 #ifndef DOUBLE_PRECISION

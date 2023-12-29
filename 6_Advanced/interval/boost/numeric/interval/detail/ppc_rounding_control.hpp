@@ -86,7 +86,7 @@ struct rounding_control<long double>:
   detail::ppc_rounding_control
 {
   static const long double & force_rounding(const long double& r) { return r; }
-  static long double to_int(const long double& r) { return rint(r); }
+  static long double to_int(const long double& r) { return rint(static_cast<double>(r)); }
 };
 
 } // namespace interval_lib

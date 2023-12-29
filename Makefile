@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
+# Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 #
 # NOTICE TO USER:   
 #
@@ -33,31 +33,20 @@
 #
 ###############################################################################
 
-# OS Name (Linux or Darwin)
-OSLOWER = $(shell uname -s 2>/dev/null | tr "[:lower:]" "[:upper:]")
-OS_ARCH = $(shell uname -m | sed -e "s/i386/i686/")
-
-ifeq ($(ARMv7),1)
-  OS_ARCH = armv7l
-endif
+TARGET_ARCH ?= $(shell uname -m)
 
 # Project folders that contain CUDA samples
 PROJECTS ?= $(shell find 0_Simple 1_Utilities 2_Graphics 3_Imaging 4_Finance 5_Simulations 6_Advanced 7_CUDALibraries -name Makefile)
 
-FILTER-OUT :=
+FILTER_OUT :=
 
-ifeq ($(OS_ARCH),armv7l)
-FILTER-OUT += 3_Imaging/cudaDecodeGL/Makefile
-FILTER-OUT += 7_CUDALibraries/imageSegmentationNPP/Makefile
-FILTER-OUT += 7_CUDALibraries/boxFilterNPP/Makefile
-FILTER-OUT += 7_CUDALibraries/grabcutNPP/Makefile
-FILTER-OUT += 7_CUDALibraries/freeImageInteropNPP/Makefile
-FILTER-OUT += 7_CUDALibraries/freeImageInteropNPP/out
-FILTER-OUT += 7_CUDALibraries/histEqualizationNPP/Makefile
-FILTER-OUT += 7_CUDALibraries/jpegNPP/Makefile
+ifeq ($(TARGET_ARCH),ppc64le)
+FILTER_OUT += 2_Graphics/simpleGLES_screen/Makefile
+FILTER_OUT += 3_Imaging/cudaDecodeGL/Makefile
+FILTER_OUT += 5_Simulations/nbody_screen/Makefile
 endif
 
-PROJECTS := $(filter-out $(FILTER-OUT),$(PROJECTS))
+PROJECTS := $(filter-out $(FILTER_OUT),$(PROJECTS))
 
 %.ph_build :
 	+@$(MAKE) -C $(dir $*) $(MAKECMDGOALS)

@@ -2,9 +2,11 @@
 <!DOCTYPE entry SYSTEM "SamplesInfo.dtd">
 <entry>
     <name>simpleZeroCopy</name>
-    <description><![CDATA[This sample illustrates how to use Zero MemCopy, kernels can read and write directly to pinned system memory.  This sample requires GPUs that support this feature (MCP79 and GT200).]]></description>
+    <description><![CDATA[This sample illustrates how to use Zero MemCopy, kernels can read and write directly to pinned system memory.]]></description>
     <whitepaper>doc\CUDA2.2PinnedMemoryAPIs.pdf</whitepaper>
-    <minspec>SM 1.2</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,1:Performance Strategies</scope>
     <files>
@@ -26,14 +28,15 @@
     <include-path>../</include-path>
     <include-path>../../common/inc</include-path>
     <devicecompilation>whole</devicecompilation>
-    <sm-arch>sm12</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
     <sm-arch>sm32</sm-arch>
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>simpleZeroCopy.cu</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

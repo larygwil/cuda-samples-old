@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -147,12 +147,12 @@ int main(int argc, char **argv)
 
     for (i = 0; i < NUM_ITERATIONS; i++)
     {
-        BlackScholesGPU<<<DIV_UP(OPT_N, 128), 128/*480, 128*/>>>(
-            d_CallResult,
-            d_PutResult,
-            d_StockPrice,
-            d_OptionStrike,
-            d_OptionYears,
+        BlackScholesGPU<<<DIV_UP((OPT_N/2), 128), 128/*480, 128*/>>>(
+            (float2 *)d_CallResult,
+            (float2 *)d_PutResult,
+            (float2 *)d_StockPrice,
+            (float2 *)d_OptionStrike,
+            (float2 *)d_OptionYears,
             RISKFREE,
             VOLATILITY,
             OPT_N
@@ -252,6 +252,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    printf("\nNOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
     printf("Test passed\n");
     exit(EXIT_SUCCESS);
 }

@@ -4,7 +4,9 @@
     <name>Bindless Texture</name>
     <description><![CDATA[This example demonstrates use of cudaSurfaceObject, cudaTextureObject, and MipMap support in CUDA.  A GPU with Compute Capability SM 3.0 is required to run the sample.]]></description>
     <whitepaper></whitepaper>
-    <minspec>KEPLER SM 3.0</minspec>
+    <supported_sm_architectures>
+        <from>3.0</from>
+    </supported_sm_architectures>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,2:Graphics Interop,2:Texture</scope>
     <files>
@@ -48,7 +50,13 @@
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file></primary-file>
+    <required_dependencies>
+        <dependency>X11</dependency>
+        <dependency>GL</dependency>
+    </required_dependencies>
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
 </entry>

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -40,6 +40,7 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined (__APPLE__) || defined(MACOSX)
+  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   #include <GLUT/glut.h>
   #ifndef glutCloseFunc
   #define glutCloseFunc glutWMCloseFunc
@@ -261,12 +262,6 @@ int main(int argc, char **argv)
 
     runTest(argc, argv, ref_file);
 
-    // cudaDeviceReset causes the driver to clean up all state. While
-    // not mandatory in normal operation, it is good practice.  It is also
-    // needed to ensure correct operation when the application is being
-    // profiled. Calling cudaDeviceReset causes all profile data to be
-    // flushed before the application exits
-    cudaDeviceReset();
     printf("%s completed, returned %s\n", sSDKsample, (g_TotalErrors == 0) ? "OK" : "ERROR!");
     exit(g_TotalErrors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
 }
@@ -357,6 +352,13 @@ bool runTest(int argc, char **argv, char *ref_file)
 
         cudaFree(d_vbo_buffer);
         d_vbo_buffer = NULL;
+
+        // cudaDeviceReset causes the driver to clean up all state. While
+        // not mandatory in normal operation, it is good practice.  It is also
+        // needed to ensure correct operation when the application is being
+        // profiled. Calling cudaDeviceReset causes all profile data to be
+        // flushed before the application exits
+        cudaDeviceReset();
     }
     else
     {
@@ -507,7 +509,7 @@ void deleteVBO(GLuint *vbo, struct cudaGraphicsResource *vbo_res)
 {
 
     // unregister this buffer object with CUDA
-    cudaGraphicsUnregisterResource(vbo_res);
+    checkCudaErrors(cudaGraphicsUnregisterResource(vbo_res));
 
     glBindBuffer(1, *vbo);
     glDeleteBuffers(1, vbo);
@@ -553,8 +555,11 @@ void display()
 
 void timerEvent(int value)
 {
-    glutPostRedisplay();
-    glutTimerFunc(REFRESH_DELAY, timerEvent,0);
+    if (glutGetWindow())
+    {
+        glutPostRedisplay();
+        glutTimerFunc(REFRESH_DELAY, timerEvent,0);
+    }
 }
 
 void cleanup()
@@ -565,6 +570,13 @@ void cleanup()
     {
         deleteVBO(&vbo, cuda_vbo_resource);
     }
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 
@@ -576,8 +588,12 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/)
     switch (key)
     {
         case (27) :
-            exit(EXIT_SUCCESS);
-            break;
+            #if defined(__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
     }
 }
 
@@ -627,7 +643,7 @@ void checkResultCuda(int argc, char **argv, const GLuint &vbo)
 {
     if (!d_vbo_buffer)
     {
-        cudaGraphicsUnregisterResource(cuda_vbo_resource);
+        checkCudaErrors(cudaGraphicsUnregisterResource(cuda_vbo_resource));
 
         // map buffer object
         glBindBuffer(GL_ARRAY_BUFFER_ARB, vbo);

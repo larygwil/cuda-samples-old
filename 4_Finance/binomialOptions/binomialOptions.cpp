@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -27,12 +27,13 @@
 #include <helper_cuda.h>
 
 #include "binomialOptions_common.h"
+#include "realtype.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Black-Scholes formula for binomial tree results validation
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" void BlackScholesCall(
-    float &callResult,
+    real &callResult,
     TOptionData optionData
 );
 
@@ -41,7 +42,7 @@ extern "C" void BlackScholesCall(
 // Note that CPU code is for correctness testing only and not for benchmarking.
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" void binomialOptionsCPU(
-    float &callResult,
+    real &callResult,
     TOptionData optionData
 );
 
@@ -49,7 +50,7 @@ extern "C" void binomialOptionsCPU(
 // Process an array of OptN options on GPU
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" void binomialOptionsGPU(
-    float *callValue,
+    real *callValue,
     TOptionData  *optionData,
     int optN
 );
@@ -58,10 +59,10 @@ extern "C" void binomialOptionsGPU(
 // Helper function, returning uniformly distributed
 // random float in [low, high] range
 ////////////////////////////////////////////////////////////////////////////////
-float randData(float low, float high)
+real randData(real low, real high)
 {
-    float t = (float)rand() / (float)RAND_MAX;
-    return (1.0f - t) * low + t * high;
+    real t = (real)rand() / (real)RAND_MAX;
+    return ((real)1.0 - t) * low + t * high;
 }
 
 
@@ -71,8 +72,6 @@ float randData(float low, float high)
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-    const unsigned int OPT_N_MAX = 512;
-
     printf("[%s] - Starting...\n", argv[0]);
 
     cudaDeviceProp deviceProp;
@@ -86,15 +85,15 @@ int main(int argc, char **argv)
         exit(EXIT_WAIVED);
     }
 
-    const int OPT_N = OPT_N_MAX;
+    const int OPT_N = MAX_OPTIONS;
 
-    TOptionData optionData[OPT_N_MAX];
-    float
-    callValueBS[OPT_N_MAX],
-                callValueGPU[OPT_N_MAX],
-                callValueCPU[OPT_N_MAX];
+    TOptionData optionData[MAX_OPTIONS];
+    real
+    callValueBS[MAX_OPTIONS],
+                callValueGPU[MAX_OPTIONS],
+                callValueCPU[MAX_OPTIONS];
 
-    double
+    real
     sumDelta, sumRef, gpuTime, errorVal;
 
     StopWatchInterface *hTimer = NULL;
@@ -151,11 +150,11 @@ int main(int argc, char **argv)
 
     if (sumRef >1E-5)
     {
-        printf("L1 norm: %E\n", sumDelta / sumRef);
+        printf("L1 norm: %E\n", (double)(sumDelta / sumRef));
     }
     else
     {
-        printf("Avg. diff: %E\n", sumDelta / (double)OPT_N);
+        printf("Avg. diff: %E\n", (double)(sumDelta / (real)OPT_N));
     }
 
     printf("CPU binomial vs. Black-Scholes\n");
@@ -174,7 +173,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        printf("Avg. diff: %E\n", sumDelta / (double)OPT_N);
+        printf("Avg. diff: %E\n", (double)(sumDelta / (real)OPT_N));
     }
 
     printf("CPU binomial vs. GPU binomial\n");
@@ -193,7 +192,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        printf("Avg. diff: %E\n", errorVal = sumDelta / (double)OPT_N);
+        printf("Avg. diff: %E\n", (double)(sumDelta / (real)OPT_N));
     }
 
     printf("Shutting down...\n");
@@ -206,6 +205,8 @@ int main(int argc, char **argv)
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
     cudaDeviceReset();
+
+    printf("\nNOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
 
     if (errorVal > 5e-4)
     {

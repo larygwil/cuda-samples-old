@@ -4,7 +4,9 @@
     <name>Box Filter with NPP</name>
     <description><![CDATA[A NPP CUDA Sample that demonstrates how to use NPP FilterBox function to perform a Box Filter.]]></description>
     <whitepaper></whitepaper>
-    <minspec>SM 1.1</minspec>
+    <supported_sm_architectures>
+        <include>all</include>
+    </supported_sm_architectures>
     <keywords>CUDA,NPP,Image Processing,box filter</keywords>
     <scope>1:CUDA Basic Topics,1:Performance Strategies,2:Image Processing,2:Computer Vision</scope>
     <files>
@@ -27,7 +29,12 @@
     <include-path>../common/UtilNPP</include-path>
     <include-path>../common/FreeImage/include</include-path>
     <devicecompilation>whole</devicecompilation>
+    <sm-arch>sm20</sm-arch>
     <type>exe</type>
     <primary-file>boxFilterNPP.cpp</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+    <required_dependencies>
+        <dependency>FreeImage</dependency>
+        <dependency>NPP</dependency>
+    </required_dependencies>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

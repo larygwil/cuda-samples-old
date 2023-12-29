@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -44,11 +44,7 @@ inline bool IsGPUCapableP2P(cudaDeviceProp *pProp)
 
 inline bool IsAppBuiltAs64()
 {
-#if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64) || defined(__aarch64__)
-    return 1;
-#else
-    return 0;
-#endif
+    return sizeof(void*) == 8;
 }
 
 int main(int argc, char **argv)

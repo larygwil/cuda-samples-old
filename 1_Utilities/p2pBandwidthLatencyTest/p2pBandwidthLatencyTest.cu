@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -24,6 +24,25 @@ const char *sSampleName = "P2P (Peer-to-Peer) GPU Bandwidth Latency Test";
             exit(EXIT_FAILURE);                                           \
         }                                                                 \
     }
+
+void checkP2Paccess(int numGPUs)
+{
+    for (int i=0; i<numGPUs; i++)
+    {
+        cudaSetDevice(i);
+
+        for (int j=0; j<numGPUs; j++)
+        {
+            int access;
+            if (i!=j)
+            {
+                cudaDeviceCanAccessPeer(&access,i,j);
+                printf("Device=%d %s Access Peer Device=%d\n", i, access ? "CAN" : "CANNOT", j);
+            }
+        }
+    }
+    printf("\n***NOTE: In case a device doesn't have P2P access to other one, it falls back to normal memcopy procedure.\nSo you can see lesser Bandwidth (GB/s) in those cases.\n\n");
+}
 
 void enableP2P(int numGPUs)
 {
@@ -337,6 +356,8 @@ int main(int argc, char **argv)
         printf("Device: %d, %s, pciBusID: %x, pciDeviceID: %x, pciDomainID:%x\n",i,prop.name, prop.pciBusID, prop.pciDeviceID, prop.pciDomainID);
     }
 
+    checkP2Paccess(numGPUs);
+
     //compute cliques
     vector<vector<int> > cliques;
 
@@ -407,6 +428,8 @@ int main(int argc, char **argv)
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
     cudaDeviceReset();
+
+    printf("\nNOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n");
 
     exit(EXIT_SUCCESS);
 }

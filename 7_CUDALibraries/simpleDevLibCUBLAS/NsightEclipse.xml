@@ -4,7 +4,9 @@
     <name>simpleDevLibCUBLAS GPU Device API Library Functions (CUDA Dynamic Parallelism)</name>
     <description><![CDATA[This sample implements a simple CUBLAS function calls that call GPU device API library running CUBLAS functions.  This sample requires a SM 3.5 capable device.]]></description>
     <whitepaper></whitepaper>
-    <minspec>KEPLER SM 3.5</minspec>
+    <supported_sm_architectures>
+        <from>3.5</from>
+    </supported_sm_architectures>
     <keywords>CUDA,CUBLAS,CDP</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
@@ -27,7 +29,13 @@
     <sm-arch>sm35</sm-arch>
     <sm-arch>sm37</sm-arch>
     <sm-arch>sm50</sm-arch>
+    <sm-arch>sm52</sm-arch>
+    <sm-arch>sm53</sm-arch>
     <type>exe</type>
     <primary-file>kernels.cu</primary-file>
-    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:aarch64</supported-env>
+    <required_dependencies>
+        <dependency>CDP</dependency>
+        <dependency>CUBLAS</dependency>
+    </required_dependencies>
+    <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm, linux:ppc64le</supported-env>
 </entry>

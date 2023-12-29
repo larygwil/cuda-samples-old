@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
 *
 * NOTICE TO USER:
 *
@@ -412,6 +412,8 @@ int main(int argc, char *argv[])
         saveImage(sResultFilename, oHostAlpha);
 
         nppiGraphcutFree(pGraphcutState);
+        nppiFree(oDeviceDst.data());
+        nppiFree(oDeviceAlpha.data());
         cudaFree(pBuffer);
         cudaFree(d_top);
         cudaFree(d_bottom);

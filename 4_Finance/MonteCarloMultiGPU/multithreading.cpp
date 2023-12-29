@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -22,13 +22,6 @@ CUTThread cutStartThread(CUT_THREADROUTINE func, void *data)
 void cutEndThread(CUTThread thread)
 {
     WaitForSingleObject(thread, INFINITE);
-    CloseHandle(thread);
-}
-
-//Destroy thread
-void cutDestroyThread(CUTThread thread)
-{
-    TerminateThread(thread, 0);
     CloseHandle(thread);
 }
 
@@ -56,12 +49,6 @@ CUTThread cutStartThread(CUT_THREADROUTINE func, void *data)
 void cutEndThread(CUTThread thread)
 {
     pthread_join(thread, NULL);
-}
-
-//Destroy thread
-void cutDestroyThread(CUTThread thread)
-{
-    pthread_cancel(thread);
 }
 
 //Wait for multiple threads

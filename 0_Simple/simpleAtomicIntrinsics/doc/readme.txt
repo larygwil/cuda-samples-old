@@ -14,7 +14,7 @@ atomicAnd()
 atomicOr()
 atomicXor()
 
-This program requires compute capability 1.1.  To compile the code, therefore, note that the flag "-arch sm_11"
+This program requires compute capability 2.0.  To compile the code, therefore, note that the flag "-arch sm_20"
 is passed to the nvcc compiler driver in the build step for simpleAtomics.cu.  To use atomics in your programs,
 you must pass the same flag to the compiler.
 

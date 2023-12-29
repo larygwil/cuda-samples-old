@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -44,6 +44,7 @@
 // OpenGL Graphics includes
 #include <GL/glew.h>
 #if defined(__APPLE__) || defined(MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -135,7 +136,8 @@ enum eFilterMode
     MODE_BILINEAR,
     MODE_BICUBIC,
     MODE_FAST_BICUBIC,
-    MODE_CATMULL_ROM
+    MODE_CATMULL_ROM,
+    NUM_MODES
 };
 
 eFilterMode g_FilterMode = MODE_FAST_BICUBIC;
@@ -319,8 +321,11 @@ void display()
 // GLUT callback functions
 void timerEvent(int value)
 {
-    glutPostRedisplay();
-    glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    if (glutGetWindow())
+    {
+        glutPostRedisplay();
+        glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
+    }
 }
 
 
@@ -329,9 +334,12 @@ void keyboard(unsigned char key, int /*x*/, int /*y*/)
     switch (key)
     {
         case 27:
-            cleanup();
-            exit(EXIT_SUCCESS);
-            break;
+            #if defined(__APPLE__) || defined(MACOSX)
+                exit(EXIT_SUCCESS);
+            #else
+                glutDestroyWindow(glutGetWindow());
+                return;
+            #endif
 
         case '1':
             g_FilterMode = MODE_NEAREST;
@@ -461,6 +469,15 @@ void cleanup()
 #else
     glDeleteTextures(1, &displayTex);
 #endif
+
+    sdkDeleteTimer(&timer);
+
+    // cudaDeviceReset causes the driver to clean up all state. While
+    // not mandatory in normal operation, it is good practice.  It is also
+    // needed to ensure correct operation when the application is being
+    // profiled. Calling cudaDeviceReset causes all profile data to be
+    // flushed before the application exits
+    cudaDeviceReset();
 }
 
 int iDivUp(int a, int b)
@@ -724,6 +741,12 @@ void initGL(int *argc, char **argv)
     glutReshapeFunc(reshape);
     glutTimerFunc(REFRESH_DELAY, timerEvent, 0);
 
+#if defined (__APPLE__) || defined(MACOSX)
+    atexit(cleanup);
+#else
+    glutCloseFunc(cleanup);
+#endif
+
     initMenus();
 
     glewInit();
@@ -814,7 +837,7 @@ main(int argc, char **argv)
     {
         g_FilterMode = (eFilterMode)getCmdLineArgumentInt(argc, (const char **) argv, "mode");
 
-        if (g_FilterMode < MODE_NEAREST && g_FilterMode > MODE_CATMULL_ROM)
+        if (g_FilterMode < 0 || g_FilterMode >= NUM_MODES)
         {
             printf("Invalid Mode setting %d\n", g_FilterMode);
             exit(EXIT_FAILURE);
@@ -834,15 +857,6 @@ main(int argc, char **argv)
         // This runs the CUDA kernel (bicubicFiltering) + OpenGL visualization
         initialize(argc, argv);
         glutMainLoop();
-        sdkDeleteTimer(&timer);
-
-        // cudaDeviceReset causes the driver to clean up all state. While
-        // not mandatory in normal operation, it is good practice.  It is also
-        // needed to ensure correct operation when the application is being
-        // profiled. Calling cudaDeviceReset causes all profile data to be
-        // flushed before the application exits
-        cudaDeviceReset();
-        exit(EXIT_SUCCESS);
     }
 
     exit(EXIT_SUCCESS);

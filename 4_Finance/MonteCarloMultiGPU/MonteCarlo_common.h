@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -58,6 +58,12 @@ typedef struct
     //Temporary Host-side pinned memory for async + faster data transfers
     __TOptionValue *h_CallValue;
 
+    // Device- and host-side option data
+    void * d_OptionData;
+    void * h_OptionData;
+
+    // Device-side option values
+    void * d_CallValue;
 
     //Intermediate device-side buffers
     void *d_Buffer;
@@ -71,8 +77,7 @@ typedef struct
     //Time stamp
     float time;
 
-    //random number generator seed.
-    unsigned long long seed;
+    int gridSize;
 } TOptionPlan;
 
 

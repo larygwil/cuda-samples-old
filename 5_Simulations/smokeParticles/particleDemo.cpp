@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2014 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2015 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -29,6 +29,7 @@
 
 #include <GL/glew.h>
 #if defined(__APPLE__) || defined(__MACOSX)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -666,7 +667,7 @@ void runEmitter()
     vec3f vy(0, 0, 1);
     vec3f spread(emitterSpread, 0.0f, emitterSpread);
 
-    psystem->sphereEmitter(emitterIndex, cursorPosLag, vel, spread, emitterRadius, (int) emitterRate*timestep, particleLifetime, particleLifetime*0.1f);
+    psystem->sphereEmitter(emitterIndex, cursorPosLag, vel, spread, emitterRadius, ftoi(emitterRate*timestep), particleLifetime, particleLifetime*0.1f);
 
     if (emitterIndex > numParticles-1)
     {
@@ -906,6 +907,8 @@ main(int argc, char **argv)
 #endif
 
     printf("%s Starting...\n\n", sSDKsample);
+
+    printf("NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.\n\n");
 
     if (argc > 1)
     {
