@@ -3,11 +3,13 @@
     <description><![CDATA[This sample demonstrates efficient implementation of 64-bin and 256-bin histogram.
 ]]></description>
     <whitepaper>doc\histogram.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.1</minspec>
     <keywords>CUDA,Data-Parallel Algorithms,Image Processing, histogram</keywords>
     <scope>1:CUDA Advanced Topics, 1:Data-Parallel Algorithms, 2:Image Processing, 2:Data Compression,2:Computer Vision</scope>
     <files>
     </files>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
+    <keyconcepts level="advanced">Data Parallel Algorithms</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

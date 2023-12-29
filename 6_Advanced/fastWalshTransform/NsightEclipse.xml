@@ -1,12 +1,16 @@
 <entry>
     <name>Fast Walsh Transform</name>
-    <description><![CDATA[Naturally(Hadamard)-ordered Fast Walsh Tranform for batched vectors of arbitrary eligible(power of two) lengths]]></description>
+    <description><![CDATA[Naturally(Hadamard)-ordered Fast Walsh Transform for batching vectors of arbitrary eligible lengths that are power of two in size.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA, DSP,Linear Algebra,dyadic convolution</keywords>
     <scope>1:CUDA Advanced Topics, 3:Linear Algebra, 1:Data-Parallel Algorithms, 2:Image Processing, 2:Data Compression, 2:Video Codecs</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Linear Algebra</keyconcepts>
+    <keyconcepts level="advanced">Data-Parallel Algorithms</keyconcepts>
+    <keyconcepts level="advanced">Video Compression</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

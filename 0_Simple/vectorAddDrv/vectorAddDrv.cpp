@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -628,7 +628,7 @@ int main(int argc, char **argv)
             break;
         }
     }
-
+	printf("%s\n", (i==N) ? "Result = PASS" : "Result = FAIL");
     exit((i==N) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
@@ -668,7 +668,7 @@ CUresult CleanupNoFailure()
         free(h_C);
     }
 
-    error = cuCtxDetach(cuContext);
+    error = cuCtxDestroy(cuContext);
 
     return error;
 }

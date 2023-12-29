@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -19,8 +19,6 @@
 #include <string.h>
 #include <math.h>
 
-#define EXIT_WAIVED 2
-
 #ifdef _WIN32
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
@@ -37,7 +35,7 @@
 #include <helper_cuda.h>         // helper functions for CUDA error check
 
 // Includes, kernels
-#include "simpleAtomicIntrinsics_kernel.cu"
+#include "simpleAtomicIntrinsics_kernel.cuh"
 
 const char *sampleName = "simpleAtomicIntrinsics";
 
@@ -91,9 +89,9 @@ void runTest(int argc, char **argv)
 
     if (version < 0x11)
     {
-        printf("%s: requires a minimum CUDA compute 1.1 capability\n",
+        printf("%s: requires a minimum CUDA compute 1.1 capability, waiving testing.\n",
                sampleName);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     StopWatchInterface *timer;

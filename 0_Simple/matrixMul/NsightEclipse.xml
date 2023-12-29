@@ -3,8 +3,8 @@
     <description><![CDATA[This sample implements matrix multiplication and is exactly the same as Chapter 6 of the programming guide.
 It has been written for clarity of exposition to illustrate various CUDA programming principles, not with the goal of providing the most performant generic kernel for matrix multiplication.  To illustrate GPU performance for matrix multiply, this sample also shows how to use the new CUDA 4.0 interface for CUBLAS to demonstrate high-performance performance for matrix multiplication.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords></keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,matrix multiply</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
     </files>
@@ -17,8 +17,9 @@ It has been written for clarity of exposition to illustrate various CUDA program
 	<cudaapi>cudaMalloc</cudaapi>
 	<cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-    <keyconcepts>CUDA Runtime API</keyconcepts>
-    <keyconcepts>Matrix Multiply</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Runtime API</keyconcepts>
+    <keyconcepts level="basic">Linear Algebra</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

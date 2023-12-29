@@ -1,9 +1,6 @@
 Sample: Simple CUDA Callbacks
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
 
 
 Key concepts:
-CUDA Streams
-Callback Functions
-Multithreading

@@ -1,5 +1,5 @@
 Sample: Fluids (OpenGL Version)
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
 An example of fluid simulation using CUDA and CUFFT, with OpenGL rendering.
 

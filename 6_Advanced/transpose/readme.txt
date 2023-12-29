@@ -1,5 +1,5 @@
 Sample: Matrix Transpose
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
 This sample demonstrates Matrix Transpose.  Different performance are shown to achieve high performance.
 

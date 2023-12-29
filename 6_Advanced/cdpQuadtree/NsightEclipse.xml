@@ -4,10 +4,10 @@
     <whitepaper></whitepaper>
     <minspec>KEPLER SM 3.5</minspec>
     <keywords>GPGPU</keywords>
-    <scope>1:CUDA Basic Topics</scope>
+    <scope>1:CUDA Advanced Topics</scope>
     <cudaapi></cudaapi>
-    <keyconcepts>CUDA Advanced Topics</keyconcepts>
-    <keyconcepts>CUDA Dynamic Parallelism</keyconcepts>
+    
+    <keyconcepts level="advanced">CUDA Dynamic Parallelism</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

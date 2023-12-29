@@ -2,7 +2,7 @@
     <name>asyncAPI</name>
     <description><![CDATA[This sample uses CUDA streams and events to overlap execution on CPU and GPU.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.1</minspec>
     <keywords>GPGPU</keywords>
     <scope>1:CUDA Basic Topics,1:Performance Strategies</scope>
     <files>
@@ -13,8 +13,8 @@
     <cudaapi>cudaEventDestroy</cudaapi>
     <cudaapi>cudaEventElapsedTime</cudaapi>
     <cudaapi>cudaMemcpyAsync</cudaapi>
-    <keyconcepts>Asynchronous Data Transfers</keyconcepts>
-    <keyconcepts>CUDA Streams and Events</keyconcepts>
+    <keyconcepts level="basic">Asynchronous Data Transfers</keyconcepts>
+    <keyconcepts level="basic">CUDA Streams and Events</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

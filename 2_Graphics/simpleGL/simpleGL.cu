@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -358,9 +358,10 @@ bool runTest(int argc, char **argv, char *ref_file)
         // use command-line specified CUDA device, otherwise use device with highest Gflops/s
         if (checkCmdLineFlag(argc, (const char **)argv, "device"))
         {
-			if( gpuGLDeviceInit(argc, (const char **)argv) == -1 ) {
-				return false;
-			}
+            if (gpuGLDeviceInit(argc, (const char **)argv) == -1)
+            {
+                return false;
+            }
         }
         else
         {

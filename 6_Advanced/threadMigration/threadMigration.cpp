@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -53,6 +53,7 @@ pthread_mutex_t g_mutex;
 #include <stdlib.h>
 #include <stdio.h>
 #include <cuda.h>
+#include <cuda_runtime_api.h>
 #include <helper_cuda_drvapi.h>
 
 #include <iostream>
@@ -93,7 +94,7 @@ bool runTest(int argc, char **argv);
 #define CLEANUP_ON_ERROR(dptr, hcuModule, hcuContext, status) \
     if ( dptr ) cuMemFree( dptr ); \
     if ( hcuModule ) cuModuleUnload( hcuModule ); \
-    if ( hcuContext ) cuCtxDetach( hcuContext ); \
+    if ( hcuContext ) cuCtxDestroy( hcuContext ); \
     return status;
 
 #define THREAD_QUIT \
@@ -126,7 +127,8 @@ findModulePath(const char *module_file, string &module_path, char **argv, string
 
         if (module_path.rfind(".ptx") != string::npos)
         {
-            FILE *fp = fopen(module_path.c_str(), "rb");
+            FILE *fp;
+            FOPEN(fp, module_path.c_str(), "rb");
             fseek(fp, 0, SEEK_END);
             int file_size = ftell(fp);
             char *buf = new char[file_size+1];
@@ -511,6 +513,7 @@ runTest(int argc, char **argv)
                 ThreadIndex += 1;
             }
         }
+        cudaDeviceReset();
     }
 
     // Wait until all workers are done

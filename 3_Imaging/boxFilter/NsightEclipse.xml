@@ -2,7 +2,7 @@
     <name>Box Filter</name>
     <description><![CDATA[Fast image box filter using CUDA with OpenGL rendering.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>GPGPU,CUDA,Image Processing,box filter,opengl</keywords>
     <scope>2:Graphics Interop,2:Image Processing,2:Computer Vision</scope>
     <files>
@@ -14,6 +14,16 @@
         <qatest>-radius=14 -file=ref_14.ppm</qatest>
         <qatest>-radius=22 -file=ref_22.ppm</qatest>
     </qatests>
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    
+    <keyconcepts level="basic">Graphics Interop</keyconcepts>
+    <keyconcepts level="basic">Image Processing</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

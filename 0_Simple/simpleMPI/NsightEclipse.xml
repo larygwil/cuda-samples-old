@@ -2,17 +2,18 @@
     <name>simpleMPI</name>
     <description><![CDATA[Simple example demonstrating how to use MPI in combination with CUDA.  This executable is not pre-built with the SDK installer.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>MPI,cluster</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,MPI,cluster</keywords>
     <scope>3:Linear Algebra,1:CUDA Systems Integration</scope>
     <files>
     </files>
     <cudaapi>cudaMallco</cudaapi>
     <cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-    <keyconcepts>CUDA Basic Concepts</keyconcepts>
-    <keyconcepts>MPI</keyconcepts>
-	<keyconcepts>Multithreading</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Systems Integration</keyconcepts>
+    <keyconcepts level="basic">MPI</keyconcepts>
+    <keyconcepts level="basic">Multithreading</keyconcepts>
 	
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
@@ -46,4 +47,7 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+
+	<!-- Nsight EE does not support driver API samples import -->
+    <no-nsight-eclipse/>
 </entry>

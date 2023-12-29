@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -78,7 +78,7 @@ void procBarrier()
     {
         while (g_barrier->sense == g_procSense)
         {
-            if (!g_barrier->allExit) 
+            if (!g_barrier->allExit)
             {
                 sched_yield();
             }
@@ -86,7 +86,7 @@ void procBarrier()
             {
                 exit(EXIT_FAILURE);
             }
-        } 
+        }
     }
 
     g_procSense = !g_procSense;
@@ -128,6 +128,7 @@ void getDeviceCount(ipcDevices_t *devices)
                 printf("> GPU%d = \"%15s\" IS capable of UVA\n", i, prop.name);
                 uvaCount += 1;
             }
+
             if (prop.computeMode != cudaComputeModeDefault)
             {
                 printf("> GPU device must be in Compute Mode Default to run\n");
@@ -289,15 +290,16 @@ int main(int argc, char **argv)
 
 
 #if CUDART_VERSION >= 4010 && defined(__linux)
+
     if (!IsAppBuiltAs64())
     {
         printf("%s is only supported on 64-bit Linux OS and the application must be built as a 64-bit target. Test is being waived.\n", argv[0]);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,18)
     printf("%s is only supported with Linux OS kernel version 2.6.18 and higher. Test is being waived.\n", argv[0]);
-    exit(EXIT_SUCCESS);
+    exit(EXIT_WAIVED);
 #endif
 
     ipcDevices_t *s_devices = (ipcDevices_t *) mmap(NULL, sizeof(*s_devices),
@@ -401,6 +403,6 @@ int main(int argc, char **argv)
 
 #else // Using CUDA 4.0 and older or non Linux OS
     printf("simpleIPC requires CUDA 4.1 and Linux to build and run, waiving testing\n\n");
-    exit(EXIT_SUCCESS);
+    exit(EXIT_WAIVED);
 #endif
 }

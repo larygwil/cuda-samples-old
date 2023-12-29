@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -9,7 +9,7 @@
  *
  */
 
-
+#pragma warning(disable:4819)
 #ifdef _WIN32
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
@@ -29,7 +29,6 @@
 #include <helper_cuda.h>       // helper for CUDA Error handling and initialization
 #include <helper_string.h>     // helper for string parsing
 
-bool g_bQATest = false;
 int  g_nDevice = -1;
 
 
@@ -55,25 +54,13 @@ inline int cudaDeviceInit(int argc, const char **argv)
     return dev;
 }
 
-void parseCommandLineArguments(int argc, char *argv[])
-{
-    if (argc >= 2)
-    {
-        if (checkCmdLineFlag(argc, (const char **)argv, "qatest") ||
-            checkCmdLineFlag(argc, (const char **)argv, "noprompt"))
-        {
-            g_bQATest = true;
-        }
-    }
-}
-
 void printfNPPinfo(int argc, char *argv[])
 {
     const char *sComputeCap[] =
     {
         "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2",  "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", NULL
+        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
+        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
     };
 
     const NppLibraryVersion *libVer   = nppGetLibVersion();
@@ -182,14 +169,11 @@ main(int argc, char *argv[])
         // set your own FreeImage error handler
         FreeImage_SetOutputMessage(FreeImageErrorHandler);
 
-        // Parse the command line arguments for proper configuration
-        parseCommandLineArguments(argc, argv);
-
         cudaDeviceInit(argc, (const char **)argv);
 
         printfNPPinfo(argc, argv);
 
-        if (g_bQATest == false && (g_nDevice == -1) && argc > 1)
+        if (argc > 1)
         {
             sFilename = argv[1];
         }
@@ -228,7 +212,7 @@ main(int argc, char *argv[])
 
         sResultFilename += "_boxFilterFII.pgm";
 
-        if (argc >= 3 && !g_bQATest)
+        if (argc >= 3)
         {
             sResultFilename = argv[2];
         }

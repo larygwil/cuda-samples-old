@@ -3,11 +3,14 @@
     <description><![CDATA[This sample shows how to perform a reduction operation on an array of values using the thread Fence intrinsic.
 to produce a single value in a single kernel (as opposed to two or more kernel calls as shown in the "reduction" SDK sample).  Single-pass reduction requires global atomic instructions (Compute Capability 1.1 or later) and the _threadfence() intrinsic (CUDA 2.2 or later).]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.1</minspec>
     <keywords>reduction</keywords>
     <scope>1:CUDA Advanced Topics,1:Data-Parallel Algorithms,1:Performance Strategies</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Data-Parallel Algorithms</keyconcepts>
+    <keyconcepts level="advanced">Performance Strategies</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
@@ -28,7 +31,7 @@ to produce a single value in a single kernel (as opposed to two or more kernel c
     <!-- These options will be passed to NVCC compiler as is and for all files -->
     <nvcc-compiler></nvcc-compiler>
     <nvcc-compiler file="threadFenceReduction.cu"></nvcc-compiler>
-    <sm-arch>sm10</sm-arch>
+    <sm-arch>sm11</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
 

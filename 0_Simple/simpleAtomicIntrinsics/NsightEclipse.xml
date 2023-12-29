@@ -2,7 +2,7 @@
     <name>Simple Atomic Intrinsics</name>
     <description><![CDATA[A simple demonstration of global memory atomic instructions. Requires Compute Capability 1.1 or higher.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.1</minspec>
     <keywords>CUDA, GPGPU, atomic</keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
@@ -11,8 +11,8 @@
     <cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
 	<cudaapi>cudaFreeHost</cudaapi>
-    <keyconcepts>CUDA Basic Concepts</keyconcepts>
-    <keyconcepts>Atomic Intrinsics</keyconcepts>
+    
+    <keyconcepts level="basic">Atomic Intrinsics</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

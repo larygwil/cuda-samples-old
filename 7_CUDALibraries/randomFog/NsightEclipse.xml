@@ -2,8 +2,8 @@
     <name>Random Fog</name>
     <description><![CDATA[This sample illustrates pseudo- and quasi- random numbers produced by CURAND.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>GPGPU, CUDA, rng, prng, qrng, random number, CURAND</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CURAND,GPGPU,rng,prng,qrng,random number</keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
         <file>data\ref_randomFog.bin</file>
@@ -11,6 +11,9 @@
     <qatests>
         <qatest>-qatest</qatest>
     </qatests>
+    
+    <keyconcepts level="basic">3D Graphics</keyconcepts>
+    <keyconcepts level="basic">CURAND Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

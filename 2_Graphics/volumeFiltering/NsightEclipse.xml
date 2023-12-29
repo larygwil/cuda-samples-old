@@ -2,7 +2,7 @@
     <name>Volumetric Filtering with 3D Textures and Surface Writes</name>
     <description><![CDATA[This sample demonstrates 3D Volumetric Filtering using 3D Textures and 3D Surface Writes.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce GTX 400</minspec>
+    <minspec>SM 2.0</minspec>
     <keywords>CUDA 3D Volume Filtering</keywords>
     <scope>1:CUDA Basic Topics,2:Texture,2:Graphics Interop,2:Image Processing,3:Volume Processing</scope>
     <files>
@@ -19,10 +19,11 @@
     <cudaapi>cudaGraphicsRegisterResource</cudaapi>
     <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
     <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
-    <keyconcepts>OpenGL Graphics Interop</keyconcepts>
-    <keyconcepts>Image Processing</keyconcepts>
-    <keyconcepts>3D Textures</keyconcepts>
-    <keyconcepts>Surface Writes</keyconcepts>
+    
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
+    <keyconcepts level="advanced">3D Textures</keyconcepts>
+    <keyconcepts level="advanced">Surface Writes</keyconcepts>
 
   <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

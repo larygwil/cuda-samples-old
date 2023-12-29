@@ -1,5 +1,5 @@
 Sample: simpleHyperQ
-Minimum spec: GeForce GTX 200
+Minimum spec: SM 1.3
 
 
 

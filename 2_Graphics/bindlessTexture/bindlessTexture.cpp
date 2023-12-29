@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -201,19 +201,24 @@ void reshape(int x, int y)
     glOrtho(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
 }
 
+// Global cleanup function
+// Shared by both GL and non-GL code paths
 void cleanup()
 {
     sdkDeleteTimer(&timer);
 
     // unregister this buffer object from CUDA C
-    cudaGraphicsUnregisterResource(cuda_pbo_resource);
-    glDeleteBuffersARB(1, &pbo);
+    if (cuda_pbo_resource)
+    {
+        cudaGraphicsUnregisterResource(cuda_pbo_resource);
+        glDeleteBuffersARB(1, &pbo);
+    }
 }
 
 void cleanup_all()
 {
-     cleanup();
-     deinitAtlasAndImages();
+    cleanup();
+    deinitAtlasAndImages();
 }
 
 void initGLBuffers()

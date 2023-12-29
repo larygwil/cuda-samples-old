@@ -2,11 +2,14 @@
     <name>Simple CUBLAS</name>
     <description><![CDATA[Example of using CUBLAS using the new CUBLAS API interface available in CUDA 4.0.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>Linear Algebra</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CUBLAS,Linear Algebra</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
     </files>
+    
+    <keyconcepts level="basic">Image Processing</keyconcepts>
+    <keyconcepts level="basic">CUBLAS Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

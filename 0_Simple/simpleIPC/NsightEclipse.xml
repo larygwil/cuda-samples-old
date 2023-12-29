@@ -10,17 +10,18 @@
 	<userguide/> 
 	<video /> 
 	<whitepaper /> 
-	<minspec>GeForce GTX 400</minspec>
+	<minspec>SM 2.0</minspec>
 	<keywords>GPGPU</keywords> 
-	<scope>1:CUDA Basic Topics</scope> 
+	<scope>1:CUDA Basic Topics,1:CUDA Systems Integration</scope> 
     <cudaapi>cudaIpcGetEventHandlet</cudaapi>
     <cudaapi>cudaIpcOpenMemHandle</cudaapi>
     <cudaapi>cudaIpcCloseMemHandle</cudaapi>
     <cudaapi>cudaFreeHost</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-    <keyconcepts>CUDA Basic Concepts</keyconcepts>
-    <keyconcepts>Peer to Peer</keyconcepts>
-    <keyconcepts>InterProcess Communication</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Systems Integration</keyconcepts>
+    <keyconcepts level="basic">Peer to Peer</keyconcepts>
+    <keyconcepts level="basic">InterProcess Communication</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

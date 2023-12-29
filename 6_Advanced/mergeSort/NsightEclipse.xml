@@ -4,11 +4,13 @@
 Refer to the excellent tutorial by H. W. Lang http://www.iti.fh-flensburg.de/lang/algorithmen/sortieren/networks/indexen.htm
 ]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>sort,bitonic,CUDA</keywords>
-    <scope>1:CUDA Basic Topics,1:Data-Parallel Algorithms</scope>
+    <scope>1:CUDA Advanced Topics,1:Data-Parallel Algorithms</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Data-Parallel Algorithms</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

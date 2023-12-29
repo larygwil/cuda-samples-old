@@ -2,7 +2,7 @@
     <name>Simple Texture</name>
     <description><![CDATA[Simple example that demonstrates use of Textures in CUDA.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,2:Texture,2:Image Processing</scope>
     <files>
@@ -17,9 +17,10 @@
 	<cudaapi>cudaFree</cudaapi>
 	<cudaapi>cudaFreeArray</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-	<keyconcepts>CUDA Runtime API</keyconcepts>
-    <keyconcepts>Texture</keyconcepts>
-    <keyconcepts>Image Processing</keyconcepts>
+    
+	<keyconcepts level="basic">CUDA Runtime API</keyconcepts>
+    <keyconcepts level="basic">Texture</keyconcepts>
+    <keyconcepts level="basic">Image Processing</keyconcepts>
 	
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

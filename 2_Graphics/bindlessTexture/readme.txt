@@ -1,5 +1,5 @@
 Sample: Bindless Texture
-Minimum spec: KEPLER SM 3.0
+Minimum spec: SM 3.0
 
 This example demonstrates use of cudaSurfaceObject, cudaTextureObject, and MipMap support in CUDA.  A GPU with Compute Capability SM 3.0 is required to run the sample.
 

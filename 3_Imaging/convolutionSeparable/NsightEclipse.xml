@@ -2,11 +2,14 @@
     <name>CUDA Separable Convolution</name>
     <description><![CDATA[This sample implements a separable convolution filter of a 2D signal with a gaussian kernel.]]></description>
     <whitepaper>doc\convolutionSeparable.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>CUDA, DSP, separable convolution, finite impulse-response filter, Image Processing</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,DSP,separable convolution, finite impulse-response filter, Image Processing</keywords>
     <scope>1:CUDA Basic Topics, 1:Data-Parallel Algorithms, 3:Linear Algebra,2:Image Processing,2:Computer Vision</scope>
     <files></files>
-
+    
+    <keyconcepts level="basic">Image Processing</keyconcepts>
+    <keyconcepts level="basic">Data Parallel Algorithms</keyconcepts>
+    
     <!-- Either absolute or relative to sample -->
     <include-path>./</include-path>
     <include-path>../</include-path>

@@ -2,7 +2,7 @@
     <name>Sobel Filter</name>
     <description><![CDATA[This sample implements the Sobel edge detection filter for 8-bit monochrome images.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA, GPGPU, convolution, separable convolution, Image Processing, filter, finite impulse-response filter</keywords>
     <scope>2:Graphics Interop,2:Texture,1:CUDA Advanced Topics,2:Image Processing,2:Computer Vision</scope>
     <files>
@@ -16,6 +16,15 @@
         <qatest>-mode=1 -file=ref_tex.pgm</qatest>
         <qatest>-mode=2 -file=ref_shared.pgm</qatest>
     </qatests>
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

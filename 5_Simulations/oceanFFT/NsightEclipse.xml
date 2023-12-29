@@ -1,10 +1,10 @@
 <entry>
     <name>CUDA FFT Ocean Simulation</name>
-    <description><![CDATA[This sample simulates an Ocean heightfield using CUFFT and renders the result using OpenGL.]]></description>
+    <description><![CDATA[This sample simulates an Ocean height field using CUFFT Library and renders the result using OpenGL.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>FFT, Ocean FFT, OpenGL, CUFFT, heightfield</keywords>
-    <scope>2:Graphics Interop,1:CUDA Advanced Topics,3:Linear Algebra,3:Physically-Based Simulation</scope>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CUFFT,Ocean,OpenGL,Height Field</keywords>
+    <scope>1:CUDA Advanced Topics,2:Graphics Interop,3:Physically-Based Simulation</scope>
     <files>
         <file>data\ocean.frag</file>
         <file>data\ocean.vert</file>
@@ -17,6 +17,20 @@
     <qatests>
         <qatest>-qatest</qatest>
     </qatests>
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    <cudaapi>cufftPlan2d</cudaapi>
+    <cudaapi>cufftExecR2C</cudaapi>
+    <cudaapi>cufftExecC2R</cudaapi>
+    <cudaapi>cufftDestroy</cudaapi>
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
+    <keyconcepts level="advanced">CUFFT Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

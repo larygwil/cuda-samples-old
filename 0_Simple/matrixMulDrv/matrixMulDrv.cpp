@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -278,7 +278,7 @@ runTest(int argc, char **argv)
         }
     }
 
-    printf("%s\n", correct ? "OK" : "FAIL");
+    printf("%s\n", correct ? "Result = PASS" : "Result = FAIL");
 
     // clean up memory
     if (use_64bit_memory_address)
@@ -295,7 +295,7 @@ runTest(int argc, char **argv)
     checkCudaErrors(cuMemFree(d_A));
     checkCudaErrors(cuMemFree(d_B));
     checkCudaErrors(cuMemFree(d_C));
-    checkCudaErrors(cuCtxDetach(cuContext));
+    checkCudaErrors(cuCtxDestroy(cuContext));
 }
 
 // Allocates a matrix with random float entries.
@@ -465,7 +465,7 @@ initCUDA(int argc, char **argv, CUfunction *pMatrixMul, int *block_size_out)
     *pMatrixMul = cuFunction;
     return CUDA_SUCCESS;
 Error:
-    cuCtxDetach(cuContext);
+    cuCtxDestroy(cuContext);
     return status;
 }
 

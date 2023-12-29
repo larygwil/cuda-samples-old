@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -30,8 +30,6 @@
 // includes, project
 #include <helper_cuda.h>
 #include <helper_functions.h>  // helper for shared that are common to CUDA SDK samples
-
-#define EXIT_WAIVED 2
 
 static char *sSDKname = "simpleLayeredTexture";
 
@@ -88,7 +86,7 @@ main(int argc, char **argv)
     {
         printf("%s requires SM >= 2.0 to support Texture Arrays.  Test will be waived... \n", sSDKname);
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     // generate input data for layered texture

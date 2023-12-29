@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -32,17 +32,17 @@ __global__ void clock_block(clock_t *d_o, clock_t clock_count)
     {
         unsigned int end_clock = (unsigned int) clock();
 
-        // The code below should work like 
-        // this (thanks to modular arithmetics): 
-        // 
-        // clock_offset = (clock_t) (end_clock > start_clock ? 
-        //                           end_clock - start_clock : 
+        // The code below should work like
+        // this (thanks to modular arithmetics):
+        //
+        // clock_offset = (clock_t) (end_clock > start_clock ?
+        //                           end_clock - start_clock :
         //                           end_clock + (0xffffffffu - start_clock));
         //
         // Indeed, let m = 2^32 then
         // end - start = end + m - start (mod m).
 
-        clock_offset = (clock_t) (end_clock - start_clock);
+        clock_offset = (clock_t)(end_clock - start_clock);
     }
 
     d_o[0] = clock_offset;
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////////////
     // time execution with nkernels streams
     clock_t total_clocks = 0;
-    clock_t time_clocks = (clock_t) (kernel_time * deviceProp.clockRate);
+    clock_t time_clocks = (clock_t)(kernel_time * deviceProp.clockRate);
 
     cudaEventRecord(start_event, 0);
 

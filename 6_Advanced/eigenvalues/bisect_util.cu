@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -15,8 +15,8 @@
 #define _BISECT_UTIL_H_
 
 // includes, project
-#include <config.h>
-#include <util.h>
+#include "config.h"
+#include "util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Compute the next lower power of two of n

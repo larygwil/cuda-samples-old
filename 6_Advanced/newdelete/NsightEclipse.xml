@@ -3,11 +3,12 @@
     <description>
 		<![CDATA[This sample demonstrates dynamic global memory allocation through device C++ new and delete operators and virtual function declarations available with CUDA 4.0. ]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce GTX 400</minspec>
+    <minspec>SM 2.0</minspec>
     <keywords>CUDA, C++, Fermi</keywords>
     <scope>1:CUDA Advanced Topics</scope>
     <files>
     </files>
+    
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

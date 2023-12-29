@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -212,7 +212,7 @@ class Pyramid
 
         uint levelsCount() const
         {
-            return static_cast<uint> (levels_.size());
+            return static_cast<uint>(levels_.size());
         }
 
         void dump(uint width, uint height) const
@@ -221,7 +221,7 @@ class Pyramid
             uint levelIndex = 0;
 
             uint requiredDigitsCount =
-                static_cast<uint> (log10(static_cast<float>(levelsCount()))) + 
+                static_cast<uint>(log10(static_cast<float>(levelsCount()))) +
                 1;
             sprintf(format, "level_%%0%uu.ppm", requiredDigitsCount);
 
@@ -287,8 +287,8 @@ class Pyramid
                        uint height,
                        const char *filename) const
         {
-            uint levelIndex = 
-                static_cast<uint> (std::distance(levels_.rbegin(), level));
+            uint levelIndex =
+                static_cast<uint>(std::distance(levels_.rbegin(), level));
 
             deque< std::pair<uint, uint> > nodesQueue;
 
@@ -300,7 +300,7 @@ class Pyramid
                 const vector<uint> &nodes =
                     level->nodes_;
 
-                totalSegments = static_cast<uint> (superNodesOffsets.size());
+                totalSegments = static_cast<uint>(superNodesOffsets.size());
 
                 for (uint superNodeIndex = 0, nodeIndex = 0;
                      superNodeIndex < superNodesOffsets.size();
@@ -310,7 +310,7 @@ class Pyramid
                     uint superNodeEnd =
                         superNodeIndex + 1 < superNodesOffsets.size() ?
                         superNodesOffsets[superNodeIndex + 1] :
-                        static_cast<uint> (nodes.size());
+                        static_cast<uint>(nodes.size());
 
                     for (; nodeIndex < superNodeEnd; ++nodeIndex)
                     {
@@ -324,7 +324,7 @@ class Pyramid
 
             while (level != levels_.rend())
             {
-                uint superNodesCount = static_cast<uint> (nodesQueue.size());
+                uint superNodesCount = static_cast<uint>(nodesQueue.size());
 
                 const vector<uint> &superNodesOffsets =
                     level->superNodesOffsets_;
@@ -341,7 +341,7 @@ class Pyramid
                     uint superNodeEnd =
                         currentNode.first + 1 < superNodesOffsets.size() ?
                         superNodesOffsets[currentNode.first + 1] :
-                        static_cast<uint> (nodes.size());
+                        static_cast<uint>(nodes.size());
 
                     for (uint nodeIndex = superNodeBegin;
                          nodeIndex < superNodeEnd;
@@ -413,16 +413,16 @@ class SegmentationTreeBuilder
             MemoryPoolsCollection pools =
             {
                 DeviceMemoryPool<uint>(
-                    static_cast<uint> (graph.vertices.size()),
+                    static_cast<uint>(graph.vertices.size()),
                     kUintVerticesPoolsRequired),
                 DeviceMemoryPool<float>(
-                    static_cast<uint> (graph.vertices.size()),
+                    static_cast<uint>(graph.vertices.size()),
                     kFloatVerticesPoolsRequired),
                 DeviceMemoryPool<uint>(
-                    static_cast<uint> (graph.edges.size()),
+                    static_cast<uint>(graph.edges.size()),
                     kUintEdgesPoolsRequired),
                 DeviceMemoryPool<float>(
-                    static_cast<uint> (graph.edges.size()),
+                    static_cast<uint>(graph.edges.size()),
                     kFloatEdgesPoolsRequired)
             };
 
@@ -492,8 +492,8 @@ class SegmentationTreeBuilder
         void initalizeData(const Graph &graph, MemoryPoolsCollection &pools)
         {
             // Get memory for the internal variables
-            verticesCount_ = static_cast<uint> (graph.vertices.size());
-            edgesCount_ = static_cast<uint> (graph.edges.size());
+            verticesCount_ = static_cast<uint>(graph.vertices.size());
+            edgesCount_ = static_cast<uint>(graph.edges.size());
 
             dVertices_ = pools.uintVertices.get();
             dEdges_ = pools.uintEdges.get();
@@ -790,8 +790,8 @@ class SegmentationTreeBuilder
                     IsGreaterEqualThan<uint>(newVerticesCount)).get();
 
             // Calculate how many edes there are in the reduced graph.
-            uint validEdgesCount = 
-                static_cast<uint> (invalidEdgesPtr - dNewStartpoints.get());
+            uint validEdgesCount =
+                static_cast<uint>(invalidEdgesPtr - dNewStartpoints.get());
 
             // Mark groups of edges correspoding to the same vertex in the
             // reduced graph.
@@ -944,7 +944,7 @@ void buildGraph(const vector<uchar3> &image,
                 uint height,
                 Graph &graph)
 {
-    uint totalNodes = static_cast<uint> (image.size());
+    uint totalNodes = static_cast<uint>(image.size());
 
     graph.vertices.resize(totalNodes);
     graph.edges.reserve(4 * totalNodes - 2 * (width + height));

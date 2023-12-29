@@ -1,8 +1,8 @@
 <entry>
     <name>Image denoising</name>
-    <description><![CDATA[ This sample demonstrates two adaptive image denoising technqiues: KNN and NLM, based on computation of both geometric and color distance between texels. While both techniques are implemented in the DirectX SDK using shaders, massively speeded up variation of the latter techique, taking advantage of shared memory, is implemented in addition to DirectX counterparts. ]]></description>
+    <description><![CDATA[ This sample demonstrates two adaptive image denoising techniques: KNN and NLM, based on computation of both geometric and color distance between texels. While both techniques are implemented in the DirectX SDK using shaders, massively speeded up variation of the latter technique, taking advantage of shared memory, is implemented in addition to DirectX counterparts. ]]></description>
     <whitepaper>doc\imageDenoising.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA,Image Processing, noise reduction</keywords>
     <scope>1:CUDA Advanced Topics, 2:Image Processing,2:Computer Vision</scope>
     <files>
@@ -18,6 +18,7 @@
       <qatest>-kernel=2 -file=ref_nlm.ppm</qatest>
       <qatest>-kernel=3 -file=ref_nlm2.ppm</qatest>
     </qatests>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

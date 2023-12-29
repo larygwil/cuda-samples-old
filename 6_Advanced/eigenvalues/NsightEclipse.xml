@@ -3,7 +3,7 @@
     <description><![CDATA[The computation of all or a subset of all eigenvalues is an important problem in Linear Algebra, statistics, physics, and many other fields. This sample demonstrates a parallel implementation of a bisection algorithm for the computation of all eigenvalues of a
 tridiagonal symmetric matrix of arbitrary size with CUDA.]]></description>
     <whitepaper>doc\eigenvalues.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA, GPGPU, Eigenvalues, Linear Algebra</keywords>
     <scope>1:CUDA Advanced Topics,3:Linear Algebra</scope>
     <files>
@@ -11,6 +11,8 @@ tridiagonal symmetric matrix of arbitrary size with CUDA.]]></description>
         <file>data\reference.dat</file>
         <file>data\superdiagonal.dat</file>
     </files>
+    
+    <keyconcepts level="advanced">Linear Algebra</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

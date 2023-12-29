@@ -1,6 +1,6 @@
 Sample: Niederreiter Quasirandom Sequence Generator
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
-This sample implements Niederreiter Quasirandom Sequence Generator and Inverse Cumulative Normal Distribution function for Standart Normal Distribution generation. 
+This sample implements Niederreiter Quasirandom Sequence Generator and Inverse Cumulative Normal Distribution functions for the generation of Standard Normal Distributions. 
 
 Key concepts:

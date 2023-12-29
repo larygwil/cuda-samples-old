@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -29,9 +29,9 @@
 #include "bisect_large.cuh"
 
 // includes, kernels
-#include "bisect_kernel_large.cu"
-#include "bisect_kernel_large_onei.cu"
-#include "bisect_kernel_large_multi.cu"
+#include "bisect_kernel_large.cuh"
+#include "bisect_kernel_large_onei.cuh"
+#include "bisect_kernel_large_multi.cuh"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
 
     sdkStartTimer(&timer_total);
 
-    // do for multiple iterations to improve timing accuracy
+    // do for multiple iterations to improve timing accuracy    
     for (unsigned int iter = 0; iter < iterations; ++iter)
     {
 
@@ -181,9 +181,10 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
          result.g_left_count_mult, result.g_right_count_mult,
          result.g_blocks_mult, result.g_blocks_mult_sum
         );
-        checkCudaErrors(cudaDeviceSynchronize());
-        sdkStopTimer(&timer_step1);
+
         getLastCudaError("Kernel launch failed.");
+        checkCudaErrors(cudaDeviceSynchronize());
+        sdkStopTimer(&timer_step1);        
 
         // get the number of intervals containing one eigenvalue after the first
         // processing step
@@ -191,7 +192,7 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
         checkCudaErrors(cudaMemcpy(&num_one_intervals, result.g_num_one,
                                    sizeof(unsigned int),
                                    cudaMemcpyDeviceToHost));
-
+        
         dim3 grid_onei;
         grid_onei.x = getNumBlocksLinear(num_one_intervals, MAX_THREADS_BLOCK);
         dim3 threads_onei;
@@ -209,6 +210,7 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
          precision
         );
 
+        getLastCudaError("bisectKernelLarge_OneIntervals() FAILED.");
         checkCudaErrors(cudaDeviceSynchronize());
         sdkStopTimer(&timer_step2_one);
 
@@ -237,9 +239,12 @@ computeEigenvaluesLargeMatrix(const InputData &input, const ResultDataLarge &res
          result.g_lambda_mult, result.g_pos_mult,
          precision
         );
+        
 
-        sdkStopTimer(&timer_step2_mult);
         getLastCudaError("bisectKernelLarge_MultIntervals() FAILED.");
+        checkCudaErrors(cudaDeviceSynchronize());
+        sdkStopTimer(&timer_step2_mult);
+        
     }
 
     sdkStopTimer(&timer_total);
@@ -340,6 +345,9 @@ processResultDataLargeMatrix(const InputData &input, const ResultDataLarge &resu
         // store result
         writeTridiagSymMatlab(filename, input.a, input.b+1, eigenvals, mat_size);
         // getLastCudaError( sdkWriteFilef( filename, eigenvals, mat_size, 0.0f));
+
+        printf("User requests non-default argument(s), skipping self-check!\n");
+        bCompareResult = true;
     }
     else
     {

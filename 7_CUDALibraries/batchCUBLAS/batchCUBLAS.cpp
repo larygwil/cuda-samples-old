@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -566,10 +566,12 @@ int main(int argc, char *argv[])
 
     printf("%s Starting...\n\n", sSDKname);
 
-	int dev = findCudaDevice(argc, (const char**) argv);
-	if( dev == -1 ) {
-		return CUBLASTEST_FAILED;
-	}
+    int dev = findCudaDevice(argc, (const char **) argv);
+
+    if (dev == -1)
+    {
+        return CUBLASTEST_FAILED;
+    }
 
     errors = processArgs(argc, argv, &opts);
 
@@ -602,7 +604,7 @@ int main(int argc, char *argv[])
     {
         fprintf(stdout, "@@@@ dgemm test WAIVED due to lack of DP support\n");
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     status = test_gemm_loop<double>(opts, (float)CUBLAS_DGEMM_MAX_ULP_ERR, (double)CUBLAS_DGEMM_MAX_RELATIVE_ERR, handle);
@@ -651,7 +653,7 @@ int main(int argc, char *argv[])
         {
             fprintf(stdout, "@@@@ dgemm test WAIVED due to lack of DP support\n");
             cudaDeviceReset();
-            exit(EXIT_SUCCESS);
+            exit(EXIT_WAIVED);
         }
         else
         {
@@ -659,7 +661,7 @@ int main(int argc, char *argv[])
             nTotalErrors += (status == CUBLASTEST_PASSED ? 0 : 1);
         }
     }
-	
+
     cublasDestroy(handle);
     cudaDeviceReset();
 

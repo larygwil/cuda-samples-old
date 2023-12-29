@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -148,8 +148,9 @@ reduceMultiPass(const float *g_idata, float *g_odata, unsigned int n)
 // Global variable used by reduceSinglePass to count how many blocks have finished
 __device__ unsigned int retirementCount = 0;
 
-cudaError_t setRetirementCount(int retCnt) {
-	return cudaMemcpyToSymbol(retirementCount, &retCnt, sizeof(unsigned int), 0, cudaMemcpyHostToDevice);
+cudaError_t setRetirementCount(int retCnt)
+{
+    return cudaMemcpyToSymbol(retirementCount, &retCnt, sizeof(unsigned int), 0, cudaMemcpyHostToDevice);
 }
 
 // This reduction kernel reduces an arbitrary size array in a single kernel invocation

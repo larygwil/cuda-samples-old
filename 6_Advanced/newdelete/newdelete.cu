@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -29,16 +29,6 @@ const char *sSDKsample = "newdelete";
 // Kernels to allocate and instanciate Container objects on the device heap
 //
 ////////////////////////////////////////////////////////////////////////////
-
-__global__
-void stackCreate(Container<int> **g_container)
-{
-    // StackAtomicPop object and the data storage are allocated in device heap memory.
-    // This makes it persistent for the lifetime of the CUDA context.
-    // The grid has only one thread as only a single object instance is needed.
-
-    *g_container = new Stack<int>();
-}
 
 __global__
 void vectorCreate(Container<int> **g_container, int max_size)
@@ -129,6 +119,7 @@ void placementNew(int *d_result)
         s_vector->push(threadIdx.x >> 1);
     }
 
+    // Need to sync as the vector implementation does not support concurrent push/pop operations.
     __syncthreads();
 
     int v;
@@ -315,7 +306,7 @@ int main(int argc, char **argv)
         exit(EXIT_SUCCESS);
     }
 
-    // set the heap size for deviuce size new/delete to 128 MB
+    // set the heap size for device size new/delete to 128 MB
 #if CUDART_VERSION >= 4000
     cudaDeviceSetLimit(cudaLimitMallocHeapSize, 128 * (1 << 20));
 #else
@@ -328,21 +319,14 @@ int main(int argc, char **argv)
     bool bTest = false;
     int test_passed = 0;
 
-    
-    printf(" > Container = StackAtomicPop test ");
-    stackCreate<<<1,1>>>(d_container);
-    bTest = testContainer(d_container, 128, 128);
-    printf(bTest ? "OK\n\n" : "NOT OK\n\n");
-    test_passed += (bTest ? 1 : 0);    
-
     printf(" > Container = Vector test ");
     vectorCreate<<<1,1>>>(d_container, 128 * 128);
     bTest = testContainer(d_container, 128, 128);
     printf(bTest ? "OK\n\n" : "NOT OK\n\n");
     test_passed += (bTest ? 1 : 0);
-    
+
     cudaFree(d_container);
-    
+
     printf(" > Container = Vector, using placement new on SMEM buffer test ");
     bTest = testPlacementNew(1024);
     printf(bTest ? "OK\n\n" : "NOT OK\n\n");
@@ -352,10 +336,9 @@ int main(int argc, char **argv)
     bTest = testComplexType(1024);
     printf(bTest ? "OK\n\n" : "NOT OK\n\n");
     test_passed += (bTest ? 1 : 0);
-    
 
-    printf("Test Summary: %d/4 succesfully run\n", test_passed);
+    printf("Test Summary: %d/3 succesfully run\n", test_passed);
 
     cudaDeviceReset();
-    exit(test_passed==4 ? EXIT_SUCCESS : EXIT_FAILURE);
+    exit(test_passed==3 ? EXIT_SUCCESS : EXIT_FAILURE);
 };

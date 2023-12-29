@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -59,23 +59,21 @@ int MAX_TILES_SM10 = (FLOOR(MATRIX_SIZE_X,384) * FLOOR(MATRIX_SIZE_Y,384)) / (TI
 // width and height must be integral multiples of TILE_DIM
 // -------------------------------------------------------
 
-__global__ void copy(float *odata, float *idata, int width, int height, int nreps)
+__global__ void copy(float *odata, float *idata, int width, int height)
 {
     int xIndex = blockIdx.x * TILE_DIM + threadIdx.x;
     int yIndex = blockIdx.y * TILE_DIM + threadIdx.y;
 
     int index  = xIndex + width*yIndex;
 
-    for (int r=0; r < nreps; r++)
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            odata[index+i*width] = idata[index+i*width];
-        }
+      odata[index+i*width] = idata[index+i*width];
     }
+
 }
 
-__global__ void copySharedMem(float *odata, float *idata, int width, int height, int nreps)
+__global__ void copySharedMem(float *odata, float *idata, int width, int height)
 {
     __shared__ float tile[TILE_DIM][TILE_DIM];
 
@@ -84,25 +82,22 @@ __global__ void copySharedMem(float *odata, float *idata, int width, int height,
 
     int index  = xIndex + width*yIndex;
 
-    for (int r=0; r < nreps; r++)
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            if (xIndex < width && yIndex < height)
-            {
-                tile[threadIdx.y][threadIdx.x] = idata[index];
-            }
-        }
+      if (xIndex < width && yIndex < height)
+      {
+        tile[threadIdx.y][threadIdx.x] = idata[index];
+      }
+    }
 
-        __syncthreads();
-
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            if (xIndex < height && yIndex < width)
-            {
-                odata[index] = tile[threadIdx.y][threadIdx.x];
-            }
-        }
+    __syncthreads();
+    
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
+    {
+      if (xIndex < height && yIndex < width)
+      {
+        odata[index] = tile[threadIdx.y][threadIdx.x];
+      }
     }
 }
 
@@ -111,7 +106,7 @@ __global__ void copySharedMem(float *odata, float *idata, int width, int height,
 // width and height must be integral multiples of TILE_DIM
 // -------------------------------------------------------
 
-__global__ void transposeNaive(float *odata, float *idata, int width, int height, int nreps)
+__global__ void transposeNaive(float *odata, float *idata, int width, int height)
 {
     int xIndex = blockIdx.x * TILE_DIM + threadIdx.x;
     int yIndex = blockIdx.y * TILE_DIM + threadIdx.y;
@@ -119,18 +114,15 @@ __global__ void transposeNaive(float *odata, float *idata, int width, int height
     int index_in  = xIndex + width * yIndex;
     int index_out = yIndex + height * xIndex;
 
-    for (int r=0; r < nreps; r++)
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            odata[index_out+i] = idata[index_in+i*width];
-        }
+      odata[index_out+i] = idata[index_in+i*width];
     }
 }
 
 // coalesced transpose (with bank conflicts)
 
-__global__ void transposeCoalesced(float *odata, float *idata, int width, int height, int nreps)
+__global__ void transposeCoalesced(float *odata, float *idata, int width, int height)
 {
     __shared__ float tile[TILE_DIM][TILE_DIM];
 
@@ -142,25 +134,22 @@ __global__ void transposeCoalesced(float *odata, float *idata, int width, int he
     yIndex = blockIdx.x * TILE_DIM + threadIdx.y;
     int index_out = xIndex + (yIndex)*height;
 
-    for (int r=0; r < nreps; r++)
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
-        }
+      tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+    }
+    
+    __syncthreads();
 
-        __syncthreads();
-
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
-        }
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
+    {
+      odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
     }
 }
 
 // Coalesced transpose with no bank conflicts
 
-__global__ void transposeNoBankConflicts(float *odata, float *idata, int width, int height, int nreps)
+__global__ void transposeNoBankConflicts(float *odata, float *idata, int width, int height)
 {
     __shared__ float tile[TILE_DIM][TILE_DIM+1];
 
@@ -172,19 +161,16 @@ __global__ void transposeNoBankConflicts(float *odata, float *idata, int width, 
     yIndex = blockIdx.x * TILE_DIM + threadIdx.y;
     int index_out = xIndex + (yIndex)*height;
 
-    for (int r=0; r < nreps; r++)
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
-        }
-
-        __syncthreads();
-
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
-        }
+      tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+    }
+    
+    __syncthreads();
+    
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
+    {
+      odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
     }
 }
 
@@ -199,7 +185,7 @@ __global__ void transposeNoBankConflicts(float *odata, float *idata, int width, 
 // are the calculation of the blockIdx_x and blockIdx_y and replacement of blockIdx.x and
 // bloclIdx.y with the subscripted versions in the remaining code
 
-__global__ void transposeDiagonal(float *odata, float *idata, int width, int height, int nreps)
+__global__ void transposeDiagonal(float *odata, float *idata, int width, int height)
 {
     __shared__ float tile[TILE_DIM][TILE_DIM+1];
 
@@ -229,19 +215,16 @@ __global__ void transposeDiagonal(float *odata, float *idata, int width, int hei
     yIndex = blockIdx_x * TILE_DIM + threadIdx.y;
     int index_out = xIndex + (yIndex)*height;
 
-    for (int r=0; r < nreps; r++)
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
     {
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
-        }
+      tile[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+    }
 
-        __syncthreads();
-
-        for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
-        {
-            odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
-        }
+    __syncthreads();
+    
+    for (int i=0; i<TILE_DIM; i+=BLOCK_ROWS)
+    {
+      odata[index_out+i*height] = tile[threadIdx.x][threadIdx.y+i];
     }
 }
 
@@ -254,7 +237,7 @@ __global__ void transposeDiagonal(float *odata, float *idata, int width, int hei
 //     components of a full transpose
 // --------------------------------------------------------------------
 
-__global__ void transposeFineGrained(float *odata, float *idata, int width, int height,  int nreps)
+__global__ void transposeFineGrained(float *odata, float *idata, int width, int height)
 {
     __shared__ float block[TILE_DIM][TILE_DIM+1];
 
@@ -262,24 +245,21 @@ __global__ void transposeFineGrained(float *odata, float *idata, int width, int 
     int yIndex = blockIdx.y * TILE_DIM + threadIdx.y;
     int index = xIndex + (yIndex)*width;
 
-    for (int r=0; r<nreps; r++)
+    for (int i=0; i < TILE_DIM; i += BLOCK_ROWS)
     {
-        for (int i=0; i < TILE_DIM; i += BLOCK_ROWS)
-        {
-            block[threadIdx.y+i][threadIdx.x] = idata[index+i*width];
-        }
-
-        __syncthreads();
-
-        for (int i=0; i < TILE_DIM; i += BLOCK_ROWS)
-        {
-            odata[index+i*height] = block[threadIdx.x][threadIdx.y+i];
-        }
+      block[threadIdx.y+i][threadIdx.x] = idata[index+i*width];
+    }
+    
+    __syncthreads();
+    
+    for (int i=0; i < TILE_DIM; i += BLOCK_ROWS)
+    {
+      odata[index+i*height] = block[threadIdx.x][threadIdx.y+i];
     }
 }
 
 
-__global__ void transposeCoarseGrained(float *odata, float *idata, int width, int height, int nreps)
+__global__ void transposeCoarseGrained(float *odata, float *idata, int width, int height)
 {
     __shared__ float block[TILE_DIM][TILE_DIM+1];
 
@@ -291,19 +271,16 @@ __global__ void transposeCoarseGrained(float *odata, float *idata, int width, in
     yIndex = blockIdx.x * TILE_DIM + threadIdx.y;
     int index_out = xIndex + (yIndex)*height;
 
-    for (int r=0; r<nreps; r++)
+    for (int i=0; i<TILE_DIM; i += BLOCK_ROWS)
     {
-        for (int i=0; i<TILE_DIM; i += BLOCK_ROWS)
-        {
-            block[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
-        }
-
-        __syncthreads();
-
-        for (int i=0; i<TILE_DIM; i += BLOCK_ROWS)
-        {
+      block[threadIdx.y+i][threadIdx.x] = idata[index_in+i*width];
+    }
+    
+    __syncthreads();
+    
+    for (int i=0; i<TILE_DIM; i += BLOCK_ROWS)
+    {
             odata[index_out+i*height] = block[threadIdx.y+i][threadIdx.x];
-        }
     }
 }
 
@@ -475,7 +452,7 @@ main(int argc, char **argv)
     }
 
     // kernel pointer and descriptor
-    void (*kernel)(float *, float *, int, int, int);
+    void (*kernel)(float *, float *, int, int);
     char *kernelName;
 
     // execution configuration parameters
@@ -603,21 +580,21 @@ main(int argc, char **argv)
         checkCudaErrors(cudaGetLastError());
 
         // warmup to avoid timing startup
-        kernel<<<grid, threads>>>(d_odata, d_idata, size_x, size_y, 1);
+        kernel<<<grid, threads>>>(d_odata, d_idata, size_x, size_y);
 
         // take measurements for loop over kernel launches
         checkCudaErrors(cudaEventRecord(start, 0));
 
         for (int i=0; i < NUM_REPS; i++)
         {
-            kernel<<<grid, threads>>>(d_odata, d_idata, size_x, size_y, 1);
+            kernel<<<grid, threads>>>(d_odata, d_idata, size_x, size_y);
             // Ensure no launch failure
             checkCudaErrors(cudaGetLastError());
         }
         checkCudaErrors(cudaEventRecord(stop, 0));
         checkCudaErrors(cudaEventSynchronize(stop));
-        float outerTime;
-        checkCudaErrors(cudaEventElapsedTime(&outerTime, start, stop));
+        float kernelTime;
+        checkCudaErrors(cudaEventElapsedTime(&kernelTime, start, stop));
 
         checkCudaErrors(cudaMemcpy(h_odata, d_odata, mem_size, cudaMemcpyDeviceToHost));
         bool res = compareData(gold, h_odata, size_x*size_y, 0.01f, 0.0f);
@@ -629,13 +606,6 @@ main(int argc, char **argv)
         }
 
         // take measurements for loop inside kernel
-        checkCudaErrors(cudaEventRecord(start, 0));
-        kernel<<<grid, threads>>>(d_odata, d_idata, size_x, size_y, NUM_REPS);
-        checkCudaErrors(cudaEventRecord(stop, 0));
-        checkCudaErrors(cudaEventSynchronize(stop));
-        float innerTime;
-        checkCudaErrors(cudaEventElapsedTime(&innerTime, start, stop));
-
         checkCudaErrors(cudaMemcpy(h_odata, d_odata, mem_size, cudaMemcpyDeviceToHost));
         res = compareData(gold, h_odata, size_x*size_y, 0.01f, 0.0f);
 
@@ -646,19 +616,11 @@ main(int argc, char **argv)
         }
 
         // report effective bandwidths
-        float outerBandwidth = 2.0f * 1000.0f * mem_size/(1024*1024*1024)/(outerTime/NUM_REPS);
-        float innerBandwidth = 2.0f * 1000.0f * mem_size/(1024*1024*1024)/(innerTime/NUM_REPS);
-
-        printf("\n");
-        printf("transpose-Outer-%s, Throughput = %.4f GB/s, Time = %.5f s, Size = %u fp32 elements, NumDevsUsed = %u, Workgroup = %u\n",
+        float kernelBandwidth = 2.0f * 1000.0f * mem_size/(1024*1024*1024)/(kernelTime/NUM_REPS);
+        printf("transpose %s, Throughput = %.4f GB/s, Time = %.5f ms, Size = %u fp32 elements, NumDevsUsed = %u, Workgroup = %u\n",
                kernelName,
-               outerBandwidth,
-               outerTime/NUM_REPS,
-               (size_x *size_y), 1, TILE_DIM *BLOCK_ROWS);
-        printf("transpose-Inner-%s, Throughput = %.4f GB/s, Time = %.5f s, Size = %u fp32 elements, NumDevsUsed = %u, Workgroup = %u\n",
-               kernelName,
-               innerBandwidth,
-               innerTime/NUM_REPS,
+               kernelBandwidth,
+               kernelTime/NUM_REPS,
                (size_x *size_y), 1, TILE_DIM *BLOCK_ROWS);
 
     }

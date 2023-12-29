@@ -2,18 +2,23 @@
     <name>Box Filter with NPP</name>
     <description><![CDATA[A NPP SDK sample that demonstrates how to use NPP FilterBox function to perform a Box Filter.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA,NPP,Image Processing,box filter</keywords>
     <scope>1:CUDA Basic Topics,1:Performance Strategies,2:Image Processing,2:Computer Vision</scope>
     <files>
         <file>..\..\common\data\Lena.pgm</file>
     </files>
+    
+    <keyconcepts level="basic">Performance Strategies</keyconcepts>
+    <keyconcepts level="basic">Image Processing</keyconcepts>
+    <keyconcepts level="basic">NPP Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->
     <!-- "framework" attribute will be ignored on platforms other then Mac OS X -->
-    <library>npp</library>
+    <library>nppi</library>
+    <library>nppc</library>
 	<library>freeimage</library>
     <!-- Either absolute or relative to sample -->
     <library-path os="windows"></library-path>

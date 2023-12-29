@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -314,10 +314,10 @@ void renderImage(bool bUseOpenGL, bool fp64, int mode)
             }
 
 #if RUN_TIMING
-            printf("CPU = %5.8f\n", 0.001f * sdkGetTimerValue(&hTimer);
+            printf("CPU = %5.8f\n", 0.001f * sdkGetTimerValue(&hTimer));
 #endif
         }
-               else
+               else // this is the GPU Path
         {
             float timeEstimate;
             int startPass = pass;
@@ -1036,7 +1036,7 @@ void initData(int argc, char **argv)
     if (version < 11)
     {
         printf("GPU compute capability is too low (1.0), program is waived\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     haveDoubles = (version >= 13);
@@ -1072,18 +1072,12 @@ int runSingleTest(int argc, char **argv)
 {
     char dump_file[256], *ref_file = NULL;
     bool haveDouble = false;
-    int  mode = 0;
 
     printf("* Running Automatic Test: <%s>\n", sSDKsample);
 
     strcpy(dump_file, (const char *)"rendered_image.ppm");
     // We've already determined that file has been passed in as input, we can grab the file here
     getCmdLineArgumentString(argc, (const char **)argv, "file", (char **)&ref_file);
-
-    if (checkCmdLineFlag(argc, (const char **)argv, "mode"))
-    {
-        mode = getCmdLineArgumentInt(argc, (const char **)argv, "mode");
-    }
 
     if (checkCmdLineFlag(argc, (const char **)argv, "fp64"))
     {
@@ -1099,42 +1093,34 @@ int runSingleTest(int argc, char **argv)
     //Allocate memory for cpu buffer
     unsigned char *h_dst =(unsigned char *)malloc(sizeof(uchar4)*imageH*imageW);
 
-    switch (mode)
+    if (g_isJuliaSet)
     {
-        case 0: // Mandelbrot Set
-            {
-                for (int i=0; i < 50; i++)
-                {
-                    renderImage(false, haveDouble, 0);
-                }
+        char *ref_path = sdkFindFilePath("params.txt", argv[0]);
+        startJulia(ref_path);
 
-                checkCudaErrors(cudaMemcpy(h_dst, d_dst, imageW*imageH*sizeof(uchar4), cudaMemcpyDeviceToHost));
-                sdkSavePPM4ub(dump_file, h_dst, imageW, imageH);
-                break;
-            }
+        for (int i=0; i < 50; i++)
+        {
+            renderImage(false, haveDouble, 0);
+        }
 
-        case 1: // Julia Set
-            {
-                char *ref_path = sdkFindFilePath("params.txt", argv[0]);
-                startJulia(ref_path);
+        checkCudaErrors(cudaMemcpy(h_dst, d_dst, imageW*imageH*sizeof(uchar4), cudaMemcpyDeviceToHost));
+        sdkSavePPM4ub(dump_file, h_dst, imageW, imageH);
+    }
+    else
+    {
+        // Mandelbrot Set
+        for (int i=0; i < 50; i++)
+        {
+            renderImage(false, haveDouble, 0);
+        }
 
-                for (int i=0; i < 50; i++)
-                {
-                    renderImage(false, haveDouble, 1);
-                }
-
-                checkCudaErrors(cudaMemcpy(h_dst, d_dst, imageW*imageH*sizeof(uchar4), cudaMemcpyDeviceToHost));
-                sdkSavePPM4ub(dump_file, h_dst, imageW, imageH);
-                break;
-            }
-
-        default:
-            break;
+        checkCudaErrors(cudaMemcpy(h_dst, d_dst, imageW*imageH*sizeof(uchar4), cudaMemcpyDeviceToHost));
+        sdkSavePPM4ub(dump_file, h_dst, imageW, imageH);
     }
 
     printf("\n[%s], %s Set, %s -> Saved File\n",
            dump_file,
-           (mode ? "Julia" : "Mandelbrot"),
+           (g_isJuliaSet ? "Julia" : "Mandelbrot"),
            (haveDouble ? "(fp64 double precision)" : "(fp32 single precision)")
           );
 
@@ -1241,6 +1227,43 @@ int main(int argc, char **argv)
     {
         printHelp();
         exit(EXIT_SUCCESS);
+    }
+
+    int mode = 0;
+
+    if (checkCmdLineFlag(argc, (const char **)argv, "mode"))
+    {
+        mode = getCmdLineArgumentInt(argc, (const char **)argv, "mode");
+        g_isJuliaSet = mode;
+
+    }
+    else
+    {
+        g_isJuliaSet = 0;
+    }
+
+    // Set the initial parameters for either Mandelbrot and Julia sets and reset all parameters
+    if (g_isJuliaSet)      // settings for Julia
+    {
+        startJulia("params.txt") ;
+    }
+    else                    // settings for Mandelbrot
+    {
+        g_isMoving = true ;
+        xOff = -0.5;
+        yOff = 0.0;
+        scale = 3.2;
+        xdOff = 0.0;
+        ydOff = 0.0;
+        dscale = 1.0;
+        colorSeed = 0;
+        colors.x = 3;
+        colors.y = 5;
+        colors.z = 7;
+        crunch = 512;
+        animationFrame = 0;
+        animationStep = 0;
+        pass = 0 ;
     }
 
     if (checkCmdLineFlag(argc, (const char **)argv, "file"))

@@ -3,7 +3,7 @@
     <description><![CDATA[This sample implements a simple CUBLAS function calls that call GPU device API library running CUBLAS functions.  This sample requires a SM 3.5 capable device.]]></description>
     <whitepaper></whitepaper>
     <minspec>KEPLER SM 3.5</minspec>
-    <keywords></keywords>
+    <keywords>CUDA,CUBLAS,CDP</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
     </files>
@@ -13,13 +13,16 @@
     <cudaapi>cudaMalloc</cudaapi>
     <cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-    <keyconcepts>CUDA Advanced Topics</keyconcepts>
-    <keyconcepts>CUDA Dynamic Parallelism</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Dynamic Parallelism</keyconcepts>
+    <keyconcepts level="basic">Linear Algebra</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->
     <!-- "framework" attribute will be ignored on platforms other then Mac OS X -->
+	<library>cublas</library>
+	<library>cublas_device</library>
 
     <!-- Either absolute or relative to sample -->
     <include-path>./</include-path>

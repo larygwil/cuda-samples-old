@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -405,15 +405,15 @@ runTest(int argc, char **argv)
     printf("%d elements\n", size);
     printf("%d threads (max)\n", maxThreads);
 
-    cpuFinalReduction = (bool)(checkCmdLineFlag(argc, (const char **) argv, "cpufinal") == true);
-    multipass = (bool)(checkCmdLineFlag(argc, (const char **) argv, "multipass") == true);
+    cpuFinalReduction = checkCmdLineFlag(argc, (const char **) argv, "cpufinal");
+    multipass         = checkCmdLineFlag(argc, (const char **) argv, "multipass");
 
     if (checkCmdLineFlag(argc, (const char **) argv, "cputhresh"))
     {
         cpuFinalThreshold = getCmdLineArgumentInt(argc, (const char **) argv, "cputhresh");
     }
 
-    bool runShmoo = (bool)(checkCmdLineFlag(argc, (const char **) argv, "shmoo") == true);
+    bool runShmoo     = checkCmdLineFlag(argc, (const char **) argv, "shmoo");
 
     if (runShmoo)
     {

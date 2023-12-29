@@ -1,9 +1,9 @@
 <entry>
     <name>Simple Multi Copy and Compute</name>
-    <description><![CDATA[Supported in GPUs with Compute Capability 1.1, overlaping compute with one memcopy is possible from the host system.  For Quadro and Tesla GPUs with Compute Capability 2.0, a second overlapped copy operation in either direction at full speed is possible (PCI-e is symmetric).  This sample illustrates the usage of CUDA streams to achieve overlapping of kernel execution with data copies to and from the device. 
+    <description><![CDATA[Supported in GPUs with Compute Capability 1.1, overlapping compute with one memcopy is possible from the host system.  For Quadro and Tesla GPUs with Compute Capability 2.0, a second overlapped copy operation in either direction at full speed is possible (PCI-e is symmetric).  This sample illustrates the usage of CUDA streams to achieve overlapping of kernel execution with data copies to and from the device. 
 ]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.1</minspec>
     <keywords>GPGPU</keywords>
     <scope>1:CUDA Advanced Topics,1:Performance Strategies</scope>
     <files>
@@ -19,10 +19,10 @@
     <cudaapi>cudaEventDestroy</cudaapi>
     <cudaapi>cudaEventElapsedTime</cudaapi>
     <cudaapi>cudaMemcpyAsync</cudaapi>
-    <keyconcepts>CUDA Streams and Events</keyconcepts>
-    <keyconcepts>Asynchronous Data Transfers</keyconcepts>
-    <keyconcepts>Overlap Compute and Copy</keyconcepts>
-    <keyconcepts>GPU Performance</keyconcepts>
+    <keyconcepts level="basic">CUDA Streams and Events</keyconcepts>
+    <keyconcepts level="basic">Asynchronous Data Transfers</keyconcepts>
+    <keyconcepts level="basic">Overlap Compute and Copy</keyconcepts>
+    <keyconcepts level="basic">GPU Performance</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

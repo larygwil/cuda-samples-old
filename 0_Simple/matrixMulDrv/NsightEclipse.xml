@@ -4,8 +4,8 @@
 It has been written for clarity of exposition to illustrate various CUDA programming principles, not with the goal of providing the most performant generic kernel for matrix multiplication.
 CUBLAS provides high-performance matrix multiplication.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords></keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,matrix multiply</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
       <file>data\matrixMul_kernel32.ptx</file>
@@ -19,8 +19,9 @@ CUBLAS provides high-performance matrix multiplication.]]></description>
     <cudaapi>cuMemcpyHtoD</cudaapi>
     <cudaapi>cuMemcpyDtoH</cudaapi>
     <cudaapi>cuLaunchKernel</cudaapi>
-    <keyconcepts>CUDA Driver API</keyconcepts>
-    <keyconcepts>Matrix Multiply</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Driver API</keyconcepts>
+    <keyconcepts level="basic">Matrix Multiply</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

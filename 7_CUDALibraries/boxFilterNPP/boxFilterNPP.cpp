@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -13,6 +13,7 @@
 #  define WINDOWS_LEAN_AND_MEAN
 #  define NOMINMAX
 #  include <windows.h>
+#  pragma warning(disable:4819)
 #endif
 
 #include <ImagesCPU.h>
@@ -55,25 +56,13 @@ inline int cudaDeviceInit(int argc, const char **argv)
     return dev;
 }
 
-void parseCommandLineArguments(int argc, char *argv[])
-{
-    if (argc >= 2)
-    {
-        if (checkCmdLineFlag(argc, (const char **)argv, "qatest") ||
-            checkCmdLineFlag(argc, (const char **)argv, "noprompt"))
-        {
-            g_bQATest = true;
-        }
-    }
-}
-
 void printfNPPinfo(int argc, char *argv[])
 {
     const char *sComputeCap[] =
     {
         "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2",  "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", NULL
+        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
+        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
     };
 
     const NppLibraryVersion *libVer   = nppGetLibVersion();
@@ -118,9 +107,6 @@ int main(int argc, char *argv[])
             printf("Error unable to find Lena.pgm\n");
             exit(EXIT_FAILURE);
         }
-
-        // Parse the command line arguments for proper configuration
-        parseCommandLineArguments(argc, argv);
 
         cudaDeviceInit(argc, (const char **)argv);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -51,29 +51,35 @@ __global__ void kernel_B(clock_t *d_o, clock_t clock_count)
     clock_block(d_o, clock_count);
 }
 
-// Single-warp reduction kernel
+// Single-warp reduction kernel (note: this is not optimized for simplicity)
 __global__ void sum(clock_t *d_clocks, int N)
 {
     __shared__ clock_t s_clocks[32];
 
     clock_t my_sum = 0;
 
-    for (int i = threadIdx.x ; i < N ; i+= blockDim.x)
+    for (int i = threadIdx.x ; i < N ; i += blockDim.x)
     {
         my_sum += d_clocks[i];
     }
-    s_clocks[threadIdx.x] = my_sum;
-    syncthreads();
 
-    for (int i=16; i>0; i/=2)
+    s_clocks[threadIdx.x] = my_sum;
+    __syncthreads();
+
+    for (int i = warpSize / 2 ; i > 0 ; i /= 2)
     {
         if (threadIdx.x < i)
         {
             s_clocks[threadIdx.x] += s_clocks[threadIdx.x + i];
         }
-        syncthreads();
+
+        __syncthreads();
     }
-    d_clocks[0] = s_clocks[0];
+
+    if (threadIdx.x == 0)
+    {
+        d_clocks[0] = s_clocks[0];
+    }
 }
 
 
@@ -119,11 +125,11 @@ int main(int argc, char **argv)
     printf("> Detected Compute SM %d.%d hardware with %d multi-processors\n",
            deviceProp.major, deviceProp.minor, deviceProp.multiProcessorCount);
 
-    // Allocate host memory for the output (one clock_t value after reduction)
+    // Allocate host memory for the output (reduced to a single value)
     clock_t *a = 0;
     checkCudaErrors(cudaMallocHost((void **)&a, sizeof(clock_t)));
 
-    // Allocate device memory for the output (one clock_t value for each kernel)
+    // Allocate device memory for the output (one value for each kernel)
     clock_t *d_a = 0;
     checkCudaErrors(cudaMalloc((void **)&d_a, 2 * nstreams * sizeof(clock_t)));
 
@@ -140,15 +146,15 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaEventCreate(&start_event));
     checkCudaErrors(cudaEventCreate(&stop_event));
 
-    //////////////////////////////////////////////////////////////////////
-    // Time execution with nkernels streams
-    clock_t time_clocks = kernel_time * deviceProp.clockRate;
+    // Target time per kernel is kernel_time ms, clockRate is in KHz
+    // Target number of clocks = target time * clock frequency
+    clock_t time_clocks = (clock_t)(kernel_time * deviceProp.clockRate);
     clock_t total_clocks = 0;
 
-    cudaEventRecord(start_event, 0);
+    // Start the clock
+    checkCudaErrors(cudaEventRecord(start_event, 0));
 
-    // Queue pairs of {kernel_A, kernel_B} in separate streams and record when
-    // they are complete
+    // Queue pairs of {kernel_A, kernel_B} in separate streams
     for (int i = 0 ; i < nstreams ; ++i)
     {
         kernel_A<<<1,1,0,streams[i]>>>(&d_a[2*i], time_clocks);
@@ -157,21 +163,24 @@ int main(int argc, char **argv)
         total_clocks += time_clocks;
     }
 
-    // Queue a sum kernel and a copy back to host in the last stream.
-    sum<<<1,32,0,streams[nstreams-1]>>>(d_a, 2 * nstreams);
-    checkCudaErrors(cudaMemcpyAsync(a, d_a, sizeof(clock_t), cudaMemcpyDeviceToHost, streams[nstreams-1]));
-
+    // Stop the clock in stream 0 (i.e. all previous kernels will be complete)
     checkCudaErrors(cudaEventRecord(stop_event, 0));
-    
-    // At this point the CPU has dispatched all work for the GPU and can
-    // continue processing other tasks in parallel.
 
-    // In this sample we just wait until the GPU is done
+    // At this point the CPU has dispatched all work for the GPU and can
+    // continue processing other tasks in parallel. In this sample we just want
+    // to wait until all work is done so we use a blocking cudaMemcpy below.
+
+    // Run the sum kernel and copy the result back to host
+    sum<<<1,32>>>(d_a, 2 * nstreams);
+    checkCudaErrors(cudaMemcpy(a, d_a, sizeof(clock_t), cudaMemcpyDeviceToHost));
+
+    // stop_event will have been recorded but including the synchronize here to
+    // prevent copy/paste errors!
     checkCudaErrors(cudaEventSynchronize(stop_event));
     checkCudaErrors(cudaEventElapsedTime(&elapsed_time, start_event, stop_event));
 
-    printf("Expected time for serial execution of %d sets of kernels = %.3fs\n", nstreams, 2 * nstreams * kernel_time / 1000.0f);
-    printf("Expected time for fully concurrent execution of %d sets of kernels = %.3fs\n", nstreams, 2 * kernel_time / 1000.0f);
+    printf("Expected time for serial execution of %d sets of kernels is between approx. %.3fs and %.3fs\n", nstreams, (nstreams + 1) * kernel_time / 1000.0f, 2 * nstreams *kernel_time / 1000.0f);
+    printf("Expected time for fully concurrent execution of %d sets of kernels is approx. %.3fs\n", nstreams, 2 * kernel_time / 1000.0f);
     printf("Measured time for sample = %.3fs\n", elapsed_time / 1000.0f);
 
     bool bTestResult  = (a[0] >= total_clocks);
@@ -182,7 +191,6 @@ int main(int argc, char **argv)
         cudaStreamDestroy(streams[i]);
     }
     free(streams);
-
     cudaEventDestroy(start_event);
     cudaEventDestroy(stop_event);
     cudaFreeHost(a);

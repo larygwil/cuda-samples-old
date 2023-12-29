@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -27,13 +27,17 @@ void integrateNbodySystem(DeviceData<T> *deviceData,
                           cudaGraphicsResource **pgres, unsigned int currentRead,
                           float deltaTime, float damping,
                           unsigned int numBodies, unsigned int numDevices,
-                          int p, int q, bool bUsePBO);
+                          int blockSize, bool bUsePBO);
 
 cudaError_t setSofteningSquared(float softeningSq);
 cudaError_t setSofteningSquared(double softeningSq);
 
 template<typename T>
-BodySystemCUDA<T>::BodySystemCUDA(unsigned int numBodies, unsigned int numDevices, unsigned int p, unsigned int q, bool usePBO, bool useSysMem)
+BodySystemCUDA<T>::BodySystemCUDA(unsigned int numBodies,
+                                  unsigned int numDevices,
+                                  unsigned int blockSize,
+                                  bool usePBO,
+                                  bool useSysMem)
     : m_numBodies(numBodies),
       m_numDevices(numDevices),
       m_bInitialized(false),
@@ -41,8 +45,7 @@ BodySystemCUDA<T>::BodySystemCUDA(unsigned int numBodies, unsigned int numDevice
       m_bUseSysMem(useSysMem),
       m_currentRead(0),
       m_currentWrite(1),
-      m_p(p),
-      m_q(q)
+      m_blockSize(blockSize)
 {
     m_hPos[0] = m_hPos[1] = 0;
     m_hVel = 0;
@@ -290,7 +293,7 @@ void BodySystemCUDA<T>::update(T deltaTime)
     integrateNbodySystem<T>(m_deviceData, m_pGRes, m_currentRead,
                             (float)deltaTime, (float)m_damping,
                             m_numBodies, m_numDevices,
-                            m_p, m_q, m_bUsePBO);
+                            m_blockSize, m_bUsePBO);
 
     std::swap(m_currentRead, m_currentWrite);
 }

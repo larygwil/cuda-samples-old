@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+// Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 //
 // Please refer to the NVIDIA end user license agreement (EULA) associated
 // with this source code for terms and conditions that govern your use of
@@ -17,6 +17,29 @@
 // This sample implements matrix multiplication as described in Chapter 3
 // of the programming guide and uses the CUBLAS library to demonstrate
 // the best performance.
+
+// SOME PRECAUTIONS:
+// IF WE WANT TO CALCULATE ROW-MAJOR MATRIX MULTIPLY C = A * B,
+// WE JUST NEED CALL CUBLAS API IN A REVERSE ORDER: cublasSegemm(B, A)! 
+// The reason is explained as follows:
+
+// CUBLAS library uses column-major storage, but C/C++ use row-major storage.
+// When passing the matrix pointer to CUBLAS, the memory layout alters from 
+// row-major to column-major, which is equivalent to an implict transpose. 
+
+// In the case of row-major C/C++ matrix A, B, and a simple matrix multiplication 
+// C = A * B, we can't use the input order like cublasSgemm(A, B)  because of
+// implict transpose. The actual result of cublasSegemm(A, B) is A(T) * B(T). 
+// If col(A(T)) != row(B(T)), equal to row(A) != col(B), A(T) and B(T) are not 
+// multipliable. Moreover, even if A(T) and B(T) are multipliable, the result C 
+// is a column-based cublas matrix, which means C(T) in C/C++, we need extra 
+// transpose code to convert it to a row-based C/C++ matrix.
+
+// To solve the problem, let's consider our desired result C, a row-major matrix. 
+// In cublas format, it is C(T) actually (becuase of the implict transpose). 
+// C = A * B, so C(T) = (A * B) (T) = B(T) * A(T). Cublas matrice B(T) and A(T) 
+// happen to be C/C++ matrice B and A (still becuase of the implict transpose)! 
+// We don't need extra transpose code, we only need alter the input order!
 //
 // CUBLAS provides high-performance matrix multiplication.
 // See also:
@@ -421,7 +444,7 @@ int matrixMultiply(int argc, char **argv, int devID, sMatrixSize &matrix_size)
         printDiff(reference, h_CUBLAS, matrix_size.uiWC, matrix_size.uiHC, 100, 1.0e-5f);
     }
 
-    printf("Comparing CUBLAS Matrix Multiply with CPU results: %s\n", (true == resCUBLAS) ? "OK" : "FAIL");
+    printf("Comparing CUBLAS Matrix Multiply with CPU results: %s\n", (true == resCUBLAS) ? "PASS" : "FAIL");
 
     // clean up memory
     free(h_A);

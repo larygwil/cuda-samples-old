@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -323,10 +323,11 @@ static const char *glsl_drawpot_fragshader_src =
     "}\n";
 #else
     "#version 130\n"
+    "in vec4 inColor;\n"
     "out uvec4 FragColor;\n"
     "void main()\n"
     "{"
-    "  FragColor = uvec4(gl_Color.xyz * 255.0, 255.0);\n"
+    "  FragColor = uvec4(inColor.xyz * 255.0, 255.0);\n"
     "}\n";
 #endif
 
@@ -798,7 +799,7 @@ main(int argc, char **argv)
         printf("   Does not explicitly support -device=n\n");
         printf("   This sample requires OpenGL.  Only -file=<reference> -radius=<n> are supported\n");
         printf("exiting...\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     if (ref_file)
@@ -853,7 +854,7 @@ void FreeResource()
 void Cleanup(int iExitCode)
 {
     FreeResource();
-    printf("%s\n", (iExitCode == EXIT_SUCCESS) ? "PASSED" : "FAILED");
+    printf("Images are %s\n", (iExitCode == EXIT_SUCCESS) ? "Matching" : "Not Matching");
     exit(EXIT_SUCCESS);
 }
 
@@ -924,16 +925,19 @@ GLuint compileGLSLprogram(const char *vertex_shader_src, const char *fragment_sh
     int infologLength = 0;
     int charsWritten  = 0;
 
-    glGetProgramiv(p, GL_INFO_LOG_LENGTH, (GLint *)&infologLength);
-
-    if (infologLength > 0)
+    GLint linked = 0;
+    glGetProgramiv(p, GL_LINK_STATUS, &linked);
+    if(linked == 0)
     {
-        char *infoLog = (char *)malloc(infologLength);
-        glGetProgramInfoLog(p, infologLength, (GLsizei *)&charsWritten, infoLog);
-        printf("Shader compilation error: %s\n", infoLog);
-        free(infoLog);
+        glGetProgramiv(p, GL_INFO_LOG_LENGTH, (GLint *)&infologLength);
+        if (infologLength > 0)
+        {
+            char *infoLog = (char *)malloc(infologLength);
+            glGetProgramInfoLog(p, infologLength, (GLsizei *)&charsWritten, infoLog);
+            printf("Shader compilation error: %s\n", infoLog);
+            free(infoLog);
+        }
     }
-
     return p;
 }
 
@@ -1079,7 +1083,7 @@ initGL(int *argc, char **argv)
     else
     {
         fprintf(stderr, "   OpenGL device is NOT Available, [%s] exiting...\n", sSDKname);
-        exit(EXIT_FAILURE);
+        exit(EXIT_WAIVED);
     }
 
     // Create GL context

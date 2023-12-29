@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -47,7 +47,7 @@ ParticleSystem::ParticleSystem(uint numParticles, bool bUseVBO, bool bUseGL) :
     m_bInitialized(false),
     m_bUseVBO(bUseVBO),
     m_numParticles(numParticles),
-    m_particleRadius(0.1),
+    m_particleRadius(0.1f),
     m_doDepthSort(false),
     m_timer(NULL),
     m_time(0.0f)
@@ -218,7 +218,7 @@ ParticleSystem::initGrid(vec3f start, uint3 size, vec3f spacing, float jitter, v
 
                 if (i < numParticles)
                 {
-                    vec3f pos = start + spacing*vec3f(x, y, z) + svrand()*jitter;
+                    vec3f pos = start + spacing*vec3f((float)x, (float)y, (float)z) + svrand()*jitter;
 
                     posPtr[i] = make_float4(pos.x, pos.y, pos.z, 0.0f);
                     velPtr[i] = make_float4(vel.x, vel.y, vel.z, lifetime);
@@ -259,7 +259,7 @@ ParticleSystem::addSphere(uint &index, vec3f pos, vec3f vel, int r, float spacin
         {
             for (int x=-r; x<=r; x++)
             {
-                vec3f delta = vec3f(x, y, z)*spacing;
+                vec3f delta = vec3f((float)x, (float)y, (float)z)*spacing;
                 float dist = length(delta);
 
                 if ((dist <= spacing*r) && (index < m_numParticles))

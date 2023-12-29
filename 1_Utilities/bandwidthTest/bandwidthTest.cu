@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -114,6 +114,7 @@ int main(int argc, char **argv)
     int iRetVal = runTest(argc, (const char **)argv);
 
     // finish
+	printf("%s\n", (iRetVal==0) ? "Result = PASS" : "Result = FAIL");
     exit((iRetVal==0) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
@@ -218,11 +219,12 @@ int runTest(const int argc, const char **argv)
         if (error_id == cudaSuccess)
         {
             printf(" Device %d: %s\n", currentDevice, deviceProp.name);
-			if (deviceProp.computeMode == cudaComputeModeProhibited)
-			{
-				fprintf(stderr, "Error: device is running in <Compute Mode Prohibited>, no threads can use ::cudaSetDevice().\n");
-				exit(EXIT_FAILURE);
-			}
+
+            if (deviceProp.computeMode == cudaComputeModeProhibited)
+            {
+                fprintf(stderr, "Error: device is running in <Compute Mode Prohibited>, no threads can use ::cudaSetDevice().\n");
+                exit(EXIT_FAILURE);
+            }
         }
         else
         {

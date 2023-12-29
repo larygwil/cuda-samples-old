@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -84,28 +84,25 @@ main(int argc, char **argv)
 {
     printf("%s Starting...\n\n", argv[0]);
 
-    char *typeChoice;
+    char *typeChoice = 0;
     getCmdLineArgumentString(argc, (const char **) argv, "type", &typeChoice);
-
-    if (0 == typeChoice)
-    {
-        typeChoice = (char *)malloc(4 * sizeof(char));
-        strcpy(typeChoice, "int");
-    }
 
     ReduceType datatype = REDUCE_INT;
 
-    if (!strcasecmp(typeChoice, "float"))
+    if (0 != typeChoice)
     {
-        datatype = REDUCE_FLOAT;
-    }
-    else if (!strcasecmp(typeChoice, "double"))
-    {
-        datatype = REDUCE_DOUBLE;
-    }
-    else
-    {
-        datatype = REDUCE_INT;
+        if (!strcasecmp(typeChoice, "float"))
+        {
+            datatype = REDUCE_FLOAT;
+        }
+        else if (!strcasecmp(typeChoice, "double"))
+        {
+            datatype = REDUCE_DOUBLE;
+        }
+        else
+        {
+            datatype = REDUCE_INT;
+        }
     }
 
     cudaDeviceProp deviceProp;
@@ -230,7 +227,7 @@ void getNumBlocksAndThreads(int whichKernel, int n, int maxBlocks, int maxThread
         blocks = (n + (threads * 2 - 1)) / (threads * 2);
     }
 
-    if (threads*blocks > prop.maxGridSize[0] * prop.maxThreadsPerBlock)
+    if ((float)threads*blocks > (float)prop.maxGridSize[0] * prop.maxThreadsPerBlock)
     {
         printf("n is too large, please choose a smaller number!\n");
     }
@@ -485,14 +482,14 @@ runTest(int argc, char **argv, ReduceType datatype)
     printf("%d elements\n", size);
     printf("%d threads (max)\n", maxThreads);
 
-    cpuFinalReduction = (bool)(checkCmdLineFlag(argc, (const char **) argv, "cpufinal") == true);
+    cpuFinalReduction = checkCmdLineFlag(argc, (const char **) argv, "cpufinal");
 
     if (checkCmdLineFlag(argc, (const char **) argv, "cputhresh"))
     {
         cpuFinalThreshold = getCmdLineArgumentInt(argc, (const char **) argv, "cputhresh");
     }
 
-    bool runShmoo = (bool)(checkCmdLineFlag(argc, (const char **) argv, "shmoo") == true);
+    bool runShmoo = checkCmdLineFlag(argc, (const char **) argv, "shmoo");
 
     if (runShmoo)
     {

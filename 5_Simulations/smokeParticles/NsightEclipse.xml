@@ -2,8 +2,8 @@
     <name>Smoke Particles</name>
     <description><![CDATA[Smoke simulation with volumetric shadows using half-angle slicing technique. Uses CUDA for procedural simulation, Thrust Library for sorting algorithms, and OpenGL for graphics rendering. ]]></description>
     <whitepaper>doc\smokeParticles.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>CUDA, GPGPU, simulation, particles</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,GPGPU,simulation,particles,OpenGL</keywords>
     <scope>2:Graphics Interop,2:Texture,3:Physically-Based Simulation</scope>
     <files>
       <file>..\..\doc\Thrust_license.txt</file>
@@ -15,7 +15,17 @@
     <qatests>
         <qatest>-qatest</qatest>
     </qatests>
-
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">Data Parallel Algorithms</keyconcepts>
+    <keyconcepts level="advanced">Physically-Based Simulation</keyconcepts>
+    
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->

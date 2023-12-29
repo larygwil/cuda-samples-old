@@ -2,7 +2,7 @@
     <name>simpleZeroCopy</name>
     <description><![CDATA[This sample illustrates how to use Zero MemCopy, kernels can read and write directly to pinned system memory.  This sample requires GPUs that support this feature (MCP79 and GT200).]]></description>
     <whitepaper>doc\CUDA2.2PinnedMemoryAPIs.pdf</whitepaper>
-    <minspec>GeForce GTX 200</minspec>
+    <minspec>SM 1.2</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,1:Performance Strategies</scope>
     <files>
@@ -17,9 +17,10 @@
     <cudaapi>cudaHostRegister</cudaapi>
 	<cudaapi>cudaHostUnregister</cudaapi>
 	<cudaapi>cudaFreeHost</cudaapi>
-    <keyconcepts>GPU Performance</keyconcepts>
-    <keyconcepts>Pinned System Paged Memory</keyconcepts>
-	<keyconcepts>Vector Addition</keyconcepts>
+    
+    <keyconcepts level="basic">Performance Strategies</keyconcepts>
+    <keyconcepts level="basic">Pinned System Paged Memory</keyconcepts>
+	<keyconcepts level="basic">Vector Addition</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

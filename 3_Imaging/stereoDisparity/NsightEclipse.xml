@@ -2,13 +2,15 @@
     <name>Stereo Disparity Computation (SAD SIMD Intrinsics)</name>
     <description><![CDATA[A CUDA program that demonstrates how to compute a stereo disparity map using SIMD SAD (Sum of Absolute Difference) intrinsics.  Requires Compute Capability 2.0 or higher.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce GTX 400</minspec>
+    <minspec>SM 2.0</minspec>
     <keywords>CUDA, GPGPU, atomic</keywords>
     <scope>2:Graphics Interop,1:CUDA Advanced Topics,2:Image Processing</scope>
     <files>
         <file>data\stereo.im0.640x533.ppm</file>
         <file>data\stereo.im1.640x533.ppm</file>
     </files>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
+    <keyconcepts level="advanced">Video Intrinsics</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

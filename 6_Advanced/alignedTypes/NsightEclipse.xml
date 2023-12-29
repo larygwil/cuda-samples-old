@@ -2,11 +2,13 @@
     <name>Aligned Types</name>
     <description><![CDATA[A simple test, showing huge access speed gap between aligned and misaligned structures.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA</keywords>
     <scope>1:CUDA Basic Topics, 1:Performance Strategies</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Performance Strategies</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

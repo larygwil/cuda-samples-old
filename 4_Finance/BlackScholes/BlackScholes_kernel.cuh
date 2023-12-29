@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -81,14 +81,17 @@ __global__ void BlackScholesGPU(
     int optN
 )
 {
-    //Thread index
-    const int      tid = blockDim.x * blockIdx.x + threadIdx.x;
-    //Total number of threads in execution grid
-    const int THREAD_N = blockDim.x * gridDim.x;
+    ////Thread index
+    //const int      tid = blockDim.x * blockIdx.x + threadIdx.x;
+    ////Total number of threads in execution grid
+    //const int THREAD_N = blockDim.x * gridDim.x;
+
+    const int opt = blockDim.x * blockIdx.x + threadIdx.x;
 
     //No matter how small is execution grid or how large OptN is,
     //exactly OptN indices will be processed with perfect memory coalescing
-    for (int opt = tid; opt < optN; opt += THREAD_N)
+    //for (int opt = tid; opt < optN; opt += THREAD_N)
+    if (opt < optN)
         BlackScholesBodyGPU(
             d_CallResult[opt],
             d_PutResult[opt],

@@ -3,11 +3,11 @@
     <description><![CDATA[This sample demonstrates simple printf implemented using CUDA Dynamic Parallelism.  This sample requires devices with compute capability 3.5 or higher.]]></description>
     <whitepaper></whitepaper>
     <minspec>KEPLER SM 3.5</minspec>
-    <keywords>GPGPU</keywords>
+    <keywords>CUDA,CDP,GPGPU</keywords>
     <scope>1:CUDA Basic Topics</scope>
     <cudaapi></cudaapi>
-    <keyconcepts>CUDA Basic Topics</keyconcepts>
-    <keyconcepts>CUDA Dynamic Parallelism</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Dynamic Parallelism</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

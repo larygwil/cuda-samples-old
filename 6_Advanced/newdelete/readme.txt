@@ -1,5 +1,5 @@
 Sample: NewDelete
-Minimum spec: GeForce GTX 400
+Minimum spec: SM 2.0
 
 
 

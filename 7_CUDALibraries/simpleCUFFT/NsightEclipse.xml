@@ -2,11 +2,14 @@
     <name>Simple CUFFT</name>
     <description><![CDATA[Example of using CUFFT. In this example, CUFFT is used to compute the 1D-convolution of some signal with some filter by transforming both into frequency domain, multiplying them together, and transforming the signal back to time domain.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>CUDA Libraries</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CUFFT</keywords>
     <scope>1:CUDA Basic Topics,2:Image Processing</scope>
     <files>
     </files>
+    
+    <keyconcepts level="basic">Image Processing</keyconcepts>
+    <keyconcepts level="basic">CUFFT Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

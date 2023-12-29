@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -362,7 +362,7 @@ void initGL(int *argc, char **argv)
         fprintf(stderr, "  GL_ARB_vertex_buffer_object\n");
         fprintf(stderr, "  GL_ARB_pixel_buffer_object\n");
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 }
 
@@ -434,7 +434,6 @@ int findCapableDevice(int argc, char **argv)
         fprintf(stderr, "This SDK sample has minimum requirements:\n");
         fprintf(stderr, "\tCUDA Compute Capability >= %d.%d is required\n", MIN_COMPUTE_VERSION/16, MIN_COMPUTE_VERSION%16);
         fprintf(stderr, "\tCUDA Runtime Version    >= %d.%d is required\n", MIN_RUNTIME_VERSION/1000, (MIN_RUNTIME_VERSION%100)/10);
-        //        fprintf(stderr, "PASSED\n");
     }
 
     return bestDev;
@@ -456,7 +455,7 @@ void checkDeviceMeetComputeSpec(int argc, char **argv)
         fprintf(stderr, "\tCUDA Compute Capability >= %d.%d is required\n", MIN_COMPUTE_VERSION/16, MIN_COMPUTE_VERSION%16);
         fprintf(stderr, "\tCUDA Runtime Version    >= %d.%d is required\n", MIN_RUNTIME_VERSION/1000, (MIN_RUNTIME_VERSION%100)/10);
         cudaDeviceReset();
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 }
 
@@ -481,26 +480,29 @@ void runAutoTest(int argc, char *argv[])
     mode = getCmdLineArgumentInt(argc, (const char **)argv, "mode");
     getCmdLineArgumentString(argc, (const char **)argv, "file", &ref_file);
 
-    switch (mode) 
+    switch (mode)
     {
-    case 0: 
-        g_SobelDisplayMode = SOBELDISPLAY_IMAGE;
-        sprintf(dump_file, "lena_orig.pgm");
-        break;
-    case 1:
-        g_SobelDisplayMode = SOBELDISPLAY_SOBELTEX;
-        sprintf(dump_file, "lena_tex.pgm");
-        break;
-    case 2:
-        g_SobelDisplayMode = SOBELDISPLAY_SOBELSHARED;
-        sprintf(dump_file, "lena_shared.pgm");
-        break;
-    default:
-        printf("Invalid Filter Mode File\n");
-        exit(EXIT_FAILURE);
-        break;
+        case 0:
+            g_SobelDisplayMode = SOBELDISPLAY_IMAGE;
+            sprintf(dump_file, "lena_orig.pgm");
+            break;
+
+        case 1:
+            g_SobelDisplayMode = SOBELDISPLAY_SOBELTEX;
+            sprintf(dump_file, "lena_tex.pgm");
+            break;
+
+        case 2:
+            g_SobelDisplayMode = SOBELDISPLAY_SOBELSHARED;
+            sprintf(dump_file, "lena_shared.pgm");
+            break;
+
+        default:
+            printf("Invalid Filter Mode File\n");
+            exit(EXIT_FAILURE);
+            break;
     }
-    
+
     printf("AutoTest: %s <%s>\n", sSDKsample, filterMode[g_SobelDisplayMode]);
     sobelFilter(d_result, imWidth, imHeight, g_SobelDisplayMode, imageScale, blockOp, pointOp);
     checkCudaErrors(cudaDeviceSynchronize());
@@ -541,7 +543,7 @@ int main(int argc, char **argv)
         printf("\t\t-mode=n (0=original, 1=texture, 2=smem + texture)\n");
         printf("\t\t-file=ref_orig.pgm (ref_tex.pgm, ref_shared.pgm)\n\n");
 
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     if (checkCmdLineFlag(argc, (const char **)argv, "file"))
@@ -558,7 +560,7 @@ int main(int argc, char **argv)
         printf("   See details below to run without OpenGL:\n\n");
         printf(" > %s -device=n\n\n", argv[0]);
         printf("exiting...\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     if (!g_bQAReadback)
@@ -566,7 +568,19 @@ int main(int argc, char **argv)
         // First initialize OpenGL context, so we can properly set the GL for CUDA.
         // This is necessary in order to achieve optimal performance with OpenGL/CUDA interop.
         initGL(&argc, argv);
-        cudaGLSetGLDevice(gpuGetMaxGflopsDeviceId());
+
+        int dev = findCapableDevice(argc, argv);
+
+		checkDeviceMeetComputeSpec(argc, argv);
+	
+		if (dev != -1)
+        {
+            cudaGLSetGLDevice(dev);
+        }
+        else
+        {
+            exit(EXIT_WAIVED);
+        }
 
         sdkCreateTimer(&timer);
         sdkResetTimer(&timer);

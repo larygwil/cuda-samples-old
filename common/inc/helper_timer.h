@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -12,6 +12,10 @@
 // Helper Timing Functions
 #ifndef HELPER_TIMER_H
 #define HELPER_TIMER_H
+
+#ifndef EXIT_WAIVED
+#define EXIT_WAIVED 2
+#endif
 
 // includes, system
 #include <vector>

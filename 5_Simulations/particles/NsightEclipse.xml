@@ -2,8 +2,8 @@
     <name>Particles</name>
     <description><![CDATA[This sample uses CUDA to simulate and visualize a large set of particles and their physical interaction.  Adding "-particles=<N>" to the command line will allow users to set # of particles for simulation.  This example implements a uniform grid data structure using either atomic operations or a fast radix sort from the Thrust library]]></description>
     <whitepaper>doc\particles.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>GPGPU</keywords>
+    <minspec>SM 1.1</minspec>
+    <keywords>CUDA,GPGPU,OpenGL</keywords>
     <scope>2:Graphics Interop,3:Physically-Based Simulation</scope>
     <files>
         <file>..\..\doc\Thrust_license.txt</file>
@@ -13,7 +13,18 @@
     <qatests>
         <qatest>-file=ref_particles.bin</qatest>
     </qatests>
-
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">Data Parallel Algorithms</keyconcepts>
+    <keyconcepts level="advanced">Physically-Based Simulation</keyconcepts>
+    <keyconcepts level="advanced">Performance Strategies</keyconcepts>
+    
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->

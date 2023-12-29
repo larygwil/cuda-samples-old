@@ -1,12 +1,13 @@
 <entry>
     <name>Niederreiter Quasirandom Sequence Generator</name>
-    <description><![CDATA[This sample implements Niederreiter Quasirandom Sequence Generator and Inverse Cumulative Normal Distribution function for Standart Normal Distribution generation. ]]></description>
+    <description><![CDATA[This sample implements Niederreiter Quasirandom Sequence Generator and Inverse Cumulative Normal Distribution functions for the generation of Standard Normal Distributions. ]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA,Advanced Topics,Quasi-Monte Carlo Integration,Computational Finance.</keywords>
     <scope>1:CUDA Advanced Topics,3:Computational Finance</scope>
     <files>
     </files>
+    <keyconcepts level="advanced">Computational Finance</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
@@ -32,7 +33,7 @@
     
     <nvcc-compiler file="quasirandomGenerator_SM10.cu"></nvcc-compiler>
     <nvcc-compiler file="quasirandomGenerator_SM13.cu"></nvcc-compiler>
-    <sm-arch>sm10</sm-arch>
+    <sm-arch>sm13</sm-arch>
     <sm-arch>sm20</sm-arch>
     <sm-arch>sm30</sm-arch>
 

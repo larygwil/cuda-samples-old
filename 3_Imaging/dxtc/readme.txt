@@ -1,5 +1,5 @@
 Sample: DirectX Texture Compressor (DXTC)
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
 High Quality DXT Compre
 

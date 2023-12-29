@@ -2,18 +2,23 @@
     <name>Image Segmentation using Graphcuts with NPP</name>
     <description><![CDATA[This sample that demonstrates how to perform image segmentation using the NPP GraphCut function.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>CUDA, NPP, segmentation, graphcuts</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,NPP,segmentation,graphcuts</keywords>
     <scope>1:CUDA Basic Topics,1:Performance Strategies,2:Computer Vision</scope>
     <files>
         <file>..\..\common\data\person.txt</file>
     </files>
+    
+    <keyconcepts level="basic">Image Processing</keyconcepts>
+    <keyconcepts level="basic">Performance Strategies</keyconcepts>
+    <keyconcepts level="basic">NPP Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->
     <!-- "framework" attribute will be ignored on platforms other then Mac OS X -->
-    <library>npp</library>
+    <library>nppi</library>
+    <library>nppc</library>
 	<library>freeimage</library>
 
     <!-- Either absolute or relative to sample -->

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -58,6 +58,8 @@ const int  NUM_ITERATIONS = 512;
 const int          OPT_SZ = OPT_N * sizeof(float);
 const float      RISKFREE = 0.02f;
 const float    VOLATILITY = 0.30f;
+
+#define DIV_UP(a, b) ( ((a) + (b) - 1) / (b) )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main program
@@ -145,7 +147,7 @@ int main(int argc, char **argv)
 
     for (i = 0; i < NUM_ITERATIONS; i++)
     {
-        BlackScholesGPU<<<480, 128>>>(
+        BlackScholesGPU<<<DIV_UP(OPT_N, 128), 128/*480, 128*/>>>(
             d_CallResult,
             d_PutResult,
             d_StockPrice,

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -367,26 +367,29 @@ void runAutoTest(int argc, char *argv[])
     mode = getCmdLineArgumentInt(argc, (const char **)argv, "mode");
     getCmdLineArgumentString(argc, (const char **)argv, "file", &ref_file);
 
-    switch (mode) 
+    switch (mode)
     {
-    case 0: 
-        g_SobelDisplayMode = SOBELDISPLAY_IMAGE;
-        sprintf(dump_file, "lena_orig.pgm");
-        break;
-    case 1:
-        g_SobelDisplayMode = SOBELDISPLAY_SOBELTEX;
-        sprintf(dump_file, "lena_tex.pgm");
-        break;
-    case 2:
-        g_SobelDisplayMode = SOBELDISPLAY_SOBELSHARED;
-        sprintf(dump_file, "lena_shared.pgm");
-        break;
-    default:
-        printf("Invalid Filter Mode File\n");
-        exit(EXIT_FAILURE);
-        break;
+        case 0:
+            g_SobelDisplayMode = SOBELDISPLAY_IMAGE;
+            sprintf(dump_file, "lena_orig.pgm");
+            break;
+
+        case 1:
+            g_SobelDisplayMode = SOBELDISPLAY_SOBELTEX;
+            sprintf(dump_file, "lena_tex.pgm");
+            break;
+
+        case 2:
+            g_SobelDisplayMode = SOBELDISPLAY_SOBELSHARED;
+            sprintf(dump_file, "lena_shared.pgm");
+            break;
+
+        default:
+            printf("Invalid Filter Mode File\n");
+            exit(EXIT_FAILURE);
+            break;
     }
-    
+
     printf("AutoTest: %s <%s>\n", sSDKsample, filterMode[g_SobelDisplayMode]);
     sobelFilter(d_result, imWidth, imHeight, g_SobelDisplayMode, imageScale);
     checkCudaErrors(cudaDeviceSynchronize());

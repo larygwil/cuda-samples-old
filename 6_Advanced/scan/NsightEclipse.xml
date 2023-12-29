@@ -1,11 +1,14 @@
 <entry>
     <name>CUDA Parallel Prefix Sum (Scan)</name>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>GPGPU, CUDA, scan, parallel prefix sum,Data-Parallel Algorithms</keywords>
     <scope>1:CUDA Advanced Topics,1:Data-Parallel Algorithms,1:Performance Strategies</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Data-Parallel Algorithms</keyconcepts>
+    <keyconcepts level="advanced">Performance Strategies</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

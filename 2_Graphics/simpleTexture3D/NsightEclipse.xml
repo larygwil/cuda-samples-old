@@ -2,7 +2,7 @@
     <name>Simple Texture 3D</name>
     <description><![CDATA[Simple example that demonstrates use of 3D Textures in CUDA.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,2:Graphics Interop,2:Texture,2:Image Processing</scope>
     <files>
@@ -12,7 +12,6 @@
     <qatests>
        <qatest>-file=ref_texture3D.bin</qatest>
     </qatests>
-
     <cudaapi>cudaGLSetGLDevice</cudaapi>
     <cudaapi>cudaGraphicsMapResources</cudaapi>
     <cudaapi>cudaGraphicsUnmapResources</cudaapi>
@@ -20,10 +19,11 @@
     <cudaapi>cudaGraphicsRegisterResource</cudaapi>
     <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
     <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
-    <keyconcepts>OpenGL Graphics Interop</keyconcepts>
-    <keyconcepts>Image Processing</keyconcepts>
-    <keyconcepts>3D Textures</keyconcepts>
-    <keyconcepts>Surface Writes</keyconcepts>
+    
+    <keyconcepts level="basic">Graphics Interop</keyconcepts>
+    <keyconcepts level="basic">Image Processing</keyconcepts>
+    <keyconcepts level="basic">3D Textures</keyconcepts>
+    <keyconcepts level="basic">Surface Writes</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

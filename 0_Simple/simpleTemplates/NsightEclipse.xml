@@ -2,14 +2,14 @@
     <name>Simple Templates</name>
     <description><![CDATA[This sample is a templatized version of the template project. It also shows how to correctly templatize dynamically allocated shared memory arrays.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
     </files>
     <cudaapi></cudaapi>
-	<keyconcepts>CUDA Basic Concepts</keyconcepts>
-    <keyconcepts>C++ Templates</keyconcepts>
+	
+    <keyconcepts level="basic">C++ Templates</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

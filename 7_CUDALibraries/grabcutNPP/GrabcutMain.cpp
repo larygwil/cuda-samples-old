@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -9,6 +9,7 @@
 *
 */
 
+#pragma warning(disable:4819)
 
 #ifdef _WIN32
 #  define WINDOWS_LEAN_AND_MEAN
@@ -65,8 +66,7 @@ const char *gold_image = "flower_gold.png";
 bool g_bQATest = false;
 bool g_bDisplay = true;
 int  g_nDevice = 0;
-std::string sFilename;
-
+std::string sFilename, sReferenceFile;
 
 const int handle_radius = 4;
 int mouseDown_x, mouseDown_y;
@@ -138,8 +138,6 @@ inline int cudaDeviceInit()
         checkCudaErrors(cudaSetDevice(dev));
     }
 
-
-
     return dev;
 }
 
@@ -147,9 +145,8 @@ void parseCommandLineArguments(int argc, char *argv[])
 {
     if (argc >= 2)
     {
-        if (checkCmdLineFlag(argc, (const char **)argv, "qatest") || checkCmdLineFlag(argc, (const char **)argv, "noprompt"))
+        if (checkCmdLineFlag(argc, (const char **)argv, "nodisplay"))
         {
-            g_bQATest = true;
             g_bDisplay = false;
         }
 
@@ -158,9 +155,19 @@ void parseCommandLineArguments(int argc, char *argv[])
             g_nDevice = getCmdLineArgumentInt(argc, (const char **)argv, "device");
         }
 
-        if (checkCmdLineFlag(argc, (const char **)argv, "file"))
+        if (checkCmdLineFlag(argc, (const char **)argv, "input"))
         {
-            getCmdLineArgumentString(argc, (const char **)argv, "file", (char **)&sFilename);
+            char* pFilename = 0;
+            getCmdLineArgumentString(argc, (const char **)argv, "input", &pFilename);
+            if( pFilename ) sFilename = pFilename;
+        }
+        if (checkCmdLineFlag(argc, (const char **)argv, "verify"))
+        {
+            char* pReferenceFile = 0;
+            getCmdLineArgumentString(argc, (const char **)argv, "verify", &pReferenceFile);
+            if( pReferenceFile) sReferenceFile = pReferenceFile;
+            g_bQATest = true;
+            g_bDisplay = false;
         }
     }
 }
@@ -170,8 +177,8 @@ NppGpuComputeCapability printfNPPinfo(char *argv[])
     const char *sComputeCap[] =
     {
         "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2",  "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", NULL
+        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
+        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
     };
 
     const NppLibraryVersion *libVer   = nppGetLibVersion();
@@ -294,7 +301,7 @@ int main(int argc, char **argv)
         p4Bitmap = FreeImage_ConvertTo32Bits(pBitmap);
     }
 
-    if (g_bDisplay)
+    if (!g_bQATest && g_bDisplay)
     {
         initGL(&argc, argv, width, height);
     }
@@ -306,7 +313,6 @@ int main(int argc, char **argv)
     FreeImage_Unload(pBitmap);
 
     checkCudaErrors(cudaMallocPitch(&d_trimap, &trimap_pitch, width, height));
-
 
     // Setup GrabCut
     grabcut = new GrabCut(d_image, (int) image_pitch, d_trimap, (int) trimap_pitch, width, height);
@@ -321,7 +327,7 @@ int main(int argc, char **argv)
 
     grabcut->computeSegmentationFromTrimap();
 
-    if (g_bDisplay)
+    if (!g_bQATest && g_bDisplay)
     {
         glutMainLoop();
     }
@@ -330,7 +336,7 @@ int main(int argc, char **argv)
 
     if (g_bQATest)
     {
-        qaStatus = verifyResult(sdkFindFilePath(gold_image, argv[0])) ? EXIT_SUCCESS : EXIT_FAILURE;
+        qaStatus = verifyResult(sdkFindFilePath((char *)sReferenceFile.c_str(), argv[0])) ? EXIT_SUCCESS : EXIT_FAILURE;
     }
 
     // Cleanup
@@ -722,6 +728,8 @@ bool verifyResult(const char *filename)
             }
         }
     }
+    printf("Checking grabcut results with reference file <%s>\n", filename);
+    printf("Images %s\n", result ? "Match!" : "Mismatched!");
 
     FreeImage_Unload(h_Image);
     FreeImage_Unload(goldImage);

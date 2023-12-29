@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     if (!IsAppBuiltAs64())
     {
         printf("%s is only supported with on 64-bit OSs and the application must be built as a 64-bit target.  Test is being waived.\n", argv[0]);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     // Number of GPUs
@@ -117,10 +117,10 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaDeviceCanAccessPeer(&can_access_peer_1_0, gpuid[1], gpuid[0]));
 
     // Output results from P2P capabilities
-    printf("> Peer access from %s (GPU%d) -> %s (GPU%d) : %s\n", prop[gpuid[0]].name, gpuid[0],
+    printf("> Peer-to-Peer (P2P) access from %s (GPU%d) -> %s (GPU%d) : %s\n", prop[gpuid[0]].name, gpuid[0],
            prop[gpuid[1]].name, gpuid[1] ,
            can_access_peer_0_1 ? "Yes" : "No");
-    printf("> Peer access from %s (GPU%d) -> %s (GPU%d) : %s\n", prop[gpuid[1]].name, gpuid[1],
+    printf("> Peer-to-Peer (P2P) access from %s (GPU%d) -> %s (GPU%d) : %s\n", prop[gpuid[1]].name, gpuid[1],
            prop[gpuid[0]].name, gpuid[0],
            can_access_peer_1_0 ? "Yes" : "No");
 

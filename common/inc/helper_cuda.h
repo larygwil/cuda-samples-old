@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -23,9 +23,39 @@
 
 #include <helper_string.h>
 
-//#include <string>
-//#include <iostream>
-//#include <sstream>
+/*
+inline void __ExitInTime(int seconds)
+{
+    fprintf(stdout, "> exiting in %d seconds: ", seconds);
+    fflush(stdout);
+    time_t t;
+    int count;
+
+    for (t=time(0)+seconds, count=seconds; time(0) < t; count--) {
+        fprintf(stdout, "%d...", count);
+#if defined(WIN32)
+        Sleep(1000);
+#else
+        sleep(1);
+#endif
+    }
+
+    fprintf(stdout,"done!\n\n");
+    fflush(stdout);
+}
+
+#define EXIT_TIME_DELAY 2
+
+inline void EXIT_DELAY(int return_code)
+{
+    __ExitInTime(EXIT_TIME_DELAY);
+    exit(return_code);
+}
+*/
+
+#ifndef EXIT_WAIVED
+#define EXIT_WAIVED 2
+#endif
 
 // Note, it is required that your SDK sample to include the proper header files, please
 // refer the CUDA examples for examples of the needed CUDA headers, which may change depending
@@ -569,23 +599,69 @@ static const char *_cudaGetErrorEnum(NppStatus error)
         case NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY:
             return "NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY";
 
+#if ((NPP_VERSION_MAJOR << 12) + (NPP_VERSION_MINOR << 4)) <= 0x5000
         case NPP_BAD_ARG_ERROR:
-            return "NPP_BAD_ARG_ERROR";
+            return "NPP_BAD_ARGUMENT_ERROR";
+
+        case NPP_COEFF_ERROR:
+            return "NPP_COEFFICIENT_ERROR";
+
+        case NPP_RECT_ERROR:
+            return "NPP_RECTANGLE_ERROR";
+
+        case NPP_QUAD_ERROR:
+            return "NPP_QUADRANGLE_ERROR";
+
+        case NPP_MEM_ALLOC_ERR:
+            return "NPP_MEMORY_ALLOCATION_ERROR";
+
+        case NPP_HISTO_NUMBER_OF_LEVELS_ERROR:
+            return "NPP_HISTOGRAM_NUMBER_OF_LEVELS_ERROR";
+
+        case NPP_INVALID_INPUT:
+            return "NPP_INVALID_INPUT";
+
+        case NPP_POINTER_ERROR:
+            return "NPP_POINTER_ERROR";
+
+        case NPP_WARNING:
+            return "NPP_WARNING";
+
+        case NPP_ODD_ROI_WARNING:
+            return "NPP_ODD_ROI_WARNING";
+#else
+
+            // These are for CUDA 5.5 or higher
+        case NPP_BAD_ARGUMENT_ERROR:
+            return "NPP_BAD_ARGUMENT_ERROR";
+
+        case NPP_COEFFICIENT_ERROR:
+            return "NPP_COEFFICIENT_ERROR";
+
+        case NPP_RECTANGLE_ERROR:
+            return "NPP_RECTANGLE_ERROR";
+
+        case NPP_QUADRANGLE_ERROR:
+            return "NPP_QUADRANGLE_ERROR";
+
+        case NPP_MEMORY_ALLOCATION_ERR:
+            return "NPP_MEMORY_ALLOCATION_ERROR";
+
+        case NPP_HISTOGRAM_NUMBER_OF_LEVELS_ERROR:
+            return "NPP_HISTOGRAM_NUMBER_OF_LEVELS_ERROR";
+
+        case NPP_INVALID_HOST_POINTER_ERROR:
+            return "NPP_INVALID_HOST_POINTER_ERROR";
+
+        case NPP_INVALID_DEVICE_POINTER_ERROR:
+            return "NPP_INVALID_DEVICE_POINTER_ERROR";
+#endif
 
         case NPP_LUT_NUMBER_OF_LEVELS_ERROR:
             return "NPP_LUT_NUMBER_OF_LEVELS_ERROR";
 
         case NPP_TEXTURE_BIND_ERROR:
             return "NPP_TEXTURE_BIND_ERROR";
-
-        case NPP_COEFF_ERROR:
-            return "NPP_COEFF_ERROR";
-
-        case NPP_RECT_ERROR:
-            return "NPP_RECT_ERROR";
-
-        case NPP_QUAD_ERROR:
-            return "NPP_QUAD_ERROR";
 
         case NPP_WRONG_INTERSECTION_ROI_ERROR:
             return "NPP_WRONG_INTERSECTION_ROI_ERROR";
@@ -602,26 +678,32 @@ static const char *_cudaGetErrorEnum(NppStatus error)
         case NPP_HAAR_CLASSIFIER_PIXEL_MATCH_ERROR:
             return "NPP_HAAR_CLASSIFIER_PIXEL_MATCH_ERROR";
 
+
+#if ((NPP_VERSION_MAJOR << 12) + (NPP_VERSION_MINOR << 4)) <= 0x5000
         case NPP_MEMFREE_ERR:
             return "NPP_MEMFREE_ERR";
 
         case NPP_MEMSET_ERR:
             return "NPP_MEMSET_ERR";
 
-        case NPP_MEMCPY_ERROR:
+        case NPP_MEMCPY_ERR:
             return "NPP_MEMCPY_ERROR";
-
-        case NPP_MEM_ALLOC_ERR:
-            return "NPP_MEM_ALLOC_ERR";
-
-        case NPP_HISTO_NUMBER_OF_LEVELS_ERROR:
-            return "NPP_HISTO_NUMBER_OF_LEVELS_ERROR";
 
         case NPP_MIRROR_FLIP_ERR:
             return "NPP_MIRROR_FLIP_ERR";
+#else
+        case NPP_MEMFREE_ERROR:
+            return "NPP_MEMFREE_ERROR";
 
-        case NPP_INVALID_INPUT:
-            return "NPP_INVALID_INPUT";
+        case NPP_MEMSET_ERROR:
+            return "NPP_MEMSET_ERROR";
+
+        case NPP_MEMCPY_ERROR:
+            return "NPP_MEMCPY_ERROR";
+
+        case NPP_MIRROR_FLIP_ERROR:
+            return "NPP_MIRROR_FLIP_ERROR";
+#endif
 
         case NPP_ALIGNMENT_ERROR:
             return "NPP_ALIGNMENT_ERROR";
@@ -631,9 +713,6 @@ static const char *_cudaGetErrorEnum(NppStatus error)
 
         case NPP_SIZE_ERROR:
             return "NPP_SIZE_ERROR";
-
-        case NPP_POINTER_ERROR:
-            return "NPP_POINTER_ERROR";
 
         case NPP_NULL_POINTER_ERROR:
             return "NPP_NULL_POINTER_ERROR";
@@ -650,9 +729,6 @@ static const char *_cudaGetErrorEnum(NppStatus error)
         case NPP_SUCCESS:
             return "NPP_SUCCESS";
 
-        case NPP_WARNING:
-            return "NPP_WARNING";
-
         case NPP_WRONG_INTERSECTION_QUAD_WARNING:
             return "NPP_WRONG_INTERSECTION_QUAD_WARNING";
 
@@ -665,9 +741,6 @@ static const char *_cudaGetErrorEnum(NppStatus error)
         case NPP_DOUBLE_SIZE_WARNING:
             return "NPP_DOUBLE_SIZE_WARNING";
 
-        case NPP_ODD_ROI_WARNING:
-            return "NPP_ODD_ROI_WARNING";
-
         case NPP_WRONG_INTERSECTION_ROI_WARNING:
             return "NPP_WRONG_INTERSECTION_ROI_WARNING";
     }
@@ -676,36 +749,26 @@ static const char *_cudaGetErrorEnum(NppStatus error)
 }
 #endif
 
+#ifdef __DRIVER_TYPES_H__
+#ifndef DEVICE_RESET
+#define DEVICE_RESET cudaDeviceReset();
+#endif
+#else
+#ifndef DEVICE_RESET
+#define DEVICE_RESET 
+#endif
+#endif
+
 template< typename T >
-bool check(T result, char const *const func, const char *const file, int const line)
+void check(T result, char const *const func, const char *const file, int const line)
 {
     if (result)
     {
         fprintf(stderr, "CUDA error at %s:%d code=%d(%s) \"%s\" \n",
                 file, line, static_cast<unsigned int>(result), _cudaGetErrorEnum(result), func);
-        /*
-                std::stringstream ss;
-                std::string msg("CUDA error at ");
-                msg += file;
-                msg += ":";
-                ss << line;
-                msg += ss.str();
-                msg += " code=";
-                ss << static_cast<unsigned int>(result);
-                msg += ss.str();
-                msg += " (";
-                msg += _cudaGetErrorEnum(result);
-                msg += ") \"";
-                msg += func;
-                msg += "\"";
-                //throw msg;
-                std::cerr  << msg <<"\n";
-        */
-        return true;
-    }
-    else
-    {
-        return false;
+		DEVICE_RESET
+        // Make sure we call CUDA Device Reset before exiting
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -724,6 +787,7 @@ inline void __getLastCudaError(const char *errorMessage, const char *file, const
     {
         fprintf(stderr, "%s(%i) : getLastCudaError() CUDA error : %s : (%d) %s.\n",
                 file, line, errorMessage, (int)err, cudaGetErrorString(err));
+		DEVICE_RESET
         exit(EXIT_FAILURE);
     }
 }
@@ -778,10 +842,10 @@ inline int _ConvertSMVer2Cores(int major, int minor)
 // General GPU Device CUDA Initialization
 inline int gpuDeviceInit(int devID)
 {
-    int deviceCount;
-    checkCudaErrors(cudaGetDeviceCount(&deviceCount));
+    int device_count;
+    checkCudaErrors(cudaGetDeviceCount(&device_count));
 
-    if (deviceCount == 0)
+    if (device_count == 0)
     {
         fprintf(stderr, "gpuDeviceInit() CUDA error: no devices supporting CUDA.\n");
         exit(EXIT_FAILURE);
@@ -792,10 +856,10 @@ inline int gpuDeviceInit(int devID)
         devID = 0;
     }
 
-    if (devID > deviceCount-1)
+    if (devID > device_count-1)
     {
         fprintf(stderr, "\n");
-        fprintf(stderr, ">> %d CUDA capable GPU device(s) detected. <<\n", deviceCount);
+        fprintf(stderr, ">> %d CUDA capable GPU device(s) detected. <<\n", device_count);
         fprintf(stderr, ">> gpuDeviceInit (-device=%d) is not a valid GPU device. <<\n", devID);
         fprintf(stderr, "\n");
         return -devID;
@@ -830,6 +894,14 @@ inline int gpuGetMaxGflopsDeviceId()
     int device_count       = 0, best_SM_arch      = 0;
     cudaDeviceProp deviceProp;
     cudaGetDeviceCount(&device_count);
+
+    checkCudaErrors(cudaGetDeviceCount(&device_count));
+
+    if (device_count == 0)
+    {
+        fprintf(stderr, "gpuGetMaxGflopsDeviceId() CUDA error: no devices supporting CUDA.\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Find the best major SM Architecture GPU device
     while (current_device < device_count)

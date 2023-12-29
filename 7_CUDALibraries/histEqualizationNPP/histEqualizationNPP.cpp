@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -9,6 +9,7 @@
  *
  */
 
+#pragma warning (disable:4819)
 
 #ifdef _WIN32
 #  define WINDOWS_LEAN_AND_MEAN
@@ -63,25 +64,13 @@ inline int cudaDeviceInit(int argc, const char **argv)
     return dev;
 }
 
-void parseCommandLineArguments(int argc, char *argv[])
-{
-    if (argc >= 2)
-    {
-        if (checkCmdLineFlag(argc, (const char **)argv, "qatest") ||
-            checkCmdLineFlag(argc, (const char **)argv, "noprompt"))
-        {
-            g_bQATest = true;
-        }
-    }
-}
-
 void printfNPPinfo(int argc, char *argv[])
 {
     const char *sComputeCap[] =
     {
         "No CUDA Capable Device Found",
-        "Compute 1.0", "Compute 1.1", "Compute 1.2",  "Compute 1.3",
-        "Compute 2.0", "Compute 2.1", "Compute 3.0", NULL
+        "Compute 1.0", "Compute 1.1", "Compute 1.2", "Compute 1.3",
+        "Compute 2.0", "Compute 2.1", "Compute 3.0", "Compute 3.5", NULL
     };
 
     const NppLibraryVersion *libVer   = nppGetLibVersion();
@@ -126,9 +115,6 @@ int main(int argc, char *argv[])
             printf("Error unable to find Lena.pgm\n");
             exit(EXIT_FAILURE);
         }
-
-        // Parse the command line arguments for proper configuration
-        parseCommandLineArguments(argc, argv);
 
         cudaDeviceInit(argc, (const char **)argv);
 
@@ -185,7 +171,7 @@ int main(int argc, char *argv[])
         // allocate arrays for histogram and levels
         //
 
-        const int binCount = 256;
+        const int binCount = 255;
         const int levelCount = binCount + 1; // levels array has one more element
 
         Npp32s *histDevice = 0;
@@ -207,7 +193,7 @@ int main(int argc, char *argv[])
 
         // compute levels values on host
         Npp32s levelsHost[levelCount];
-        NPP_CHECK_NPP(nppiEvenLevelsHost_32s(levelsHost, levelCount, 0, binCount));
+        NPP_CHECK_NPP(nppiEvenLevelsHost_32s(levelsHost, levelCount, 0, levelCount));
         // compute the histogram
         NPP_CHECK_NPP(nppiHistogramEven_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(), oSizeROI,
                                                histDevice, levelCount, 0, binCount,
@@ -261,11 +247,11 @@ int main(int argc, char *argv[])
         Npp32s  *lutDevice  = 0;
         Npp32s  *lvlsDevice = 0;
 
-        NPP_CHECK_CUDA(cudaMalloc((void **)&lutDevice,  sizeof(Npp32s) * (binCount + 1)));
-        NPP_CHECK_CUDA(cudaMalloc((void **)&lvlsDevice, sizeof(Npp32s) * binCount));
+        NPP_CHECK_CUDA(cudaMalloc((void **)&lutDevice,    sizeof(Npp32s) * (binCount + 1)));
+        NPP_CHECK_CUDA(cudaMalloc((void **)&lvlsDevice,   sizeof(Npp32s) * (binCount + 1)));
 
-        NPP_CHECK_CUDA(cudaMemcpy(lutDevice , lutHost,   sizeof(Npp32s) * (binCount+1), cudaMemcpyHostToDevice));
-        NPP_CHECK_CUDA(cudaMemcpy(lvlsDevice, levelsHost, sizeof(Npp32s) * binCount   , cudaMemcpyHostToDevice));
+        NPP_CHECK_CUDA(cudaMemcpy(lutDevice , lutHost,    sizeof(Npp32s) * (binCount+1), cudaMemcpyHostToDevice));
+        NPP_CHECK_CUDA(cudaMemcpy(lvlsDevice, levelsHost, sizeof(Npp32s) * (binCount+1), cudaMemcpyHostToDevice));
 
         NPP_CHECK_NPP(nppiLUT_Linear_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(),
                                             oDeviceDst.data(), oDeviceDst.pitch(),

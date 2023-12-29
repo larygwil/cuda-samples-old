@@ -1,8 +1,8 @@
 <entry>
-    <name>Bicubic Texture Filtering</name>
-    <description><![CDATA[This sample demonstrates how to efficiently implement bicubic Texture filtering in CUDA.]]></description>
+    <name>Bicubic B-spline Interoplation</name>
+    <description><![CDATA[This sample demonstrates how to efficiently implement a Bicubic B-spline interpolation filter with CUDA texture.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,2:Texture,2:Image Processing,2:Computer Vision</scope>
     <files>
@@ -20,7 +20,17 @@
         <qatest>-mode=3 -file=3_fastbicubic.ppm</qatest>
         <qatest>-mode=4 -file=4_catmull-rom.ppm</qatest>
     </qatests>
-	
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    
+    <keyconcepts level="basic">Graphics Interop</keyconcepts>
+    <keyconcepts level="basic">Image Processing</keyconcepts>
+
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->
@@ -31,6 +41,13 @@
     <library os="linux">X11</library>
     <library os="linux">GLEW</library>
     <library os="linux">glut</library>
+
+    <!-- Either absolute or relative to sample -->
+    <library-path os="windows" arch="x86_64">../../common/lib/x64</library-path>
+    <library-path os="windows" arch="Win32">../../common/lib/Win32</library-path>
+    <library-path os="linux" arch="x86_64">../../common/lib/linux/x86_64</library-path>
+    <library-path os="linux" arch="i686">../../common/lib/linux/i686</library-path>
+    <library-path os="macosx">../../common/lib/darwin</library-path>
 
     <!-- Either absolute or relative to sample -->
     <include-path>./</include-path>

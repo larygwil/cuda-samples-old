@@ -1,16 +1,16 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
- * NOTICE TO USER:   
+ * NOTICE TO USER:
  *
  * This source code is subject to NVIDIA ownership rights under U.S. and
- * international Copyright laws.  
+ * international Copyright laws.
  *
- * This software and the information contained herein is being provided 
- * under the terms and conditions of a Source Code License Agreement.     
+ * This software and the information contained herein is being provided
+ * under the terms and conditions of a Source Code License Agreement.
  *
  * NVIDIA MAKES NO REPRESENTATION ABOUT THE SUITABILITY OF THIS SOURCE
- * CODE FOR ANY PURPOSE.  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR 
+ * CODE FOR ANY PURPOSE.  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR
  * IMPLIED WARRANTY OF ANY KIND.  NVIDIA DISCLAIMS ALL WARRANTIES WITH
  * REGARD TO THIS SOURCE CODE, INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -18,15 +18,15 @@
  * OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
  * OF USE, DATA OR PROFITS,  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
  * OR OTHER TORTIOUS ACTION,  ARISING OUT OF OR IN CONNECTION WITH THE USE
- * OR PERFORMANCE OF THIS SOURCE CODE.  
+ * OR PERFORMANCE OF THIS SOURCE CODE.
  *
- * U.S. Government End Users.   This source code is a "commercial item" as 
+ * U.S. Government End Users.   This source code is a "commercial item" as
  * that term is defined at  48 C.F.R. 2.101 (OCT 1995), consisting  of
- * "commercial computer  software"  and "commercial computer software 
+ * "commercial computer  software"  and "commercial computer software
  * documentation" as such terms are  used in 48 C.F.R. 12.212 (SEPT 1995)
  * and is provided to the U.S. Government only as a commercial end item.
  * Consistent with 48 C.F.R.12.212 and 48 C.F.R. 227.7202-1 through
- * 227.7202-4 (JUNE 1995), all U.S. Government End Users acquire the 
+ * 227.7202-4 (JUNE 1995), all U.S. Government End Users acquire the
  * source code with only those rights set forth herein.
  */
 
@@ -87,22 +87,23 @@
 
 // based on swap_rows - in just folds in the loop from the cpu,
 // so there is no going in and out of the gpu
-__global__ void dlaswp( int n, double *A, int lda, int *ipiv, int k1, int k2 ) 
+__global__ void dlaswp(int n, double *A, int lda, int *ipiv, int k1, int k2)
 {
-  for( ; k1 < k2 ; ++k1 )
-  {
-    int src_row = k1;
-    int dst_row = ipiv[k1];
-  
-    for( int col_id = threadIdx.x ; col_id < n ; col_id += blockDim.x ) 
+    for (; k1 < k2 ; ++k1)
     {
-      double A_tmp = A[col_id*lda + src_row];
-      A[col_id*lda + src_row] = A[col_id*lda + dst_row];
-      A[col_id*lda + dst_row] = A_tmp;
-      
-      __syncthreads();
+        int src_row = k1;
+        int dst_row = ipiv[k1];
+
+        for (int col_id = threadIdx.x ; col_id < n ; col_id += blockDim.x)
+        {
+            double A_tmp = A[col_id*lda + src_row];
+            A[col_id*lda + src_row] = A[col_id*lda + dst_row];
+            A[col_id*lda + dst_row] = A_tmp;
+
+            __syncthreads();
+        }
+
+        // TODO: we have very poor coalescing here. Can't we do better? Launch one warp of threads per column and
+        // ask those threads to reorder the column, for example.
     }
-    // TODO: we have very poor coalescing here. Can't we do better? Launch one warp of threads per column and
-    // ask those threads to reorder the column, for example.
-  }
 }

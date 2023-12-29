@@ -61,136 +61,155 @@ DOUBLE PRECISION   A( LDA, * )
 
 
 /* Input error reporting function, C version */
-__device__ void report_error( const char *strName, int info ) 
+__device__ void report_error(const char *strName, int info)
 {
-	printf(" ** On entry to %s parameter number %d had an illegal value\n", strName, info );
+    printf(" ** On entry to %s parameter number %d had an illegal value\n", strName, info);
 }
 
-__device__ __noinline__ void dgetf2( cublasHandle_t cb_handle, int m, int n, double *A, int lda, int *ipiv, int *info )
+__device__ __noinline__ void dgetf2(cublasHandle_t cb_handle, int m, int n, double *A, int lda, int *ipiv, int *info)
 {
-	cublasStatus_t status;
+    cublasStatus_t status;
 
-	// The flag set by one thread to indicate a failure.
-	__shared__ int s_info;
+    // The flag set by one thread to indicate a failure.
+    __shared__ int s_info;
 
-	// Initialize to 0.
-	if( threadIdx.x == 0 )
-		s_info = 0;
-	__syncthreads();
+    // Initialize to 0.
+    if (threadIdx.x == 0)
+        s_info = 0;
 
-	// Basic	 argument checking
-	*info = 0;
-	if( m < 0 ) {
-		*info = -1;
-	}
-	if( n < 0 ) {
-		*info = -2;
-	}
-	if( lda < max( 1, m ) ) {
-		*info = -4;
-	}
-	if( *info ) {
-		report_error( "DGETF2", *info );
-		return;
-	}
+    __syncthreads();
 
-	// Quick return if possible
-	if( m == 0 || n == 0 ) {
-		return;
-	}
+    // Basic     argument checking
+    *info = 0;
 
-	// Compute machine safe minimum 
-	const int minDim = min( m, n );
+    if (m < 0)
+    {
+        *info = -1;
+    }
 
-	// Set up the pivot array, unless it was passed in to us already set-up
-	for( int j=0; j < minDim; j++ ) 
-	{
-		int jp = 0;
-		if( threadIdx.x == 0 )
-		{
-			status = cublasIdamax_v2( cb_handle, m-j, &A[j*lda + j], 1, &jp );
-			if( status != CUBLAS_STATUS_SUCCESS )
-			{
-				printf( "Failed idamax: %d\n", status );
-				s_info = 1;
-			}
+    if (n < 0)
+    {
+        *info = -2;
+    }
 
-      jp += j-1; // cublasIdamax_v2 is 1-indexed (so remove 1).
-			ipiv[j] = jp;
-		}
-		__syncthreads();
+    if (lda < max(1, m))
+    {
+        *info = -4;
+    }
 
-		// Make sure both s_info and s_jp are valid.
-		if( s_info )
-		{
-			*info = s_info;
-			return;
-		}
+    if (*info)
+    {
+        report_error("DGETF2", *info);
+        return;
+    }
 
-		// Load the value A(jp, j).
-		double rowval = threadIdx.x == 0 ? A[j*lda + jp] : 0.0;
+    // Quick return if possible
+    if (m == 0 || n == 0)
+    {
+        return;
+    }
 
-		// Only threadIdx.x == 0, can be different from 0.0.
-		if( threadIdx.x == 0 && rowval != 0.0 && jp != j )
-		{
-			status = cublasDswap_v2( cb_handle, n, &A[j], lda, &A[jp], lda );
-      if( status != CUBLAS_STATUS_SUCCESS )
-			{
-				printf("Failed dswap: %d\n", status);
-				s_info = 1;
-			}
-		}
-		__syncthreads();
+    // Compute machine safe minimum
+    const int minDim = min(m, n);
 
-		// Make sure s_info has the correct value.
-		if( s_info )
-		{
-			*info = s_info;
-			return;
-		}
+    // Set up the pivot array, unless it was passed in to us already set-up
+    for (int j=0; j < minDim; j++)
+    {
+        int jp = 0;
 
-		// Compute elements J+1:M of J-th column.
-		if( threadIdx.x == 0 && rowval != 0.0 && j < m ) 
-		{ 
-			double scale = 1.0 / rowval;
-			status = cublasDscal_v2( cb_handle, m-j-1, &scale, &A[j*lda + j+1], 1 );
-      if( status != CUBLAS_STATUS_SUCCESS )
-			{
-				printf("Failed dscal: %d\n", status);
-				s_info = 1;
-			}
-		}
-		else if( threadIdx.x == 0 && rowval != 0.0 )
-		{
-			s_info = j;
-		}
-		__syncthreads();
+        if (threadIdx.x == 0)
+        {
+            status = cublasIdamax_v2(cb_handle, m-j, &A[j*lda + j], 1, &jp);
 
-		// Make sure s_info has the correct value.
-		if( s_info )
-		{
-			*info = s_info;
-			return;
-		}
+            if (status != CUBLAS_STATUS_SUCCESS)
+            {
+                printf("Failed idamax: %d\n", status);
+                s_info = 1;
+            }
 
-		if( threadIdx.x == 0 && j < minDim ) 
-		{
-			// Update trailing submatrix.
-			double alpha = -1.0;
-			status = cublasDger_v2( cb_handle, m-j-1, n-j-1, &alpha, &A[j*lda + j+1], 1, &A[(j+1)*lda + j], lda, &A[(j+1)*lda + j+1], lda );
-      if( status != CUBLAS_STATUS_SUCCESS )
-			{
-				printf("Failed dger: %d\n", status);
-				s_info = 1;
-			}
-		}
-		__syncthreads();
+            jp += j-1; // cublasIdamax_v2 is 1-indexed (so remove 1).
+            ipiv[j] = jp;
+        }
 
-		// Make sure s_info has the correct value.
-		if( s_info )
-		{
-			*info = s_info;
-			return;
-		}
-	}
+        __syncthreads();
+
+        // Make sure both s_info and s_jp are valid.
+        if (s_info)
+        {
+            *info = s_info;
+            return;
+        }
+
+        // Load the value A(jp, j).
+        double rowval = threadIdx.x == 0 ? A[j*lda + jp] : 0.0;
+
+        // Only threadIdx.x == 0, can be different from 0.0.
+        if (threadIdx.x == 0 && rowval != 0.0 && jp != j)
+        {
+            status = cublasDswap_v2(cb_handle, n, &A[j], lda, &A[jp], lda);
+
+            if (status != CUBLAS_STATUS_SUCCESS)
+            {
+                printf("Failed dswap: %d\n", status);
+                s_info = 1;
+            }
+        }
+
+        __syncthreads();
+
+        // Make sure s_info has the correct value.
+        if (s_info)
+        {
+            *info = s_info;
+            return;
+        }
+
+        // Compute elements J+1:M of J-th column.
+        if (threadIdx.x == 0 && rowval != 0.0 && j < m)
+        {
+            double scale = 1.0 / rowval;
+            status = cublasDscal_v2(cb_handle, m-j-1, &scale, &A[j*lda + j+1], 1);
+
+            if (status != CUBLAS_STATUS_SUCCESS)
+            {
+                printf("Failed dscal: %d\n", status);
+                s_info = 1;
+            }
+        }
+        else if (threadIdx.x == 0 && rowval != 0.0)
+        {
+            s_info = j;
+        }
+
+        __syncthreads();
+
+        // Make sure s_info has the correct value.
+        if (s_info)
+        {
+            *info = s_info;
+            return;
+        }
+
+        if (threadIdx.x == 0 && j < minDim)
+        {
+            // Update trailing submatrix.
+            double alpha = -1.0;
+            status = cublasDger_v2(cb_handle, m-j-1, n-j-1, &alpha, &A[j*lda + j+1], 1, &A[(j+1)*lda + j], lda, &A[(j+1)*lda + j+1], lda);
+
+            if (status != CUBLAS_STATUS_SUCCESS)
+            {
+                printf("Failed dger: %d\n", status);
+                s_info = 1;
+            }
+        }
+
+        __syncthreads();
+
+        // Make sure s_info has the correct value.
+        if (s_info)
+        {
+            *info = s_info;
+            return;
+        }
+    }
 }

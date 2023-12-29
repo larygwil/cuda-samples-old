@@ -2,17 +2,18 @@
     <name>cudaOpenMP</name>
     <description><![CDATA[This sample demonstrates how to use OpenMP API to write an application for multiple GPUs.  This executable is not pre-built with the SDK installer.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>OpenMP,cluster,multi-GPU Support</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,OpenMP,cluster,multi-GPU Support</keywords>
     <scope>1:CUDA Basic Topics,1:CUDA Systems Integration</scope>
     <files>
     </files>
     <cudaapi>cudaMalloc</cudaapi>
     <cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-    <keyconcepts>CUDA Basic Concepts</keyconcepts>
-    <keyconcepts>OpenMP</keyconcepts>
-	<keyconcepts>Multithreading</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Systems Integration</keyconcepts>
+    <keyconcepts level="basic">OpenMP</keyconcepts>
+	<keyconcepts level="basic">Multithreading</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
@@ -50,4 +51,6 @@
 
     <!-- Collection of [OS][:arch] tokens -->
     <supported-env>linux:x86_64, linux:i686, windows7, macosx:x86_64, macosx:i686, :arm</supported-env>
+
+	<no-nsight-eclipse />
 </entry>

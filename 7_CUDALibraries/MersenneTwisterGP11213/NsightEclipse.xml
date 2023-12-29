@@ -2,11 +2,14 @@
     <name>MersenneTwisterGP11213</name>
     <description><![CDATA[This sample demonstrates the Mersenne Twister random number generator GP11213 in cuRAND.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>CUDA, Monte-Carlo, random number generation, GSFR, Mersenne Twister</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CURAND,Monte-Carlo,random number generation, GSFR, Mersenne Twister</keywords>
     <scope>1:CUDA Advanced Topics,3:Computational Finance</scope>
     <files>
     </files>
+    
+    <keyconcepts level="basic">Computational Finance</keyconcepts>
+    <keyconcepts level="basic">CURAND Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

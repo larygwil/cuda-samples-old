@@ -2,7 +2,7 @@
     <name>C++ Integration</name>
     <description><![CDATA[This example demonstrates how to integrate CUDA into an existing C++ application, i.e. the CUDA entry point on host side is only a function which is called from C++ code and only the file containing this function is compiled with nvcc. It also demonstrates that vector types can be used from cpp.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
@@ -10,7 +10,7 @@
     <cudaapi>cudaMalloc</cudaapi>
     <cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-    <keyconcepts>CUDA Basic Concepts</keyconcepts>
+    
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

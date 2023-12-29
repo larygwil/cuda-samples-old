@@ -2,20 +2,29 @@
     <name>Post-Process in OpenGL</name>
     <description><![CDATA[This sample shows how to post-process an image rendered in OpenGL using CUDA.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>GPGPU,CUDA,Image Processing, opengl</keywords>
     <scope>2:Graphics Interop,2:Image Processing</scope>
     <files>
-        <file>data\original.ppm</file>
-        <file>data\ref_4.ppm</file>
-        <file>data\ref_8.ppm</file>
-        <file>data\ref_16.ppm</file>
+        <file>data\teapot_orig.ppm</file>
+        <file>data\teapot_2.ppm</file>
+        <file>data\teapot_4.ppm</file>
+        <file>data\teapot_8.ppm</file>
     </files>
     <qatests>
-      <qatest>-radius=2 -file=ref_2.ppm</qatest>
-      <qatest>-radius=4 -file=ref_4.ppm</qatest>
-      <qatest>-radius=8 -file=ref_8.ppm</qatest>
+      <qatest>-radius=2 -file=teapot_2.ppm</qatest>
+      <qatest>-radius=4 -file=teapot_4.ppm</qatest>
+      <qatest>-radius=8 -file=teapot_8.ppm</qatest>
     </qatests>
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -328,7 +328,7 @@ void lineOfSight_gold(const HeightField heightField, const Ray ray,
 __device__ __host__ float2 getLocation(const Ray ray, int i)
 {
     float step = i * ray.oneOverLength;
-    return make_float2(ray.origin.x, ray.origin.y) + step * ray.dir;
+    return make_float2(ray.origin.x, ray.origin.y) + ray.dir * step;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

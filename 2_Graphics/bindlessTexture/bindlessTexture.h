@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -27,7 +27,7 @@ typedef unsigned char uchar;
 #pragma pack(push,4)
 struct Image
 {
-    void*                   h_data;
+    void                   *h_data;
     cudaExtent              size;
     cudaResourceType        type;
     cudaArray_t             dataArray;
@@ -41,13 +41,14 @@ struct Image
 };
 #pragma pack(pop)
 
-inline void _checkHost(bool test, const char* condition, const char* file, int line, const char* func)
+inline void _checkHost(bool test, const char *condition, const char *file, int line, const char *func)
 {
-  if (!test){
-      fprintf(stderr, "HOST error at %s:%d (%s) \"%s\" \n",
-          file, line, condition, func);
-      exit(EXIT_FAILURE);
-  }
+    if (!test)
+    {
+        fprintf(stderr, "HOST error at %s:%d (%s) \"%s\" \n",
+                file, line, condition, func);
+        exit(EXIT_FAILURE);
+    }
 }
 
 #define checkHost(condition)   _checkHost(condition, #condition,__FILE__,__LINE__,__FUNCTION__)

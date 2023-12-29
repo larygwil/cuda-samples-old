@@ -4,7 +4,7 @@
 
 This example shows how to implement an existing computationally-intensive CPU compression algorithm in parallel on the GPU, and obtain an order of magnitude performance improvement.]]></description>
     <whitepaper>doc\cuda_dxtc.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>Texture Compression,DXTC,S3TC,cluster fit,power method,covariance,least squares</keywords>
     <scope>1:CUDA Advanced Topics,2:Image Processing,2:Data Compression</scope>
     <files>
@@ -13,6 +13,8 @@ This example shows how to implement an existing computationally-intensive CPU co
         <file>data\colors.ppm</file>
         <file>data\lena_std.ppm</file>
     </files>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
+    <keyconcepts level="advanced">Image Compression</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

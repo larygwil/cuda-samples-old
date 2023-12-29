@@ -3,19 +3,21 @@
     <description><![CDATA[This sample demonstrates LU Decomposition implemented using CUDA Dynamic Parallelism.  This sample requires devices with compute capability 3.5 or higher.]]></description>
     <whitepaper></whitepaper>
     <minspec>KEPLER SM 3.5</minspec>
-    <keywords>GPGPU</keywords>
-    <scope>1:CUDA Basic Topics</scope>
+    <keywords>CUDA,CDP,CUBLAS,GPGPU</keywords>
+    <scope>1:CUDA Advanced Topics</scope>
     <files>
-	  <file>settings.nvlink</file>
+    <file>settings.nvlink</file>
     </files>
     <cudaapi></cudaapi>
-    <keyconcepts>CUDA Advanced Topics</keyconcepts>
-    <keyconcepts>CUDA Dynamic Parallelism</keyconcepts>
+    
+    <keyconcepts level="advanced">CUDA Dynamic Parallelism</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->
     <!-- "framework" attribute will be ignored on platforms other then Mac OS X -->
+	<library>cublas</library>
+	<library>cublas_device</library>
 
     <!-- Either absolute or relative to sample -->
     <include-path>./</include-path>

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -35,10 +35,12 @@ int main(int argc, char **argv)
 
     printf("%s Starting...\n\n", argv[0]);
 
-	int dev = findCudaDevice(argc, (const char**) argv);
-	if( dev == -1 ) {
-		return EXIT_FAILURE;
-	}
+    int dev = findCudaDevice(argc, (const char **) argv);
+
+    if (dev == -1)
+    {
+        return EXIT_FAILURE;
+    }
 
     printf("Allocating and initializing host arrays...\n\n");
     sdkCreateTimer(&hTimer);

@@ -2,11 +2,13 @@
     <name>Scalar Product</name>
     <description><![CDATA[This sample calculates scalar products of a given set of input vector pairs.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA,Linear Algebra, scalar product</keywords>
     <scope>1:CUDA Basic Topics, 3:Linear Algebra</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Linear Algebra</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

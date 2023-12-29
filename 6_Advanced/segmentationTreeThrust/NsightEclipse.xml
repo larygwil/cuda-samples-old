@@ -2,7 +2,7 @@
     <name>CUDA Segmentation Tree Thrust Library</name>
     <description><![CDATA[This sample demonstrates an approach to the image segmentation trees construction.  This method is based on Boruvka's MST algorithm.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce GTX 200</minspec>
+    <minspec>SM 1.3</minspec>
     <keywords>GPGPU,Sorting</keywords>
     <scope>1:CUDA Advanced Topics,1:Data-Parallel Algorithms,1:Performance Strategies</scope>
     <files>
@@ -10,6 +10,9 @@
         <file>data\ref_00.ppm</file>
         <file>data\ref_09.ppm</file>
     </files>
+    
+    <keyconcepts level="advanced">Data-Parallel Algorithms</keyconcepts>
+    <keyconcepts level="advanced">Performance Strategies</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

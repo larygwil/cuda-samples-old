@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -9,15 +9,15 @@
  *
  */
 
-/* 
+/*
  * This example demonstrates how to call CUBLAS library
- * functions both from the HOST code and from the DEVICE code 
+ * functions both from the HOST code and from the DEVICE code
  * running on the GPU (the latter is available only for the compute
  * capability >= 3.5). The single-precision matrix-matrix
  * multiplication operation, SGEMM, will be performed 3 times:
- * 1) once by calling a method defined in this file (simple_sgemm), 
+ * 1) once by calling a method defined in this file (simple_sgemm),
  * 2) once by calling the cublasSgemm library routine from the HOST code
- * 3) and once by calling the cublasSgemm library routine from 
+ * 3) and once by calling the cublasSgemm library routine from
  *    the DEVICE code.
  */
 
@@ -61,8 +61,8 @@ static void simple_sgemm(int n, float alpha, const float *A, const float *B,
 }
 
 /* Checks result against reference and returns relative error */
-static float check_result(const float *result, 
-                          const float *reference, 
+static float check_result(const float *result,
+                          const float *reference,
                           int size)
 {
     float error_norm = 0.0f;
@@ -88,10 +88,10 @@ static float check_result(const float *result,
 }
 
 /* Declaration of the function that computes sgemm using CUBLAS device API */
-extern "C" void device_cublas_sgemm(int n, 
-                                    float alpha, 
+extern "C" void device_cublas_sgemm(int n,
+                                    float alpha,
                                     const float *d_A, const float *d_B,
-                                    float beta, 
+                                    float beta,
                                     float *d_C);
 
 /* Main */
@@ -112,29 +112,29 @@ int main(int argc, char **argv)
     int i;
     cublasHandle_t handle;
 
-	int dev_id;
-	cudaDeviceProp device_prop;
+    int dev_id;
+    cudaDeviceProp device_prop;
 
-	bool do_device_api_test = false;
+    bool do_device_api_test = false;
 
-	float host_api_test_ratio, device_api_test_ratio;
+    float host_api_test_ratio, device_api_test_ratio;
 
     /* Initialize CUBLAS */
     printf("simpleCUBLAS test running...\n");
 
-	dev_id = findCudaDevice(argc, (const char **) argv);
+    dev_id = findCudaDevice(argc, (const char **) argv);
     checkCudaErrors(cudaGetDeviceProperties(&device_prop, dev_id));
 
     if ((device_prop.major << 4) + device_prop.minor >= 0x35)
-	{	
-		printf("Host and device APIs will be tested.\n");
-		do_device_api_test = true;
-	}
-	else
-	{
-		printf("Host API will be tested.\n");
-		do_device_api_test = false;
-	}
+    {
+        printf("Host and device APIs will be tested.\n");
+        do_device_api_test = true;
+    }
+    else
+    {
+        printf("Host API will be tested.\n");
+        do_device_api_test = false;
+    }
 
     status = cublasCreate(&handle);
 
@@ -230,13 +230,13 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    /* 
+    /*
      * Performs operation using plain C code
      */
     simple_sgemm(N, alpha, h_A, h_B, beta, h_C);
     h_C_ref = h_C;
 
-    /* 
+    /*
      * Performs operation using cublas
      */
     status = cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, N, N, N, &alpha, d_A, N, d_B, N, &beta, d_C, N);
@@ -268,34 +268,34 @@ int main(int argc, char **argv)
     /* Check result against reference */
     host_api_test_ratio = check_result(h_C, h_C_ref, n2);
 
-	if (do_device_api_test)
-	{
-		/* Reset device resident C matrix */
-		status = cublasSetVector(n2, sizeof(h_C_rnd[0]), h_C_rnd, 1, d_C, 1);
+    if (do_device_api_test)
+    {
+        /* Reset device resident C matrix */
+        status = cublasSetVector(n2, sizeof(h_C_rnd[0]), h_C_rnd, 1, d_C, 1);
 
-		if (status != CUBLAS_STATUS_SUCCESS)
-		{
-			fprintf(stderr, "!!!! device access error (write C)\n");
-			return EXIT_FAILURE;
-		}
+        if (status != CUBLAS_STATUS_SUCCESS)
+        {
+            fprintf(stderr, "!!!! device access error (write C)\n");
+            return EXIT_FAILURE;
+        }
 
-		/*
-		 * Performs operation using the device API of CUBLAS library 
-		 */
-		device_cublas_sgemm(N, alpha, d_A, d_B, beta, d_C);
+        /*
+         * Performs operation using the device API of CUBLAS library
+         */
+        device_cublas_sgemm(N, alpha, d_A, d_B, beta, d_C);
 
-		/* Read the result back */
-		status = cublasGetVector(n2, sizeof(h_C[0]), d_C, 1, h_C, 1);
+        /* Read the result back */
+        status = cublasGetVector(n2, sizeof(h_C[0]), d_C, 1, h_C, 1);
 
-		if (status != CUBLAS_STATUS_SUCCESS)
-		{
-			fprintf(stderr, "!!!! device access error (read C)\n");
-			return EXIT_FAILURE;
-		}
+        if (status != CUBLAS_STATUS_SUCCESS)
+        {
+            fprintf(stderr, "!!!! device access error (read C)\n");
+            return EXIT_FAILURE;
+        }
 
-		/* Check result against reference */
-		device_api_test_ratio = check_result(h_C, h_C_ref, n2);
-	}
+        /* Check result against reference */
+        device_api_test_ratio = check_result(h_C, h_C_ref, n2);
+    }
 
     /* Memory clean up */
     free(h_A);
@@ -331,12 +331,12 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-	bool test_result = do_device_api_test ?
-					   host_api_test_ratio < 1e-6 &&
-					   device_api_test_ratio < 1e-6 :
-					   host_api_test_ratio < 1e-6;
+    bool test_result = do_device_api_test ?
+                       host_api_test_ratio < 1e-6 &&
+                       device_api_test_ratio < 1e-6 :
+                       host_api_test_ratio < 1e-6;
 
-	printf("simpleCUBLAS completed, returned %s\n",
+    printf("simpleCUBLAS completed, returned %s\n",
            test_result ? "OK" : "ERROR!");
 
     exit(test_result ? EXIT_SUCCESS : EXIT_FAILURE);

@@ -2,11 +2,13 @@
     <name>CUDA C 3D FDTD</name>
     <description><![CDATA[This sample applies a finite differences time domain progression stencil on a 3D surface.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>GPGPU, CUDA, finite difference, fdtd, differential equation, pde, ode</keywords>
-    <scope>1:Performance Strategies</scope>
+    <scope>1:CUDA Advanced Topics,1:Performance Strategies</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Performance Strategies</keyconcepts>
 
     <!-- Either absolute or relative to sample -->
     <include-path>./</include-path>

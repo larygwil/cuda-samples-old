@@ -1,5 +1,5 @@
 Sample: Concurrent Kernels
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
 
 

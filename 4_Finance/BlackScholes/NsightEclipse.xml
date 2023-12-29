@@ -2,17 +2,18 @@
     <name>Black-Scholes Option Pricing</name>
     <description><![CDATA[This sample evaluates fair call and put prices for a given set of European options by Black-Scholes formula.]]></description>
     <whitepaper>doc\BlackScholes.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA,Computational Finance, option pricing, Black-Scholes</keywords>
     <scope>1:CUDA Basic Topics, 3:Computational Finance</scope>
     <files>
     </files>
+    
+    <keyconcepts level="basic">Computational Finance</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->
     <!-- Attributes "os" and "arch" are optional and may be used in any combination. -->
     <!-- "framework" attribute will be ignored on platforms other then Mac OS X -->
-    <library>GLU</library>
     <library os="macosx" framework="true">GLUT</library>
     <library os="linux">X11</library>
     <library os="linux">GLEW</library>

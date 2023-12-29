@@ -2,13 +2,15 @@
     <name>Optical Flow</name>
     <description><![CDATA[Variational optical flow estimation example.  Uses textures for image operations. Shows how simple PDE solver can be accelerated with CUDA.]]></description>
     <whitepaper>doc\OpticalFlow.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>optical flow, motion estimation, texture, shared memory</keywords>
     <scope>1:CUDA Advanced Topics,2:Image Processing</scope>
     <files>
         <file>data\frame10.ppm</file>
         <file>data\frame11.ppm</file>
     </files>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
+    <keyconcepts level="advanced">Data Parallel Algorithms</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

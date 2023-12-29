@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * NOTICE TO USER:
  *
@@ -96,10 +96,12 @@ int main(int argc, char **argv)
     float diff;
     cublasHandle_t handle;
 
-	int dev = findCudaDevice(argc, (const char**) argv);
-	if( dev == -1 ) {
-		return EXIT_FAILURE;
-	}
+    int dev = findCudaDevice(argc, (const char **) argv);
+
+    if (dev == -1)
+    {
+        return EXIT_FAILURE;
+    }
 
     /* Initialize CUBLAS */
     printf("simpleCUBLAS test running..\n");

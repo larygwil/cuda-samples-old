@@ -1,6 +1,6 @@
 Sample: Fast Walsh Transform
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
-Naturally(Hadamard)-ordered Fast Walsh Tranform for batched vectors of arbitrary eligible(power of two) lengths
+Naturally(Hadamard)-ordered Fast Walsh Transform for batching vectors of arbitrary eligible lengths that are power of two in size.
 
 Key concepts:

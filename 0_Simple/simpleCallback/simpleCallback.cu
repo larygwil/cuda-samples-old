@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -137,25 +137,28 @@ int main(int argc, char **argv)
 
     checkCudaErrors(cudaGetDeviceCount(&N_gpus));
     printf("Found %d CUDA capable GPUs\n", N_gpus);
-    if (N_gpus > 32) 
+
+    if (N_gpus > 32)
     {
-       printf("simpleCallback only supports 32 GPU(s)\n");
+        printf("simpleCallback only supports 32 GPU(s)\n");
     }
 
     for (int devid=0; devid < N_gpus; devid++)
     {
-       int SMversion;
-       cudaDeviceProp deviceProp;
-       cudaSetDevice(devid);
-       cudaGetDeviceProperties(&deviceProp, devid);
-       SMversion = deviceProp.major << 4 + deviceProp.minor;
-       printf("GPU[%d] %s supports SM %d.%d", devid, deviceProp.name, deviceProp.major, deviceProp.minor);
-       printf(", %s GPU Callback Functions\n", (SMversion >= 0x11) ? "capable" : "NOT capable");
-       if (SMversion >= 0x11)
-       {
-          gpuInfo[max_gpus++] = devid;
-       } 
+        int SMversion;
+        cudaDeviceProp deviceProp;
+        cudaSetDevice(devid);
+        cudaGetDeviceProperties(&deviceProp, devid);
+        SMversion = deviceProp.major << 4 + deviceProp.minor;
+        printf("GPU[%d] %s supports SM %d.%d", devid, deviceProp.name, deviceProp.major, deviceProp.minor);
+        printf(", %s GPU Callback Functions\n", (SMversion >= 0x11) ? "capable" : "NOT capable");
+
+        if (SMversion >= 0x11)
+        {
+            gpuInfo[max_gpus++] = devid;
+        }
     }
+
     printf("%d GPUs available to run Callback Functions\n", max_gpus);
 
     heterogeneous_workload *workloads;

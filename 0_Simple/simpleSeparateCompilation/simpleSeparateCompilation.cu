@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -173,7 +173,6 @@ void runTest(int argc, const char **argv)
         // Free resources.
         if (dVector) checkCudaErrors(cudaFree(dVector));
         checkCudaErrors(cudaDeviceReset());
-        exit(testResult ? EXIT_SUCCESS : EXIT_FAILURE);
     }
     catch (...)
     {

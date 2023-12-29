@@ -2,7 +2,7 @@
     <name>Simple OpenGL</name>
     <description><![CDATA[Simple program which demonstrates interoperability between CUDA and OpenGL. The program modifies vertex positions with CUDA and uses OpenGL to render the geometry.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics,2:Graphics Interop</scope>
     <files>
@@ -18,10 +18,10 @@
     <cudaapi>cudaGraphicsRegisterResource</cudaapi>
     <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
     <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
-    <keyconcepts>CUDA Basic Topics</keyconcepts>
-    <keyconcepts>OpenGL Graphics Interop</keyconcepts>
-    <keyconcepts>Vertex Buffers</keyconcepts>
-    <keyconcepts>3D Graphics</keyconcepts>
+    
+    <keyconcepts level="basic">Graphics Interop</keyconcepts>
+    <keyconcepts level="basic">Vertex Buffers</keyconcepts>
+    <keyconcepts level="basic">3D Graphics</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

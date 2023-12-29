@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -59,12 +59,6 @@ const char *sDeviceSyncMethod[] =
 // helper functions and utilities to work with CUDA
 #include <helper_functions.h>
 #include <helper_cuda.h>
-
-#define EXIT_WAIVED 2
-
-#ifndef MAX
-#define MAX(a,b) (a > b ? a : b)
-#endif
 
 #ifndef WIN32
 #include <sys/mman.h> // for mmap() / munmap()
@@ -262,7 +256,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    cudaSetDevice(cuda_device);
+    checkCudaErrors(cudaSetDevice(cuda_device));
 
     // Checking for compute capabilities
     cudaDeviceProp deviceProp;
@@ -275,7 +269,7 @@ int main(int argc, char **argv)
 
     if (deviceProp.major >= 2)
     {
-        niterations = 100;
+        niterations = 5;
     }
     else
     {
@@ -316,7 +310,7 @@ int main(int argc, char **argv)
 
     // enable use of blocking sync, to reduce CPU usage
     printf("> Using CPU/GPU Device Synchronization method (%s)\n", sDeviceSyncMethod[device_sync_method]);
-    cudaSetDeviceFlags(device_sync_method | (bPinGenericMemory ? cudaDeviceMapHost : 0));
+    checkCudaErrors(cudaSetDeviceFlags(device_sync_method | (bPinGenericMemory ? cudaDeviceMapHost : 0)));
 
     // allocate host memory
     int c = 5;                      // value to which the array will be initialized
@@ -351,20 +345,20 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaEventCreateWithFlags(&stop_event, eventflags));
 
     // time memcopy from device
-    cudaEventRecord(start_event, 0);     // record in stream-0, to ensure that all previous CUDA calls have completed
-    cudaMemcpyAsync(hAligned_a, d_a, nbytes, cudaMemcpyDeviceToHost, streams[0]);
-    cudaEventRecord(stop_event, 0);
-    cudaEventSynchronize(stop_event);   // block until the event is actually recorded
+    checkCudaErrors(cudaEventRecord(start_event, 0));     // record in stream-0, to ensure that all previous CUDA calls have completed
+    checkCudaErrors(cudaMemcpyAsync(hAligned_a, d_a, nbytes, cudaMemcpyDeviceToHost, streams[0]));
+    checkCudaErrors(cudaEventRecord(stop_event, 0));
+    checkCudaErrors(cudaEventSynchronize(stop_event));   // block until the event is actually recorded
     checkCudaErrors(cudaEventElapsedTime(&time_memcpy, start_event, stop_event));
     printf("memcopy:\t%.2f\n", time_memcpy);
 
     // time kernel
     threads=dim3(512, 1);
     blocks=dim3(n / threads.x, 1);
-    cudaEventRecord(start_event, 0);
+    checkCudaErrors(cudaEventRecord(start_event, 0));
     init_array<<<blocks, threads, 0, streams[0]>>>(d_a, d_c, niterations);
-    cudaEventRecord(stop_event, 0);
-    cudaEventSynchronize(stop_event);
+    checkCudaErrors(cudaEventRecord(stop_event, 0));
+    checkCudaErrors(cudaEventSynchronize(stop_event));
     checkCudaErrors(cudaEventElapsedTime(&time_kernel, start_event, stop_event));
     printf("kernel:\t\t%.2f\n", time_kernel);
 
@@ -372,15 +366,15 @@ int main(int argc, char **argv)
     // time non-streamed execution for reference
     threads=dim3(512, 1);
     blocks=dim3(n / threads.x, 1);
-    cudaEventRecord(start_event, 0);
+    checkCudaErrors(cudaEventRecord(start_event, 0));
 
     for (int k = 0; k < nreps; k++)
     {
         init_array<<<blocks, threads>>>(d_a, d_c, niterations);
-        cudaMemcpy(hAligned_a, d_a, nbytes, cudaMemcpyDeviceToHost);
+        checkCudaErrors(cudaMemcpy(hAligned_a, d_a, nbytes, cudaMemcpyDeviceToHost));
     }
-    cudaEventRecord(stop_event, 0);
-    cudaEventSynchronize(stop_event);
+    checkCudaErrors(cudaEventRecord(stop_event, 0));
+    checkCudaErrors(cudaEventSynchronize(stop_event));
     checkCudaErrors(cudaEventElapsedTime(&elapsed_time, start_event, stop_event));
     printf("non-streamed:\t%.2f (%.2f expected)\n", elapsed_time / nreps, time_kernel + time_memcpy);
 
@@ -389,8 +383,8 @@ int main(int argc, char **argv)
     threads=dim3(512,1);
     blocks=dim3(n/(nstreams*threads.x),1);
     memset(hAligned_a, 255, nbytes);     // set host memory bits to all 1s, for testing correctness
-    cudaMemset(d_a, 0, nbytes); // set device memory to all 0s, for testing correctness
-    cudaEventRecord(start_event, 0);
+    checkCudaErrors(cudaMemset(d_a, 0, nbytes)); // set device memory to all 0s, for testing correctness
+    checkCudaErrors(cudaEventRecord(start_event, 0));
 
     for (int k = 0; k < nreps; k++)
     {
@@ -404,11 +398,12 @@ int main(int argc, char **argv)
         //   commence executing when all previous CUDA calls in stream x have completed
         for (int i = 0; i < nstreams; i++)
         {
-            cudaMemcpyAsync(hAligned_a + i * n / nstreams, d_a + i * n / nstreams, nbytes / nstreams, cudaMemcpyDeviceToHost, streams[i]);
+            checkCudaErrors(cudaMemcpyAsync(hAligned_a + i * n / nstreams, d_a + i * n / nstreams, nbytes / nstreams, cudaMemcpyDeviceToHost, streams[i]));
         }
     }
-    cudaEventRecord(stop_event, 0);
-    cudaEventSynchronize(stop_event);
+    
+    checkCudaErrors(cudaEventRecord(stop_event, 0));
+    checkCudaErrors(cudaEventSynchronize(stop_event));
     checkCudaErrors(cudaEventElapsedTime(&elapsed_time, start_event, stop_event));
     printf("%d streams:\t%.2f (%.2f expected with compute capability 1.1 or later)\n", nstreams, elapsed_time / nreps, time_kernel + time_memcpy / nstreams);
 
@@ -419,18 +414,18 @@ int main(int argc, char **argv)
     // release resources
     for (int i = 0; i < nstreams; i++)
     {
-        cudaStreamDestroy(streams[i]);
+        checkCudaErrors(cudaStreamDestroy(streams[i]));
     }
-    cudaEventDestroy(start_event);
-    cudaEventDestroy(stop_event);
+    checkCudaErrors(cudaEventDestroy(start_event));
+    checkCudaErrors(cudaEventDestroy(stop_event));
 
     // Free cudaMallocHost or Generic Host allocated memory (from CUDA 4.0)
     FreeHostMemory(bPinGenericMemory, &h_a, &hAligned_a, nbytes);
 
-    cudaFree(d_a);
-    cudaFree(d_c);
+    checkCudaErrors(cudaFree(d_a));
+    checkCudaErrors(cudaFree(d_c));
 
-    cudaDeviceReset();
+    checkCudaErrors(cudaDeviceReset());
 
     return bResults ? EXIT_SUCCESS : EXIT_FAILURE;
 }

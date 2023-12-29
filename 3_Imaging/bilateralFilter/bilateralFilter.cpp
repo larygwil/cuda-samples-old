@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -615,7 +615,7 @@ int findCapableDevice(int argc, char **argv)
         fprintf(stderr, "The SDK sample minimum requirements:\n");
         fprintf(stderr, "\tCUDA Compute Capability >= %d.%d is required\n", MIN_COMPUTE_VERSION/16, MIN_COMPUTE_VERSION%16);
         fprintf(stderr, "\tCUDA Runtime Version    >= %d.%d is required\n", MIN_RUNTIME_VERSION/1000, (MIN_RUNTIME_VERSION%100)/10);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_WAIVED);
     }
 
     return bestDev;
@@ -692,10 +692,12 @@ int main(int argc, char **argv)
 
         if (dev != -1)
         {
-            dev = gpuGLDeviceInit(argc, (const char**)argv);
-			if( dev == -1 ) {
-				exit(EXIT_FAILURE);	
-			}
+            dev = gpuGLDeviceInit(argc, (const char **)argv);
+
+            if (dev == -1)
+            {
+                exit(EXIT_FAILURE);
+            }
         }
         else
         {

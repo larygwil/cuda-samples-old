@@ -2,8 +2,8 @@
     <name>Fluids (OpenGL Version)</name>
     <description><![CDATA[An example of fluid simulation using CUDA and CUFFT, with OpenGL rendering.]]></description>
     <whitepaper>doc\fluidsGL.pdf</whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>CUDA, GPGPU, Fluid Simulation, FFT, CUFFT</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CUFFT,GPGPU,Fluid Simulation,FFT</keywords>
     <scope>2:Graphics Interop,1:CUDA Advanced Topics,3:Physically-Based Simulation</scope>
     <files>
       <file>data\ref_fluidsGL.ppm</file>
@@ -11,6 +11,16 @@
     <qatests>
        <qatest>-file=ref_fluidsGL.ppm</qatest>
     </qatests>
+    <cudaapi>cudaGLSetGLDevice</cudaapi>
+    <cudaapi>cudaGraphicsMapResources</cudaapi>
+    <cudaapi>cudaGraphicsUnmapResources</cudaapi>
+    <cudaapi>cudaGraphicsResourceGetMappedPointer</cudaapi>
+    <cudaapi>cudaGraphicsRegisterResource</cudaapi>
+    <cudaapi>cudaGraphicsGLRegisterBuffer</cudaapi>
+    <cudaapi>cudaGraphicsUnregisterResource</cudaapi>
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">CUFFT Library</keyconcepts>
+    <keyconcepts level="advanced">Physically-Based Simulation</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

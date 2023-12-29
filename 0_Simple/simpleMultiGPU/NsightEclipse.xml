@@ -2,7 +2,7 @@
     <name>Simple Multi-GPU</name>
     <description><![CDATA[This application demonstrates how to use the new CUDA 4.0 API for CUDA context management and multi-threaded access to run CUDA kernels on multiple-GPUs.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>Performance, multi-GPU support</keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
@@ -13,10 +13,10 @@
     <cudaapi>cudaEventDestroy</cudaapi>
     <cudaapi>cudaEventElapsedTime</cudaapi>
     <cudaapi>cudaMemcpyAsync</cudaapi>
-    <keyconcepts>Asynchronous Data Transfers</keyconcepts>
-    <keyconcepts>CUDA Streams and Events</keyconcepts>
-	<keyconcepts>Multithreading</keyconcepts>
-	<keyconcepts>Multi-GPU</keyconcepts>
+    <keyconcepts level="basic">Asynchronous Data Transfers</keyconcepts>
+    <keyconcepts level="basic">CUDA Streams and Events</keyconcepts>
+	<keyconcepts level="basic">Multithreading</keyconcepts>
+	<keyconcepts level="basic">Multi-GPU</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

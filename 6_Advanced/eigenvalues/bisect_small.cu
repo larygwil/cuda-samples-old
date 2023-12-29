@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -26,7 +26,7 @@
 #include "matlab.h"
 
 // includes, kernels
-#include "bisect_kernel_small.cu"
+#include "bisect_kernel_small.cuh"
 
 // includes, file
 #include "bisect_small.cuh"
@@ -51,6 +51,7 @@ computeEigenvaluesSmallMatrix(const InputData &input, ResultDataSmall &result,
 {
     StopWatchInterface *timer = NULL;
     sdkCreateTimer(&timer);
+    sdkStartTimer(&timer);
 
     for (unsigned int i = 0; i < iterations; ++i)
     {

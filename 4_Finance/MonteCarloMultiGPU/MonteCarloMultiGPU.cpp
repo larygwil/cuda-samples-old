@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -47,19 +47,24 @@ float randFloat(float low, float high)
 }
 
 /// Utility function to tweak problem size for small GPUs
-int adjustProblemSize(int GPU_N, int default_nOptions )
+int adjustProblemSize(int GPU_N, int default_nOptions)
 {
     int nOptions = default_nOptions;
+
     // select problem size
-    for( int i=0; i<GPU_N; i++ ) {
+    for (int i=0; i<GPU_N; i++)
+    {
         cudaDeviceProp deviceProp;
         checkCudaErrors(cudaGetDeviceProperties(&deviceProp, i));
         int cudaCores = _ConvertSMVer2Cores(deviceProp.major, deviceProp.minor)
-                 * deviceProp.multiProcessorCount;
-        if( cudaCores <= 32 ) {
-                nOptions = ( nOptions < cudaCores/2 ? nOptions : cudaCores/2);
+                        * deviceProp.multiProcessorCount;
+
+        if (cudaCores <= 32)
+        {
+            nOptions = (nOptions < cudaCores/2 ? nOptions : cudaCores/2);
         }
     }
+
     return nOptions;
 }
 
@@ -277,7 +282,7 @@ int main(int argc, char **argv)
     checkCudaErrors(cudaGetDeviceCount(&GPU_N));
     int nOptions = 256;
 
-    nOptions = adjustProblemSize(GPU_N, nOptions );
+    nOptions = adjustProblemSize(GPU_N, nOptions);
 
     // select problem size
     int scale = (strongScaling) ? 1 : GPU_N;

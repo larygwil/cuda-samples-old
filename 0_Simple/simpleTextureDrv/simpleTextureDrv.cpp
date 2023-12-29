@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -500,7 +500,7 @@ runTest(int argc, char **argv)
     free(image_path);
     free(ref_path);
 
-    checkCudaErrors(cuCtxDetach(cuContext));
+    checkCudaErrors(cuCtxDestroy(cuContext));
 
     exit(bTestResults ? EXIT_SUCCESS : EXIT_FAILURE);
 }
@@ -638,6 +638,6 @@ initCUDA(int argc, char **argv, CUfunction *transform)
     *transform = cuFunction;
     return CUDA_SUCCESS;
 Error:
-    cuCtxDetach(cuContext);
+    cuCtxDestroy(cuContext);
     return status;
 }

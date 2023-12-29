@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -28,6 +28,10 @@
 #endif
 #ifndef MAX
 #define MAX(a,b) ((a > b) ? a : b)
+#endif
+
+#ifndef EXIT_WAIVED
+#define EXIT_WAIVED 2
 #endif
 
 #include <helper_string.h>
@@ -394,7 +398,7 @@ sdkReadFile(const char *filename, T **data, unsigned int *len, bool verbose)
     std::vector<T>  data_read;
 
     // open file for reading
-    FILE* fh = NULL;
+    FILE *fh = NULL;
 
     // check if filestream is valid
     if (FOPEN_FAIL(FOPEN(fh, filename, "r")))
@@ -405,10 +409,13 @@ sdkReadFile(const char *filename, T **data, unsigned int *len, bool verbose)
 
     // read all data elements
     T token;
-    while(!feof(fh)) {
+
+    while (!feof(fh))
+    {
         fscanf(fh, "%f", &token);
         data_read.push_back(token);
     }
+
     // the last element is read twice
     data_read.pop_back();
     fclose(fh);

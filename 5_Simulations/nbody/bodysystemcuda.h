@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -29,7 +29,11 @@ template <typename T>
 class BodySystemCUDA : public BodySystem<T>
 {
     public:
-        BodySystemCUDA(unsigned int numBodies, unsigned int numDevices, unsigned int p, unsigned int q, bool usePBO, bool useSysMem = false);
+        BodySystemCUDA(unsigned int numBodies,
+                       unsigned int numDevices,
+                       unsigned int blockSize,
+                       bool usePBO,
+                       bool useSysMem = false);
         virtual ~BodySystemCUDA();
 
         virtual void loadTipsyFile(const std::string &filename);
@@ -80,8 +84,7 @@ class BodySystemCUDA : public BodySystem<T>
         unsigned int m_currentRead;
         unsigned int m_currentWrite;
 
-        unsigned int m_p;
-        unsigned int m_q;
+        unsigned int m_blockSize;
 };
 
 #include "bodysystemcuda_impl.h"

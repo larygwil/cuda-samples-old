@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -22,6 +22,10 @@
 
 #ifndef MAX
 #define MAX(a,b) (a > b ? a : b)
+#endif
+
+#ifndef EXIT_WAIVED
+#define EXIT_WAIVED 2
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,6 +191,12 @@ inline int gpuGetMaxGflopsDeviceIdDRV()
     cuInit(0);
     checkCudaErrors(cuDeviceGetCount(&device_count));
 
+    if (device_count == 0)
+    {
+        fprintf(stderr, "gpuGetMaxGflopsDeviceIdDRV error: no devices supporting CUDA\n");
+        exit(EXIT_FAILURE);
+    }
+
     // Find the best major SM Architecture GPU device
     while (current_device < device_count)
     {
@@ -267,6 +277,12 @@ inline int gpuGetMaxGflopsGLDeviceIdDRV()
 
     cuInit(0);
     checkCudaErrors(cuDeviceGetCount(&device_count));
+
+    if (device_count == 0)
+    {
+        fprintf(stderr, "gpuGetMaxGflopsGLDeviceIdDRV error: no devices supporting CUDA\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Find the best major SM Architecture GPU device that are graphics devices
     while (current_device < device_count)

@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+# Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 #
 # NOTICE TO USER:   
 #
@@ -29,88 +29,92 @@
 #
 ################################################################################
 #
-# Makefile project only supported on Mac OSX and Linux Platforms
+# Makefile project only supported on Mac OS X and Linux Platforms)
 #
 ################################################################################
 
-# OS Name (Linux or Darwin)
-OSUPPER = $(shell uname -s 2>/dev/null | tr [:lower:] [:upper:])
-OSLOWER = $(shell uname -s 2>/dev/null | tr [:upper:] [:lower:])
+include ./findcudalib.mk
 
-# Flags to detect 32-bit or 64-bit OS platform
-OS_SIZE = $(shell uname -m | sed -e "s/i.86/32/" -e "s/x86_64/64/")
-OS_ARCH = $(shell uname -m | sed -e "s/i386/i686/")
+# Location of the CUDA Toolkit
+CUDA_PATH ?= "/usr/local/cuda-5.5"
 
-# These flags will override any settings
-ifeq ($(i386),1)
-	OS_SIZE = 32
-	OS_ARCH = i686
-endif
-
-ifeq ($(x86_64),1)
-	OS_SIZE = 64
-	OS_ARCH = x86_64
-endif
-
-# Flags to detect either a Linux system (linux) or Mac OSX (darwin)
-DARWIN = $(strip $(findstring DARWIN, $(OSUPPER)))
-
-# Location of the CUDA Toolkit binaries and libraries
-CUDA_PATH       ?= /usr/local/cuda-5.0
-CUDA_INC_PATH   ?= $(CUDA_PATH)/include
-CUDA_BIN_PATH   ?= $(CUDA_PATH)/bin
-ifneq ($(DARWIN),)
-  CUDA_LIB_PATH  ?= $(CUDA_PATH)/lib
-else
-  ifeq ($(OS_SIZE),32)
-    CUDA_LIB_PATH  ?= $(CUDA_PATH)/lib
-  else
-    CUDA_LIB_PATH  ?= $(CUDA_PATH)/lib64
-  endif
-endif
-
-# Common binaries
-NVCC            ?= $(CUDA_BIN_PATH)/nvcc
-GCC             ?= g++
+# internal flags
+NVCCFLAGS   := -m${OS_SIZE}
+CCFLAGS     :=
+NVCCLDFLAGS :=
+LDFLAGS     :=
 
 # Extra user flags
-EXTRA_NVCCFLAGS ?=
-EXTRA_LDFLAGS   ?=
-
-# CUDA code generation flags
-GENCODE_SM35    := -gencode arch=compute_35,code=sm_35
-GENCODE_FLAGS   :=  $(GENCODE_SM35) 
-#$(GENCODE_SM30)
+EXTRA_NVCCFLAGS   ?=
+EXTRA_NVCCLDFLAGS ?=
+EXTRA_LDFLAGS     ?=
+EXTRA_CCFLAGS     ?=
 
 # OS-specific build flags
 ifneq ($(DARWIN),) 
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudadevrt
-      CCFLAGS   := -arch $(OS_ARCH) 
+  LDFLAGS += -rpath $(CUDA_PATH)/lib
+  CCFLAGS += -arch $(OS_ARCH) $(STDLIB)  
 else
-      LDFLAGS   := -L$(CUDA_LIB_PATH) -lcudadevrt
+  ifeq ($(OS_ARCH),armv7l)
+    ifeq ($(abi),gnueabi)
+      CCFLAGS += -mfloat-abi=softfp
+    else
+      # default to gnueabihf
+      override abi := gnueabihf
+      LDFLAGS += --dynamic-linker=/lib/ld-linux-armhf.so.3
+      CCFLAGS += -mfloat-abi=hard
+    endif
+  endif
 endif
 
-# OS-architecture specific flags
-ifeq ($(OS_SIZE),32)
-      CCFLAGS   := -m32
-      NVCCFLAGS := -m32 -dc 
-else
-      CCFLAGS   := -m64
-      NVCCFLAGS := -m64 -dc
+ifeq ($(ARMv7),1)
+NVCCFLAGS += -target-cpu-arch ARM
+ifneq ($(TARGET_FS),) 
+CCFLAGS += --sysroot=$(TARGET_FS)
+LDFLAGS += --sysroot=$(TARGET_FS)
+LDFLAGS += -rpath-link=$(TARGET_FS)/lib
+LDFLAGS += -rpath-link=$(TARGET_FS)/usr/lib
+LDFLAGS += -rpath-link=$(TARGET_FS)/usr/lib/arm-linux-$(abi)
+endif
 endif
 
 # Debug build flags
 ifeq ($(dbg),1)
-      CCFLAGS   += -g
       NVCCFLAGS += -g -G
-      TARGET    := debug
+      TARGET := debug
 else
-      TARGET    := release
+      TARGET := release
 endif
 
+ALL_CCFLAGS :=
+ALL_CCFLAGS += $(NVCCFLAGS)
+ALL_CCFLAGS += $(addprefix -Xcompiler ,$(CCFLAGS))
+ALL_CCFLAGS += $(EXTRA_NVCCFLAGS)
+ALL_CCFLAGS += $(addprefix -Xcompiler ,$(EXTRA_CCFLAGS))
+
+ALL_LDFLAGS :=
+ALL_LDFLAGS += $(ALL_CCFLAGS)
+ALL_LDFLAGS += $(NVCCLDFLAGS)
+ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
+ALL_LDFLAGS += $(EXTRA_NVCCLDFLAGS)
+ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
 
 # Common includes and paths for CUDA
-INCLUDES      := -I$(CUDA_INC_PATH) -I. -I.. -I../../common/inc
+INCLUDES  := -I../../common/inc
+LIBRARIES :=
+
+################################################################################
+
+# CUDA code generation flags
+GENCODE_SM35    := -gencode arch=compute_35,code=\"sm_35,compute_35\"
+GENCODE_FLAGS   :=  $(GENCODE_SM35) 
+#$(GENCODE_SM30)
+
+ALL_CCFLAGS += -dc
+
+LIBRARIES += -lcudadevrt
+
+################################################################################
 
 # Target rules
 all: build
@@ -118,16 +122,18 @@ all: build
 build: cdpQuadtree
 
 cdpQuadtree.o: cdpQuadtree.cu
-	$(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
+	$(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
 cdpQuadtree: cdpQuadtree.o
-	$(NVCC) $(CCFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LDFLAGS) $(EXTRA_LDFLAGS)
-	mkdir -p ../../bin/$(OSLOWER)/$(TARGET)
-	cp $@ ../../bin/$(OSLOWER)/$(TARGET)
+	$(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+	mkdir -p ../../bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
+	cp $@ ../../bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))
 
 run: build
 	./cdpQuadtree
 
 clean:
 	rm -f cdpQuadtree cdpQuadtree.o 
-  
+	rm -rf ../../bin/$(OS_ARCH)/$(OSLOWER)/$(TARGET)$(if $(abi),/$(abi))/cdpQuadtree
+
+clobber: clean

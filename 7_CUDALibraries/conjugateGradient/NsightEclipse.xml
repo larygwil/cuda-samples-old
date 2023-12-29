@@ -3,11 +3,14 @@
     <description><![CDATA[This sample implements a conjugate gradient solver on GPU
  using CUBLAS and CUSPARSE library.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>CUDA,CUBLAS,CUSPARSE,Sparse Matrix</keywords>
     <scope>1:CUDA Advanced Topics,3:Linear Algebra</scope>
     <files>
     </files>
+    <keyconcepts level="advanced">Linear Algebra</keyconcepts>
+    <keyconcepts level="advanced">CUBLAS Library</keyconcepts>
+    <keyconcepts level="advanced">CUSPARSE Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

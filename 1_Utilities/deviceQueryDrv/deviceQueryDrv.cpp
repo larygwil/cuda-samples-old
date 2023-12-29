@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -19,21 +19,6 @@
 #include <cuda.h>
 #include <helper_cuda_drvapi.h>
 #include <drvapi_error_string.h>
-
-/*
-// This function (found in helper_cuda_drvapi.h) wraps the CUDA Driver API into a template function
-template <class T>
-inline void getCudaAttribute(T *attribute, CUdevice_attribute device_attribute, int device)
-{
-    CUresult error_result = cuDeviceGetAttribute(attribute, device_attribute, device);
-
-    if (error_result != CUDA_SUCCESS)
-    {
-        printf("cuDeviceGetAttribute returned %d\n-> %s\n", (int)error_result, getCudaDrvErrorString(error_result));
-        exit(EXIT_SUCCESS);
-    }
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
@@ -56,6 +41,7 @@ main(int argc, char **argv)
     if (error_id != CUDA_SUCCESS)
     {
         printf("cuInit(0) returned %d\n-> %s\n", error_id, getCudaDrvErrorString(error_id));
+        printf("Result = FAIL\n");
         exit(EXIT_FAILURE);
     }
 
@@ -64,11 +50,12 @@ main(int argc, char **argv)
     if (error_id != CUDA_SUCCESS)
     {
         printf("cuDeviceGetCount returned %d\n-> %s\n", (int)error_id, getCudaDrvErrorString(error_id));
+        printf("Result = FAIL\n");
         exit(EXIT_FAILURE);
     }
 
     // This function call returns 0 if there are no CUDA capable devices.
-    if (deviceCount == 0) 
+    if (deviceCount == 0)
     {
         printf("There are no available device(s) that support CUDA\n");
     }
@@ -84,6 +71,7 @@ main(int argc, char **argv)
         if (error_id != CUDA_SUCCESS)
         {
             printf("cuDeviceComputeCapability returned %d\n-> %s\n", (int)error_id, getCudaDrvErrorString(error_id));
+            printf("Result = FAIL\n");
             exit(EXIT_FAILURE);
         }
 
@@ -92,6 +80,7 @@ main(int argc, char **argv)
         if (error_id != CUDA_SUCCESS)
         {
             printf("cuDeviceGetName returned %d\n-> %s\n", (int)error_id, getCudaDrvErrorString(error_id));
+            printf("Result = FAIL\n");
             exit(EXIT_FAILURE);
         }
 
@@ -108,25 +97,26 @@ main(int argc, char **argv)
         if (error_id != CUDA_SUCCESS)
         {
             printf("cuDeviceTotalMem returned %d\n-> %s\n", (int)error_id, getCudaDrvErrorString(error_id));
+            printf("Result = FAIL\n");
             exit(EXIT_FAILURE);
         }
 
         char msg[256];
-        sprintf(msg, "  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n",
+        SPRINTF(msg, "  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n",
                 (float)totalGlobalMem/1048576.0f, (unsigned long long) totalGlobalMem);
         printf("%s", msg);
 
         int multiProcessorCount;
         getCudaAttribute<int>(&multiProcessorCount, CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT, dev);
 
-        printf("  (%2d) Multiprocessors x (%3d) CUDA Cores/MP:    %d CUDA Cores\n",
+        printf("  (%2d) Multiprocessors, (%3d) CUDA Cores/MP:     %d CUDA Cores\n",
                multiProcessorCount, _ConvertSMVer2CoresDRV(major, minor),
                _ConvertSMVer2CoresDRV(major, minor) * multiProcessorCount);
 
         int clockRate;
         getCudaAttribute<int>(&clockRate, CU_DEVICE_ATTRIBUTE_CLOCK_RATE, dev);
         printf("  GPU Clock rate:                                %.0f MHz (%0.2f GHz)\n", clockRate * 1e-3f, clockRate * 1e-6f);
-		int memoryClock;
+        int memoryClock;
         getCudaAttribute<int>(&memoryClock, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE, dev);
         printf("  Memory Clock rate:                             %.0f Mhz\n", memoryClock * 1e-3f);
         int memBusWidth;
@@ -147,16 +137,20 @@ main(int argc, char **argv)
         getCudaAttribute<int>(&maxTex3D[0], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE3D_WIDTH, dev);
         getCudaAttribute<int>(&maxTex3D[1], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE3D_HEIGHT, dev);
         getCudaAttribute<int>(&maxTex3D[2], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE3D_DEPTH, dev);
-        printf("  Max Texture Dimension Sizes                    1D=(%d) 2D=(%d,%d) 3D=(%d,%d,%d)\n",
+        printf("  Max Texture Dimension Sizes                    1D=(%d) 2D=(%d, %d) 3D=(%d, %d, %d)\n",
                maxTex1D, maxTex2D[0], maxTex2D[1], maxTex3D[0], maxTex3D[1], maxTex3D[2]);
+
+        int  maxTex1DLayered[2];
+        getCudaAttribute<int>(&maxTex1DLayered[0], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_WIDTH, dev);
+        getCudaAttribute<int>(&maxTex1DLayered[1], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE1D_LAYERED_LAYERS, dev);
+        printf("  Maximum Layered 1D Texture Size, (num) layers  1D=(%d), %d layers\n",
+				maxTex1DLayered[0], maxTex1DLayered[1]);
 
         int  maxTex2DLayered[3];
         getCudaAttribute<int>(&maxTex2DLayered[0], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_WIDTH, dev);
         getCudaAttribute<int>(&maxTex2DLayered[1], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_HEIGHT, dev);
         getCudaAttribute<int>(&maxTex2DLayered[2], CU_DEVICE_ATTRIBUTE_MAXIMUM_TEXTURE2D_LAYERED_LAYERS, dev);
-
-        printf("  Max Layered Texture Size (dim) x layers        1D=(%d) x %d, 2D=(%d,%d) x %d\n",
-               maxTex2DLayered[0], maxTex2DLayered[2],
+		printf("  Maximum Layered 2D Texture Size, (num) layers  2D=(%d, %d), %d layers\n",
                maxTex2DLayered[0], maxTex2DLayered[1], maxTex2DLayered[2]);
 
         int totalConstantMemory;
@@ -182,12 +176,12 @@ main(int argc, char **argv)
         getCudaAttribute<int>(&blockDim[0], CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_X, dev);
         getCudaAttribute<int>(&blockDim[1], CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Y, dev);
         getCudaAttribute<int>(&blockDim[2], CU_DEVICE_ATTRIBUTE_MAX_BLOCK_DIM_Z, dev);
-        printf("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", blockDim[0], blockDim[1], blockDim[2]);
+        printf("  Max dimension size of a thread block (x,y,z): (%d, %d, %d)\n", blockDim[0], blockDim[1], blockDim[2]);
         int gridDim[3];
         getCudaAttribute<int>(&gridDim[0], CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_X, dev);
         getCudaAttribute<int>(&gridDim[1], CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Y, dev);
         getCudaAttribute<int>(&gridDim[2], CU_DEVICE_ATTRIBUTE_MAX_GRID_DIM_Z, dev);
-        printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", gridDim[0], gridDim[1], gridDim[2]);
+        printf("  Max dimension size of a grid size (x,y,z):    (%d, %d, %d)\n", gridDim[0], gridDim[1], gridDim[2]);
 
         int textureAlign;
         getCudaAttribute<int>(&textureAlign, CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT, dev);
@@ -200,7 +194,7 @@ main(int argc, char **argv)
         int gpuOverlap;
         getCudaAttribute<int>(&gpuOverlap, CU_DEVICE_ATTRIBUTE_GPU_OVERLAP, dev);
 
-		int asyncEngineCount;
+        int asyncEngineCount;
         getCudaAttribute<int>(&asyncEngineCount, CU_DEVICE_ATTRIBUTE_ASYNC_ENGINE_COUNT, dev);
         printf("  Concurrent copy and kernel execution:          %s with %d copy engine(s)\n", (gpuOverlap ? "Yes" : "No"), asyncEngineCount);
 
@@ -214,7 +208,7 @@ main(int argc, char **argv)
         getCudaAttribute<int>(&canMapHostMemory, CU_DEVICE_ATTRIBUTE_CAN_MAP_HOST_MEMORY, dev);
         printf("  Support host page-locked memory mapping:       %s\n", canMapHostMemory ? "Yes" : "No");
 
-		int concurrentKernels;
+        int concurrentKernels;
         getCudaAttribute<int>(&concurrentKernels, CU_DEVICE_ATTRIBUTE_CONCURRENT_KERNELS, dev);
         printf("  Concurrent kernel execution:                   %s\n", concurrentKernels ? "Yes" : "No");
 
@@ -257,5 +251,66 @@ main(int argc, char **argv)
         printf("     < %s >\n", sComputeMode[computeMode]);
     }
 
+
+    // If there are 2 or more GPUs, query to determine whether RDMA is supported
+    if (deviceCount >= 2)
+    {
+        int gpuid[64]; // we want to find the first two GPU's that can support P2P
+        int gpu_p2p_count = 0;
+        int tccDriver = 0;
+
+        for (int i=0; i < deviceCount; i++)
+        {
+            checkCudaErrors(cuDeviceComputeCapability(&major, &minor, i));
+            getCudaAttribute<int>(&tccDriver, CU_DEVICE_ATTRIBUTE_TCC_DRIVER, i);
+
+            // Only boards based on Fermi or later can support P2P
+            if ((major >= 2)
+#ifdef _WIN32
+                // on Windows (64-bit), the Tesla Compute Cluster driver for windows must be enabled to supprot this
+                && tccDriver
+#endif
+               )
+            {
+                // This is an array of P2P capable GPUs
+                gpuid[gpu_p2p_count++] = i;
+            }
+        }
+
+        // Show all the combinations of support P2P GPUs
+        int can_access_peer_0_1, can_access_peer_1_0;
+        char deviceName0[256], deviceName1[256];
+
+        if (gpu_p2p_count >= 2)
+        {
+            for (int i = 0; i < gpu_p2p_count-1; i++)
+            {
+                for (int j = 1; j < gpu_p2p_count; j++)
+                {
+                    checkCudaErrors(cuDeviceCanAccessPeer(&can_access_peer_0_1, gpuid[i], gpuid[j]));
+                    checkCudaErrors(cuDeviceGetName(deviceName0, 256, gpuid[i]));
+                    checkCudaErrors(cuDeviceGetName(deviceName1, 256, gpuid[j]));
+                    printf("> Peer-to-Peer (P2P) access from %s (GPU%d) -> %s (GPU%d) : %s\n", deviceName0, gpuid[i],
+                           deviceName1, gpuid[j] ,
+                           can_access_peer_0_1 ? "Yes" : "No");
+                }
+            }
+
+            for (int j = 1; j < gpu_p2p_count; j++)
+            {
+                for (int i = 0; i < gpu_p2p_count-1; i++)
+                {
+                    checkCudaErrors(cuDeviceCanAccessPeer(&can_access_peer_1_0, gpuid[j], gpuid[i]));
+                    checkCudaErrors(cuDeviceGetName(deviceName0, 256, gpuid[j]));
+                    checkCudaErrors(cuDeviceGetName(deviceName1, 256, gpuid[i]));
+                    printf("> Peer-to-Peer (P2P) access from %s (GPU%d) -> %s (GPU%d) : %s\n", deviceName0, gpuid[j],
+                           deviceName1, gpuid[i] ,
+                           can_access_peer_1_0 ? "Yes" : "No");
+                }
+            }
+        }
+    }
+
+    printf("Result = PASS\n");
     exit(EXIT_SUCCESS);
 }

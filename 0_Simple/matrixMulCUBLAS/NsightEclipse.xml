@@ -3,8 +3,8 @@
     <description><![CDATA[This sample implements matrix multiplication from Chapter 3 of the programming guide.
 To illustrate GPU performance for matrix multiply, this sample also shows how to use the new CUDA 4.0 interface for CUBLAS to demonstrate high-performance performance for matrix multiplication.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords></keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CUBLAS,matrix multiply</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
     </files>
@@ -13,15 +13,15 @@ To illustrate GPU performance for matrix multiply, this sample also shows how to
     <cudaapi>cudaEventQuery</cudaapi>
     <cudaapi>cudaEventDestroy</cudaapi>
     <cudaapi>cudaEventElapsedTime</cudaapi>
-	<cudaapi>cudaMalloc</cudaapi>
-	<cudaapi>cudaFree</cudaapi>
+    <cudaapi>cudaMalloc</cudaapi>
+    <cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
     <cudaapi>cublasCreate</cudaapi>
-	<cudaapi>cublasSgemm</cudaapi>
-    <keyconcepts>CUDA Runtime API</keyconcepts>
-    <keyconcepts>GPU Performance</keyconcepts>
-    <keyconcepts>Matrix Multiply</keyconcepts>
-	<keyconcepts>CUBLAS</keyconcepts>
+    <cudaapi>cublasSgemm</cudaapi>
+    <keyconcepts level="basic">CUDA Runtime API</keyconcepts>
+    <keyconcepts level="basic">Performance Strategies</keyconcepts>
+    <keyconcepts level="basic">Linear Algebra</keyconcepts>
+    <keyconcepts level="basic">CUBLAS</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

@@ -2,9 +2,9 @@
     <name>Function Pointers</name>
     <description><![CDATA[This sample illustrates how to use function pointers and implements the Sobel Edge Detection filter for 8-bit monochrome images.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce GTX 400</minspec>
+    <minspec>SM 2.0</minspec>
     <keywords>CUDA, GPGPU, convolution, separable convolution,Image Processing, filter, finite impulse-response filter</keywords>
-    <scope>2:Graphics Interop,1:CUDA Advanced Topics,2:Image Processing</scope>
+    <scope>1:CUDA Advanced Topics,2:Graphics Interop,2:Image Processing</scope>
     <files>
         <file>data\lena.pgm</file>
         <file>data\ref_orig.pgm</file>
@@ -16,7 +16,9 @@
         <qatest>-mode=1 -file=ref_tex.pgm</qatest>
         <qatest>-mode=2 -file=ref_shared.pgm</qatest>
     </qatests>
-
+    
+    <keyconcepts level="advanced">Graphics Interop</keyconcepts>
+    <keyconcepts level="advanced">Image Processing</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

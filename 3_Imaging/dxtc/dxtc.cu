@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -60,8 +60,6 @@ __device__ void sortColors(const float *values, int *ranks)
     ranks[tid] = rank;
 
     // Resolve elements with the same index.
-#pragma unroll
-
     for (int i = 0; i < 15; i++)
     {
         if (tid > i && ranks[tid] == ranks[i])
@@ -306,6 +304,8 @@ __device__ void evalAllPermutations(const float3 *colors, const uint *permutatio
         bestPermutation ^= 0x55555555;    // Flip indices.
     }
 
+    __syncthreads(); // Sync here to ensure s_permutations is valid going forward
+
     for (int i = 0; i < 3; i++)
     {
         int pidx = idx + NUM_THREADS * i;
@@ -343,70 +343,27 @@ __device__ void evalAllPermutations(const float3 *colors, const uint *permutatio
 __device__ int findMinError(float *errors)
 {
     const int idx = threadIdx.x;
-
     __shared__ int indices[NUM_THREADS];
     indices[idx] = idx;
 
-    for (int d = NUM_THREADS/2; d > 32; d >>= 1)
+    __syncthreads();
+
+    for (int d = NUM_THREADS/2; d > 0; d >>= 1)
     {
+        float err0 = errors[idx];
+        float err1 = (idx + d) < NUM_THREADS ? errors[idx + d] : FLT_MAX;
+        int index1 = (idx + d) < NUM_THREADS ? indices[idx + d] : 0;
+
         __syncthreads();
 
-        if (idx < d)
+        if (err1 < err0)
         {
-            float err0 = errors[idx];
-            float err1 = errors[idx + d];
-
-            if (err1 < err0)
-            {
-                errors[idx] = err1;
-                indices[idx] = indices[idx + d];
-            }
+            errors[idx] = err1;
+            indices[idx] = index1;
         }
+
+        __syncthreads();
     }
-
-    __syncthreads();
-
-    // unroll last 6 iterations
-    if (idx < 32)
-    {
-        if (errors[idx + 32] < errors[idx])
-        {
-            errors[idx] = errors[idx + 32];
-            indices[idx] = indices[idx + 32];
-        }
-
-        if (errors[idx + 16] < errors[idx])
-        {
-            errors[idx] = errors[idx + 16];
-            indices[idx] = indices[idx + 16];
-        }
-
-        if (errors[idx + 8] < errors[idx])
-        {
-            errors[idx] = errors[idx + 8];
-            indices[idx] = indices[idx + 8];
-        }
-
-        if (errors[idx + 4] < errors[idx])
-        {
-            errors[idx] = errors[idx + 4];
-            indices[idx] = indices[idx + 4];
-        }
-
-        if (errors[idx + 2] < errors[idx])
-        {
-            errors[idx] = errors[idx + 2];
-            indices[idx] = indices[idx + 2];
-        }
-
-        if (errors[idx + 1] < errors[idx])
-        {
-            errors[idx] = errors[idx + 1];
-            indices[idx] = indices[idx + 1];
-        }
-    }
-
-    __syncthreads();
 
     return indices[0];
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -21,8 +21,8 @@
  * Note that the code in this example and the specific matrices used here
  * were chosen to demonstrate the use of the CUSPARSE library as simply
  * and as clearly as possible.  This is not optimized code and the input
- * matrices have been chosen for simplicity rather than performance.  
- * These should not be used either as a performance guide or for 
+ * matrices have been chosen for simplicity rather than performance.
+ * These should not be used either as a performance guide or for
  * benchmarking purposes.
  *
  */
@@ -202,29 +202,20 @@ int main(int argc, char **argv)
     cublasStatus_t cublasStatus;
     cublasStatus = cublasCreate(&cublasHandle);
 
-    if (checkCudaErrors(cublasStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cublasStatus);
 
     /* Create CUSPARSE context */
     cusparseHandle_t cusparseHandle = 0;
     cusparseStatus_t cusparseStatus;
     cusparseStatus = cusparseCreate(&cusparseHandle);
 
-    if (checkCudaErrors(cusparseStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cusparseStatus);
 
     /* Description of the A matrix*/
     cusparseMatDescr_t descr = 0;
     cusparseStatus = cusparseCreateMatDescr(&descr);
 
-    if (checkCudaErrors(cusparseStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cusparseStatus);
 
     /* Define the properties of the matrix */
     cusparseSetMatType(descr,CUSPARSE_MATRIX_TYPE_GENERAL);
@@ -349,16 +340,13 @@ int main(int argc, char **argv)
     cusparseSolveAnalysisInfo_t infoA = 0;
     cusparseStatus = cusparseCreateSolveAnalysisInfo(&infoA);
 
-    if (checkCudaErrors(cusparseStatus)) return EXIT_FAILURE;
+    checkCudaErrors(cusparseStatus);
 
     /* Perform the analysis for the Non-Transpose case */
     cusparseStatus = cusparseScsrsv_analysis(cusparseHandle, CUSPARSE_OPERATION_NON_TRANSPOSE,
                                              N, nz, descr, d_val, d_row, d_col, infoA);
 
-    if (checkCudaErrors(cusparseStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cusparseStatus);
 
     /* Copy A data to ILU0 vals as input*/
     cudaMemcpy(d_valsILU0, d_val, nz*sizeof(float), cudaMemcpyDeviceToDevice);
@@ -366,10 +354,7 @@ int main(int argc, char **argv)
     /* generate the Incomplete LU factor H for the matrix A using cudsparseScsrilu0 */
     cusparseStatus = cusparseScsrilu0(cusparseHandle, CUSPARSE_OPERATION_NON_TRANSPOSE, N, descr, d_valsILU0, d_row, d_col, infoA);
 
-    if (checkCudaErrors(cusparseStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cusparseStatus);
 
     /* Create info objects for the ILU0 preconditioner */
     cusparseSolveAnalysisInfo_t info_u;
@@ -407,20 +392,12 @@ int main(int argc, char **argv)
         // Forward Solve, we can re-use infoA since the sparsity pattern of A matches that of L
         cusparseStatus = cusparseScsrsv_solve(cusparseHandle, CUSPARSE_OPERATION_NON_TRANSPOSE, N, &floatone, descrL,
                                               d_valsILU0, d_row, d_col, infoA, d_r, d_y);
-
-        if (checkCudaErrors(cusparseStatus))
-        {
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cusparseStatus);
 
         // Back Substitution
         cusparseStatus = cusparseScsrsv_solve(cusparseHandle, CUSPARSE_OPERATION_NON_TRANSPOSE, N, &floatone, descrU,
                                               d_valsILU0, d_row, d_col, info_u, d_y, d_zm1);
-
-        if (checkCudaErrors(cusparseStatus))
-        {
-            exit(EXIT_FAILURE);
-        }
+        checkCudaErrors(cusparseStatus);
 
         k++;
 

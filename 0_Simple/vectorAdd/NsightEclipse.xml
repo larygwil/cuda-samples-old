@@ -2,7 +2,7 @@
     <name>Vector Addition</name>
     <description><![CDATA[This CUDA Runtime API sample is a very basic sample that implements element by element vector addition. It is the same as the sample illustrating Chapter 3 of the programming guide with some additions like error checking.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords>Linear Algebra</keywords>
     <scope>1:CUDA Basic Topics,3:Linear Algebra</scope>
     <files>
@@ -16,8 +16,9 @@
 	<cudaapi>cudaMalloc</cudaapi>
 	<cudaapi>cudaFree</cudaapi>
     <cudaapi>cudaMemcpy</cudaapi>
-    <keyconcepts>CUDA Runtime API</keyconcepts>
-    <keyconcepts>Vector Addition</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Runtime API</keyconcepts>
+    <keyconcepts level="basic">Vector Addition</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

@@ -2,7 +2,7 @@
     <name>Device Query</name>
     <description><![CDATA[This sample enumerates the properties of the CUDA devices present in the system.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
+    <minspec>SM 1.0</minspec>
     <keywords></keywords>
     <scope>1:CUDA Basic Topics</scope>
     <files>
@@ -12,8 +12,9 @@
     <cudaapi>cudaGetDeviceProperties</cudaapi>
     <cudaapi>cudaDriverGetVersion</cudaapi>
     <cudaapi>cudaRuntimeGetVersion</cudaapi>
-    <keyconcepts>CUDA Runtime API</keyconcepts>
-    <keyconcepts>Device Query</keyconcepts>
+    
+    <keyconcepts level="basic">CUDA Runtime API</keyconcepts>
+    <keyconcepts level="basic">Device Query</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

@@ -1,5 +1,5 @@
 /*
-* Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+* Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 *
 * Please refer to the NVIDIA end user license agreement (EULA) associated
 * with this source code for terms and conditions that govern your use of
@@ -149,7 +149,7 @@ d_mipmap(cudaSurfaceObject_t mipOutput, cudaTextureObject_t mipInput, uint image
 
         // we are using the normalized access to make sure non-power-of-two textures
         // behave well when downsized.
-        float4 color = 
+        float4 color =
             (tex2D<float4>(mipInput,(x + 0) * px, (y + 0) * py)) +
             (tex2D<float4>(mipInput,(x + 1) * px, (y + 0) * py)) +
             (tex2D<float4>(mipInput,(x + 1) * px, (y + 1) * py)) +
@@ -304,22 +304,32 @@ void deinitAtlasAndImages()
     for (size_t i = 0; i < contentImages.size(); i++)
     {
         Image &image = contentImages[i];
-        if (image.h_data){
+
+        if (image.h_data)
+        {
             free(image.h_data);
         }
-        if (image.textureObject){
+
+        if (image.textureObject)
+        {
             checkCudaErrors(cudaDestroyTextureObject(image.textureObject));
         }
-        if (image.mipmapArray){
+
+        if (image.mipmapArray)
+        {
             checkCudaErrors(cudaFreeMipmappedArray(image.mipmapArray));
         }
     }
 
     checkCudaErrors(cudaUnbindTexture(atlasTexture));
-    if (atlasImage.h_data){
+
+    if (atlasImage.h_data)
+    {
         free(atlasImage.h_data);
     }
-    if (atlasImage.dataArray){
+
+    if (atlasImage.dataArray)
+    {
         checkCudaErrors(cudaFreeArray(atlasImage.dataArray));
     }
 }

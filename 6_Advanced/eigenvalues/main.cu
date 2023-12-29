@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -160,6 +160,9 @@ getMatrixSize(int argc, char **argv,
         // data type short is used in the kernel
         assert(mat_size < (1 << 16));
 
+        // mat_size should be large than 2
+        assert(mat_size >= 2);
+
         user_defined = 1;
     }
 
@@ -172,9 +175,11 @@ getMatrixSize(int argc, char **argv,
 //! @param argv  pointers to command line arguments (from main(argc, argv)
 //! @param iters_timing  numbers of iterations for timing, updated if a
 //!                      specific number is specified on the command line
+//! @param user_defined  1 if the precision has been requested by the user,
+//!                      0 if the default size
 ////////////////////////////////////////////////////////////////////////////////
 void
-getPrecision(int argc, char **argv, float &precision)
+getPrecision(int argc, char **argv, float &precision, unsigned int &user_defined)
 {
 
     float temp = -1.0f;
@@ -182,11 +187,13 @@ getPrecision(int argc, char **argv, float &precision)
     if (checkCmdLineFlag(argc, (const char **)argv, "precision"))
     {
         temp = getCmdLineArgumentFloat(argc, (const char **) argv, "precision");
+	printf("Precision is between [0.001, 0.000001]\n");
     }
 
-    if (temp > 0.0f)
+    if (temp > 1e-6 && temp <= 0.001)
     {
         precision = temp;
+        user_defined = 1;
     }
 
     printf("Precision: %f\n", precision);
@@ -274,7 +281,7 @@ runTest(int argc, char **argv)
     getMatrixSize(argc, argv, mat_size, user_defined);
 
     // check if user requested specific precision
-    getPrecision(argc, argv, precision);
+    getPrecision(argc, argv, precision, user_defined);
 
     // check if user requested specific number of iterations for timing
     getItersTiming(argc, argv, iters_timing);
@@ -310,6 +317,9 @@ runTest(int argc, char **argv)
 
         // clean up
         cleanupResultSmallMatrix(result);
+
+        printf("User requests non-default argument(s), skipping self-check!\n");
+        bCompareResult = true;
     }
     else
     {

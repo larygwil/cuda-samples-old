@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -84,7 +84,7 @@ const unsigned int  NUM_BANKS     = 16;
 
 ////////////////////////////////////////////////////////////////////////////////
 // includes, kernels
-#include <dwtHaar1D_kernel.cuh>
+#include "dwtHaar1D_kernel.cuh"
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
@@ -134,6 +134,7 @@ runTest(int argc, char **argv)
     if (argc == 4)
     {
         char *tmp_sfname, *tmp_rfname, *tmp_goldfname;
+
         if ((getCmdLineArgumentString(argc, (const char **)argv, "signal", &tmp_sfname) != true) ||
             (getCmdLineArgumentString(argc, (const char **)argv, "result", &tmp_rfname) != true) ||
             (getCmdLineArgumentString(argc, (const char **)argv, "gold", &tmp_goldfname) != true))
@@ -141,6 +142,7 @@ runTest(int argc, char **argv)
             fprintf(stderr, "Invalid input syntax.\n%s", usage);
             exit(EXIT_FAILURE);
         }
+
         s_fname      = sdkFindFilePath(tmp_sfname,    argv[0]);
         r_gold_fname = sdkFindFilePath(tmp_goldfname, argv[0]);
         strcpy(r_fname, tmp_rfname);
@@ -151,6 +153,7 @@ runTest(int argc, char **argv)
         r_gold_fname = sdkFindFilePath("regression.gold.dat", argv[0]);
         strcpy(r_fname, "result.dat");
     }
+
     printf("source file    = \"%s\"\n", s_fname);
     printf("reference file = \"%s\"\n", r_fname);
     printf("gold file      = \"%s\"\n", r_gold_fname);

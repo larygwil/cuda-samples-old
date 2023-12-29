@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -133,28 +133,19 @@ int main(int argc, char **argv)
     cublasStatus_t cublasStatus;
     cublasStatus = cublasCreate(&cublasHandle);
 
-    if (checkCudaErrors(cublasStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cublasStatus);
 
     /* Get handle to the CUSPARSE context */
     cusparseHandle_t cusparseHandle = 0;
     cusparseStatus_t cusparseStatus;
     cusparseStatus = cusparseCreate(&cusparseHandle);
 
-    if (checkCudaErrors(cusparseStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cusparseStatus);
 
     cusparseMatDescr_t descr = 0;
     cusparseStatus = cusparseCreateMatDescr(&descr);
 
-    if (checkCudaErrors(cusparseStatus))
-    {
-        exit(EXIT_FAILURE);
-    }
+    checkCudaErrors(cusparseStatus);
 
     cusparseSetMatType(descr,CUSPARSE_MATRIX_TYPE_GENERAL);
     cusparseSetMatIndexBase(descr,CUSPARSE_INDEX_BASE_ZERO);

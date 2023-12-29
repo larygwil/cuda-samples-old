@@ -7,6 +7,9 @@
     <scope>1:CUDA Advanced Topics,1:Data-Parallel Algorithms,1:Performance Strategies</scope>
     <files>
     </files>
+    
+    <keyconcepts level="advanced">Data-Parallel Algorithms</keyconcepts>
+    <keyconcepts level="advanced">Performance Strategies</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

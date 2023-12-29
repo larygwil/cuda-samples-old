@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 NVIDIA CUDA Profiler Tools Interface (CUPTI)
 Release Notes
-CUDA Toolkit 5.0
+CUDA Toolkit 5.5
 ------------------------------------------------------------------------------
 
 FILES IN THE RELEASE:
@@ -12,7 +12,7 @@ FILES IN THE RELEASE:
 
 * <cupti_dir>/sample   : Contains samples showing use of the CUPTI APIs
 
-* <cupti_dir>/doc      : Contains the CUPTI release notes and User's Guide.
+* <cupti_dir>/doc      : Contains the CUPTI release notes
 
 
 SUPPORTED DISTRIBUTIONS
@@ -23,21 +23,10 @@ CUPTI is supported on all platforms for which CUDA Toolkit is supported.
 SYSTEM REQUIREMENTS
 -------------------
 . CUDA-enabled GPU
-  See http://www.nvidia.com/object/cuda_learn_products.html
 
 . NVIDIA Display Driver
 
 . NVIDIA CUDA Toolkit
-
-
-INSTALLATION AND SETUP
----------------------
-1) Install the NVIDIA display driver
-
-2) Install the NVIDIA CUDA Toolkit
-
-This will install CUPTI into <cuda_dir>/extras/CUPTI (<cuda_dir>
-is specified during Toolkit install).
 
 
 COMPILING AND RUNNING CUPTI SAMPLES
@@ -109,12 +98,9 @@ KNOWN ISSUES
   as cuptiActivityEnable()) is called before the first CUDA driver or
   runtime function.
 
-- CUPTI requirements for correctly initializing the activity API have
-  changed. To ensure collection of all GPU activities, every context
-  must queue at least one buffer at all times.
-
-- CUDA peer-to-peer memory copies are reported as a single DtoD memcpy
-  if the memcpy can be performed using the copy engine of one of the
-  devices. CUDA peer-to-peer memory copies are reported as a DtoH
-  memcpy followed by an HtoD memcpy if the memcpy is performed using a
-  staging buffer on the host.
+- The activity API functions cuptiActivityEnqueueBuffer() and
+  cuptiActivityDequeueBuffer() are deprecated and will be removed in a
+  future release. The new asynchronous API implemented by
+  cuptiActivityRegisterCallbacks(), cuptiActivityFlush(), and
+  cuptiActivityFlushAll() should be adopted. See the CUPTI
+  documentation for details.

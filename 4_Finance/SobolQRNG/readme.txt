@@ -1,5 +1,5 @@
 Sample: Sobol Quasirandom Number Generator
-Minimum spec: GeForce 8
+Minimum spec: SM 1.0
 
 This sample implements Sobol Quasirandom Sequence Generator. 
 

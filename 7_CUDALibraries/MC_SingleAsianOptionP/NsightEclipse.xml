@@ -2,11 +2,14 @@
     <name>Monte Carlo Single Asian Option</name>
     <description><![CDATA[This sample uses Monte Carlo to simulate Single Asian Options using the NVIDIA CURAND library.]]></description>
     <whitepaper></whitepaper>
-    <minspec>GeForce 8</minspec>
-    <keywords>GPGPU, CUDA, Monte Carlo, rng, prng, qrng, random number, CURAND</keywords>
+    <minspec>SM 1.0</minspec>
+    <keywords>CUDA,CURAND,GPGPU,Monte Carlo,rng,prng,qrng,random number</keywords>
     <scope>1:CUDA Advanced Topics,3:Computational Finance</scope>
     <files>
     </files>
+    <keyconcepts level="advanced">Random Number Generator</keyconcepts>
+    <keyconcepts level="advanced">Computational Finance</keyconcepts>
+    <keyconcepts level="advanced">CURAND Library</keyconcepts>
 
     <!-- *** Additional project definition information *** -->
     <!-- Libraries that the project should be linked against. Document may contain any number of "libraries" elements. -->

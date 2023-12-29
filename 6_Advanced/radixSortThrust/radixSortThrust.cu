@@ -20,8 +20,8 @@ bool testSort(int argc, char **argv)
     int keybits = 32;
 
     unsigned int numElements = 1048576;
-    bool keysOnly = (checkCmdLineFlag(argc, (const char **)argv, "keysonly") == true);
-    bool quiet = (checkCmdLineFlag(argc, (const char **)argv, "quiet") == true);
+    bool keysOnly = checkCmdLineFlag(argc, (const char **)argv, "keysonly");
+    bool quiet    = checkCmdLineFlag(argc, (const char **)argv, "quiet");
 
     if (checkCmdLineFlag(argc, (const char **)argv, "n"))
     {
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
         bTestResult = testSort<unsigned int, false>(argc, argv);
 
     checkCudaErrors(cudaDeviceReset());
-		
+
     printf(bTestResult ? "Test passed\n" : "Test failed!\n");
 }
 

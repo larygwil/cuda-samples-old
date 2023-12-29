@@ -1,5 +1,5 @@
 /*
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -55,8 +55,7 @@ ParticleRenderer::DisplayMode displayMode =
 bool benchmark = false;
 bool compareToCPU = false;
 bool QATest = false;
-int p = 256;
-int q = 1;
+int blockSize = 256;
 bool useHostMem = false;
 bool fp64 = false;
 bool useCpu = false;
@@ -159,10 +158,10 @@ class NBodyDemo
             delete m_singleton;
         }
 
-        static void init(int numBodies, int numDevices, int p, int q,
+        static void init(int numBodies, int numDevices, int blockSize,
                          bool usePBO, bool useHostMem, bool useCpu)
         {
-            m_singleton->_init(numBodies, numDevices, p, q, usePBO, useHostMem, useCpu);
+            m_singleton->_init(numBodies, numDevices, blockSize, usePBO, useHostMem, useCpu);
         }
 
         static void reset(int numBodies, NBodyConfig config)
@@ -312,7 +311,7 @@ class NBodyDemo
                 delete m_renderer;
         }
 
-        void _init(int numBodies, int numDevices, int p, int q,
+        void _init(int numBodies, int numDevices, int blockSize,
                    bool bUsePBO, bool useHostMem, bool useCpu)
         {
             if (useCpu)
@@ -323,7 +322,7 @@ class NBodyDemo
             }
             else
             {
-                m_nbodyCuda = new BodySystemCUDA<T>(numBodies, numDevices, p, q, bUsePBO, useHostMem);
+                m_nbodyCuda = new BodySystemCUDA<T>(numBodies, numDevices, blockSize, bUsePBO, useHostMem);
                 m_nbody = m_nbodyCuda;
                 m_nbodyCpu = 0;
             }
@@ -495,7 +494,7 @@ void finalize()
         checkCudaErrors(cudaEventDestroy(stopEvent));
         checkCudaErrors(cudaEventDestroy(hostMemSyncEvent));
     }
-    
+
     NBodyDemo<float>::Destroy();
 
     if (bSupportDouble) NBodyDemo<double>::Destroy();
@@ -1139,8 +1138,8 @@ main(int argc, char **argv)
         initParameters();
     }
 
-    
-    if(!useCpu)
+
+    if (!useCpu)
     {
         // Now choose the CUDA Device
         // Either without GL interop:
@@ -1189,7 +1188,7 @@ main(int argc, char **argv)
             exit(EXIT_SUCCESS);
         }
 
-        if (customGPU)
+        if (customGPU || numDevsRequested == 1)
         {
             cudaDeviceProp props;
             checkCudaErrors(cudaGetDeviceProperties(&props, devID));
@@ -1248,34 +1247,20 @@ main(int argc, char **argv)
     }
 
     numIterations = 0;
-    p = 0;
-    q = 1;
+    blockSize = 0;
 
     if (checkCmdLineFlag(argc, (const char **)argv, "i"))
     {
         numIterations = getCmdLineArgumentInt(argc, (const char **)argv, "i");
     }
 
-    if (checkCmdLineFlag(argc, (const char **) argv, "p"))
+    if (checkCmdLineFlag(argc, (const char **) argv, "blockSize"))
     {
-        p = getCmdLineArgumentInt(argc, (const char **)argv, "p");
+        blockSize = getCmdLineArgumentInt(argc, (const char **)argv, "blockSize");
     }
 
-    if (checkCmdLineFlag(argc, (const char **) argv, "q"))
-    {
-        q = getCmdLineArgumentInt(argc, (const char **)argv, "q");
-    }
-
-    if (p == 0)   // p not set on command line
-    {
-        p = 256;
-
-        if (q * p > 256)
-        {
-            p = 256 / q;
-            printf("Setting p=%d, q=%d to maintain %d threads per block\n", p, q, 256);
-        }
-    }
+    if (blockSize == 0)   // blockSize not set on command line
+        blockSize = 256;
 
     // default number of bodies is #SMs * 4 * CTA size
     if (useCpu)
@@ -1287,7 +1272,7 @@ main(int argc, char **argv)
 #endif
     else if (numDevsRequested == 1)
     {
-        numBodies = compareToCPU ? 4096 : p*q*4*props.multiProcessorCount;
+        numBodies = compareToCPU ? 4096 : blockSize*4*props.multiProcessorCount;
     }
     else
     {
@@ -1297,7 +1282,7 @@ main(int argc, char **argv)
         {
             cudaDeviceProp props;
             checkCudaErrors(cudaGetDeviceProperties(&props, i));
-            numBodies += p*q*(props.major >= 2 ? 4 : 1)*props.multiProcessorCount;
+            numBodies += blockSize*(props.major >= 2 ? 4 : 1)*props.multiProcessorCount;
         }
 
     }
@@ -1327,9 +1312,9 @@ main(int argc, char **argv)
 
     }
 
-    if (q == 1 && numBodies < p)
+    if (numBodies < blockSize)
     {
-        p = numBodies;
+        blockSize = numBodies;
     }
 
 
@@ -1367,13 +1352,13 @@ main(int argc, char **argv)
     // Create the demo -- either double (fp64) or float (fp32, default) implementation
     NBodyDemo<float>::Create();
 
-    NBodyDemo<float>::init(numBodies, numDevsRequested, p, q, !(benchmark || compareToCPU || useHostMem), useHostMem, useCpu);
+    NBodyDemo<float>::init(numBodies, numDevsRequested, blockSize, !(benchmark || compareToCPU || useHostMem), useHostMem, useCpu);
     NBodyDemo<float>::reset(numBodies, NBODY_CONFIG_SHELL);
 
     if (bSupportDouble)
     {
         NBodyDemo<double>::Create();
-        NBodyDemo<double>::init(numBodies, numDevsRequested, p, q, !(benchmark || compareToCPU || useHostMem), useHostMem, useCpu);
+        NBodyDemo<double>::init(numBodies, numDevsRequested, blockSize, !(benchmark || compareToCPU || useHostMem), useHostMem, useCpu);
         NBodyDemo<double>::reset(numBodies, NBODY_CONFIG_SHELL);
     }
 

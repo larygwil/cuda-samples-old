@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -15,7 +15,7 @@
 
 #include <string>
 #include <sstream>
-
+#include <iostream>
 
 /// All npp related C++ classes are put into the npp namespace.
 namespace npp
@@ -159,19 +159,22 @@ namespace npp
 
     /// Macro for checking error return code of CUDA (runtime) calls.
     /// This macro never gets disabled.
-#define NPP_CHECK_CUDA(S) do {cudaError_t eCudaResult; \
-        eCudaResult = S; \
-        NPP_ASSERT(eCudaResult == cudaSuccess);} while (false)
+#define NPP_CHECK_CUDA(S) do {cudaError_t eCUDAResult; \
+        eCUDAResult = S; \
+        if (eCUDAResult != cudaSuccess) std::cout << "NPP_CHECK_CUDA - eCUDAResult = " << eCUDAResult << std::endl; \
+        NPP_ASSERT(eCUDAResult == cudaSuccess);} while (false)
 
     /// Macro for checking error return code for NPP calls.
 #define NPP_CHECK_NPP(S) do {NppStatus eStatusNPP; \
         eStatusNPP = S; \
+        if (eStatusNPP != NPP_SUCCESS) std::cout << "NPP_CHECK_NPP - eStatusNPP = " << eStatusNPP << std::endl; \
         NPP_ASSERT(eStatusNPP == NPP_SUCCESS);} while (false)
 
     /// Macro for checking error return codes from cuFFT calls.
-#define NPP_CHECK_CUFFT(S) do {cufftResult eCuFftResult; \
-        eCuFftResult = S; \
-        NPP_ASSERT(eCuFftResult == CUFFT_SUCCESS);} while (false)
+#define NPP_CHECK_CUFFT(S) do {cufftResult eCUFFTResult; \
+        eCUFFTResult = S; \
+        if (eCUFFTResult != NPP_SUCCESS) std::cout << "NPP_CHECK_CUFFT - eCUFFTResult = " << eCUFFTResult << std::endl; \
+        NPP_ASSERT(eCUFFTResult == CUFFT_SUCCESS);} while (false)
 
 } // npp namespace
 

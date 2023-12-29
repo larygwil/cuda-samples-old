@@ -1,5 +1,5 @@
 /**
- * Copyright 1993-2012 NVIDIA Corporation.  All rights reserved.
+ * Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
  *
  * Please refer to the NVIDIA end user license agreement (EULA) associated
  * with this source code for terms and conditions that govern your use of
@@ -32,6 +32,7 @@
 #include <nvShaderUtils.h>
 
 #include <helper_image.h>
+
 
 using std::vector;
 using std::map;
@@ -88,7 +89,7 @@ class CheckRender
 
         virtual void setExecPath(char *path)
         {
-            strcpy(m_ExecPath, path);
+                STRCPY(m_ExecPath, strlen(path), path);
         }
         virtual void EnableQAReadback(bool bStatus)
         {
@@ -345,8 +346,9 @@ class CheckRender
 
         virtual void dumpBin(void *data, unsigned int bytes, const char *filename)
         {
+            FILE *fp;
             printf("CheckRender::dumpBin: <%s>\n", filename);
-            FILE *fp = fopen(filename, "wb");
+            FOPEN(fp, filename, "wb");
             fwrite(data, bytes, 1, fp);
             fflush(fp);
             fclose(fp);
@@ -360,7 +362,8 @@ class CheckRender
             unsigned long error_count = 0;
             size_t fsize = 0;
 
-            if ((src_fp = fopen(src_file, "rb")) == NULL)
+            FOPEN(src_fp, src_file, "rb");
+            if (src_fp == NULL)
             {
                 printf("compareBin2Bin <unsigned int> unable to open src_file: %s\n", src_file);
                 error_count++;
@@ -388,7 +391,8 @@ class CheckRender
             }
             else
             {
-                if ((ref_fp = fopen(ref_file_path, "rb")) == NULL)
+                FOPEN(ref_fp, ref_file_path, "rb");
+                if (ref_fp == NULL)
                 {
                     printf("compareBin2Bin <unsigned int>  unable to open ref_file: %s\n", ref_file_path);
                     error_count++;
@@ -451,7 +455,8 @@ class CheckRender
 
             unsigned long error_count = 0;
 
-            if ((src_fp = fopen(src_file, "rb")) == NULL)
+            FOPEN(src_fp, src_file, "rb");
+            if (src_fp == NULL)
             {
                 printf("compareBin2Bin <float> unable to open src_file: %s\n", src_file);
                 error_count = 1;
@@ -479,7 +484,8 @@ class CheckRender
             }
             else
             {
-                if ((ref_fp = fopen(ref_file_path, "rb")) == NULL)
+                FOPEN(ref_fp, ref_file_path, "rb");
+                if (ref_fp == NULL)
                 {
                     printf("compareBin2Bin <float> unable to open ref_file: %s\n", ref_file_path);
                     error_count = 1;
